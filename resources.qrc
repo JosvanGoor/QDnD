@@ -1,0 +1,6 @@
+<!DOCTYPE RCC><RCC version="1.0">
+    <qresource>
+        <file>data/paper.jpg</file>
+        <file>data/spells.json</file>
+    </qresource>
+</RCC>
