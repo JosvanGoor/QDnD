@@ -9,6 +9,11 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    src/centralwidget/centralwidget.cc \
+    \
+    src/displaywidget/displaywidget.cc \
+    src/displaywidget/paintevent_dw.cc \
+    \
     src/gridwidget/getters_gw.cc \
     src/gridwidget/gridwidget.cc \
     src/gridwidget/mouseevents.cc \
@@ -18,6 +23,8 @@ SOURCES += \
     \
     src/mainwindow/mainwindow.cc\
     \
+    src/menubar/menubar.cc \
+    \
     src/spellswidget/spell/formatteddescription.cc \
     src/spellswidget/spell/getters.cc \
     src/spellswidget/spell/private.cc \
@@ -26,16 +33,25 @@ SOURCES += \
     src/spellswidget/slots.cc \
     src/spellswidget/spellswidget.cc \
     \
-    src/startupwindow/startupwindow.cc \ 
+    src/startupwindow/startupwindow.cc \
+    \
+    src/statusbar/statusbar.cc \
+    \
+    src/textwidget/textwidget.cc \
     \
     src/main.cc
 
 HEADERS += \
+    src/centralwidget/centralwidget.h \
+    src/displaywidget/displaywidget.h \
     src/gridwidget/gridwidget.h \
     src/mainwindow/mainwindow.h \
+    src/menubar/menubar.h \
     src/spellswidget/spell/spell.h \
     src/spellswidget/spellswidget.h \
-    src/startupwindow/startupwindow.h
+    src/startupwindow/startupwindow.h \
+    src/statusbar/statusbar.h \
+    src/textwidget/textwidget.h
 
 RESOURCES   +=  resources.qrc
 

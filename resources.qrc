@@ -2,5 +2,6 @@
     <qresource>
         <file>data/paper.jpg</file>
         <file>data/spells.json</file>
+        <file>data/display_default.jpg</file>
     </qresource>
 </RCC>

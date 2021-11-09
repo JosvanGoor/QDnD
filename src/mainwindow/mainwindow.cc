@@ -3,7 +3,14 @@
 MainWindow::MainWindow(QWidget *parent)
 :   QMainWindow(parent)
 {
-    setCentralWidget(new GridWidget);
+    d_menu_bar = new MenuBar;
+    setMenuBar(d_menu_bar);
+
+    d_central_widget = new CentralWidget;
+    setCentralWidget(d_central_widget);
+
+    d_status_bar = new StatusBar;
+    setStatusBar(d_status_bar);
 }
 
 

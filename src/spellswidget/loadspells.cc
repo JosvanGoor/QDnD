@@ -20,4 +20,5 @@ void SpellsWidget::load_spells(QString const &filename)
 
     d_spells_list->sortItems();
     d_spells_label->setText("(" + QString::number(d_spells_list->count()) + " found)");
+    on_selection_change(0);
 }
