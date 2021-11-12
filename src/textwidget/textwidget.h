@@ -3,6 +3,8 @@
 
 #include <QLineEdit>
 #include <QPushButton>
+#include <QTextBlock>
+#include <QTextCursor>
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -18,6 +20,9 @@ class TextWidget : public QWidget
     public:
         explicit TextWidget(QWidget *parent = nullptr);
         ~TextWidget();
+
+    public slots:
+        void add_text(QString const &str);
 };
 
 #endif

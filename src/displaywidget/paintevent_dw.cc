@@ -3,10 +3,11 @@
 void DisplayWidget::set_pixmap(QPixmap &&display)
 {
     d_current_display = std::move(display);
+    update();
 }
 
 
-void DisplayWidget::paintEvent(QPaintEvent *event)
+void DisplayWidget::paintEvent([[maybe_unused]] QPaintEvent *event)
 {
     // first we find the scale of the image vs display size
     float widthscale = qMin(1.0f, float(width()) / d_current_display.width());

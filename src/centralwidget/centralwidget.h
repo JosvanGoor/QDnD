@@ -19,10 +19,16 @@ class CentralWidget : public QSplitter
         GridWidget *d_grid_tab;
     QTabWidget *d_right_tabs;
         TextWidget *d_text_tab;
+        QWidget *d_control_tab;
+            DisplayControlWidget *d_display_control;
 
     public:
         explicit CentralWidget(QWidget *parent = nullptr);
         ~CentralWidget();
+
+        DisplayWidget *display_widget();
+        DisplayControlWidget *display_control_widget();
+        TextWidget *text_widget();
 };
 
 #endif

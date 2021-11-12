@@ -8,6 +8,11 @@ CentralWidget::CentralWidget(QWidget *parent)
     d_grid_tab = new GridWidget;
     d_text_tab = new TextWidget;
 
+    d_control_tab = new QWidget;
+    d_control_tab->setLayout(new QVBoxLayout);
+    d_display_control = new DisplayControlWidget;
+    d_control_tab->layout()->addWidget(d_display_control);
+
     d_left_tabs = new QTabWidget;
     d_left_tabs->addTab(d_display_tab, "Display");
     d_left_tabs->addTab(d_spells_tab, "Spells");
@@ -15,10 +20,11 @@ CentralWidget::CentralWidget(QWidget *parent)
 
     d_right_tabs = new QTabWidget;
     d_right_tabs->addTab(d_text_tab, "Chat");
+    d_right_tabs->addTab(d_control_tab, "Control");
 
     addWidget(d_left_tabs);
     addWidget(d_right_tabs);
-    setSizes({600, 300});
+    setSizes({1300, 300});
 }
 
 

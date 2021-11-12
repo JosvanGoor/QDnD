@@ -13,6 +13,9 @@ class StatusBar : public QStatusBar
     public:
         explicit StatusBar(QWidget *parent = nullptr);
         ~StatusBar();
+
+    public slots:
+        void update_connection_status(QString const &str);
 };
 
 #endif

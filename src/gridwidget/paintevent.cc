@@ -1,6 +1,6 @@
 #include "gridwidget.h"
 
-void GridWidget::paintEvent(QPaintEvent *event)
+void GridWidget::paintEvent([[maybe_unused]] QPaintEvent *event)
 {
     QPainter painter{this};
     

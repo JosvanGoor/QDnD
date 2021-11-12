@@ -18,7 +18,7 @@ class GridWidget : public QWidget
 
     // grid stuff
     float d_scale;
-    size_t d_gridsize;
+    int d_gridsize;
     int d_offset_x;
     int d_offset_y;
     QColor d_foreground_color;
