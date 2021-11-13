@@ -17,6 +17,6 @@ HostConnection::HostConnection()
 HostConnection::~HostConnection()
 {
     for (auto sock : d_clients)
-        delete sock;
+        delete sock.d_socket;
     delete d_server;
 }

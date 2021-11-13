@@ -40,6 +40,14 @@ void MainWindow::on_host_pressed([[maybe_unused]] bool triggered)
         &StatusBar::update_connection_status
     );
 
+    QObject::connect
+    (
+        d_server,
+        &HostConnection::debug_message,
+        d_central_widget->text_widget(),
+        &TextWidget::add_text
+    );
+
     d_server->start_listening(4144);
 }
 

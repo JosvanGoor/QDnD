@@ -16,6 +16,9 @@ SOURCES += \
     src/clientconnection/clientconnection.cc \
     src/clientconnection/connect_cc.cc \
     \
+    src/connectioncommon/readsocket.cc \
+    src/connectioncommon/sendblob.cc \
+    \
     src/displaywidget/displaycontrolwidget.cc \
     src/displaywidget/displaywidget.cc \
     src/displaywidget/getters_dcw.cc \
@@ -28,11 +31,13 @@ SOURCES += \
     src/gridwidget/paintgrid.cc \
     src/gridwidget/setters_gw.cc \
     \
+    src/hostconnection/onconnectionclosed.cc \
     src/hostconnection/hostconnection.cc \
     src/hostconnection/incomingconnections.cc \
+    src/hostconnection/onincomingdata.cc \
     \
     src/mainwindow/connection_mw.cc \
-    src/mainwindow/mainwindow.cc\
+    src/mainwindow/mainwindow.cc \
     src/mainwindow/onselectpressed.cc \
     \
     src/menubar/getters_mb.cc \
@@ -59,7 +64,7 @@ SOURCES += \
 HEADERS += \
     src/centralwidget/centralwidget.h \
     src/clientconnection/clientconnection.h \
-    src/connectionemitter/connectionemitter.h \
+    src/connectioncommon/connectioncommon.h \
     src/displaywidget/displaywidget.h \
     src/gridwidget/gridwidget.h \
     src/hostconnection/hostconnection.h \

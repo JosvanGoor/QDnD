@@ -4,9 +4,9 @@
 #include <QtCore>
 #include <QTcpSocket>
 
-#include "../connectionemitter/connectionemitter.h"
+#include "../connectioncommon/connectioncommon.h"
 
-class ClientConnection : public ConnectionEmitter
+class ClientConnection : public ConnectionCommon
 {
     Q_OBJECT
 
