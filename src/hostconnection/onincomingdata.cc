@@ -13,8 +13,8 @@ void HostConnection::on_incoming_data()
         if (document.isEmpty())
             return;
 
-        debug_message("Name of connection is: " + document["name"].toString());
+        emit debug_message("Name of connection is: " + document["character_name"].toString());
     }
     else
-        emit debug_message("Connection not found frowny face\n");
+        emit debug_message("Connection not found frowny face");
 }

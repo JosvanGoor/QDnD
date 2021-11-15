@@ -16,6 +16,7 @@ class ClientConnection : public ConnectionCommon
         ClientConnection();
         ~ClientConnection();
 
+        void send(QString const &data);
         void connect(QString const &host, uint16_t port);
 
 };

@@ -7,6 +7,7 @@ void TextWidget::add_text(QString const &str)
     
     cursor.beginEditBlock();
     cursor.insertText(str);
+    cursor.insertText("\n");
     cursor.endEditBlock();
 
     while (d_output->document()->blockCount() > 2500)

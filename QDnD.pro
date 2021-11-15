@@ -16,6 +16,10 @@ SOURCES += \
     src/clientconnection/clientconnection.cc \
     src/clientconnection/connect_cc.cc \
     \
+    src/connectdialog/connectdialog.cc \
+    src/connectdialog/getentries.cc \
+    src/connectdialog/onpress_cd.cc \
+    \
     src/connectioncommon/readsocket.cc \
     src/connectioncommon/sendblob.cc \
     \
@@ -59,11 +63,14 @@ SOURCES += \
     src/textwidget/addtext.cc \
     src/textwidget/textwidget.cc \
     \
+    src/utility/readfileb64.cc \
+    \
     src/main.cc
 
 HEADERS += \
     src/centralwidget/centralwidget.h \
     src/clientconnection/clientconnection.h \
+    src/connectdialog/connectdialog.h \
     src/connectioncommon/connectioncommon.h \
     src/displaywidget/displaywidget.h \
     src/gridwidget/gridwidget.h \
@@ -74,7 +81,8 @@ HEADERS += \
     src/spellswidget/spellswidget.h \
     src/startupwindow/startupwindow.h \
     src/statusbar/statusbar.h \
-    src/textwidget/textwidget.h
+    src/textwidget/textwidget.h \
+    src/utility/utility.h
 
 RESOURCES   +=  resources.qrc
 

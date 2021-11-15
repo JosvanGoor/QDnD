@@ -6,11 +6,13 @@
 #include <QMainWindow>
 
 #include "../centralwidget/centralwidget.h"
+#include "../clientconnection/clientconnection.h"
+#include "../connectdialog/connectdialog.h"
+#include "../hostconnection/hostconnection.h"
 #include "../menubar/menubar.h"
 #include "../statusbar/statusbar.h"
+#include "../utility/utility.h"
 
-#include "../clientconnection/clientconnection.h"
-#include "../hostconnection/hostconnection.h"
 
 class MainWindow : public QMainWindow
 {
