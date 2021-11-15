@@ -32,6 +32,8 @@ class HostConnection : public ConnectionCommon
 
         void start_listening(uint16_t port);
 
+        void dispatch(QJsonDocument const &doc);
+
     private slots:
         void on_incoming_data();
         void on_incoming_connection();

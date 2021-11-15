@@ -19,6 +19,9 @@ class ConnectionCommon : public QObject
     signals:
         void debug_message(QString const &str);
         void connection_status_update(QString const &str);
+        
+        // network messages
+        void display_update_message(QJsonDocument const &doc);
 };
 
 #endif

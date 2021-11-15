@@ -46,6 +46,7 @@ void MainWindow::on_host_pressed([[maybe_unused]] bool triggered)
         &TextWidget::add_text
     );
 
+    connect_host_networking();
     d_server->start_listening(4144);
 }
 
@@ -75,6 +76,7 @@ void MainWindow::on_client_pressed([[maybe_unused]] bool triggered)
         &StatusBar::update_connection_status
     );
 
+    connect_client_networking();
     d_client->connect(info.hostname, info.port);
 
     // send first hello!

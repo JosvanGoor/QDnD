@@ -31,6 +31,8 @@ class MainWindow : public QMainWindow
         ~MainWindow();
 
         void connect_connection_buttons();
+        void connect_host_networking();
+        void connect_client_networking();
 
     signals:
         void debug_output(QString const &msg);
@@ -40,6 +42,9 @@ class MainWindow : public QMainWindow
 
         void on_host_pressed(bool triggered);
         void on_client_pressed(bool triggered);
+
+        // network messages
+        void on_display_update(QJsonDocument const &doc);
 };
 
 #endif

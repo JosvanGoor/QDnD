@@ -15,6 +15,7 @@ SOURCES += \
     \
     src/clientconnection/clientconnection.cc \
     src/clientconnection/connect_cc.cc \
+    src/clientconnection/ondata_cc.cc \
     \
     src/connectdialog/connectdialog.cc \
     src/connectdialog/getentries.cc \
@@ -35,6 +36,7 @@ SOURCES += \
     src/gridwidget/paintgrid.cc \
     src/gridwidget/setters_gw.cc \
     \
+    src/hostconnection/dispatch_hc.cc \
     src/hostconnection/onconnectionclosed.cc \
     src/hostconnection/hostconnection.cc \
     src/hostconnection/incomingconnections.cc \
@@ -42,6 +44,7 @@ SOURCES += \
     \
     src/mainwindow/connection_mw.cc \
     src/mainwindow/mainwindow.cc \
+    src/mainwindow/network.cc \
     src/mainwindow/onselectpressed.cc \
     \
     src/menubar/getters_mb.cc \
