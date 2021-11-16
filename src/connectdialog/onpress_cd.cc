@@ -10,7 +10,7 @@ void ConnectDialog::on_select()
 {
     d_pixmap_path->setText
     (
-        QFileDialog::getOpenFileName(this, "Select Image", "", "Image Files (*.png, *.jpg)")
+        QFileDialog::getOpenFileName(this, "Select Image", "", "Any File")
     );
 }
 

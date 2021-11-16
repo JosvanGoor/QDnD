@@ -8,6 +8,12 @@ void MainWindow::connect_host_networking()
     QObject::connect(d_server, &HostConnection::avatar_move_message, this, &MainWindow::on_avatar_moved);
     QObject::connect(d_server, &HostConnection::line_received, this, &MainWindow::on_incoming_line);
     QObject::connect(d_server, &HostConnection::line_removed, this, &MainWindow::on_line_removed);
+
+    d_central_widget->add_monster_control();
+    MonsterControlWidget *mc = d_central_widget->monster_control();
+    QObject::connect(mc, &MonsterControlWidget::monster_removed, this, &MainWindow::on_monster_removed);
+    QObject::connect(mc, &MonsterControlWidget::monster_added, this, &MainWindow::on_monster_added);
+    QObject::connect(mc, &MonsterControlWidget::monster_selected, this, &MainWindow::on_monster_selected);
 }
 
 
@@ -19,6 +25,9 @@ void MainWindow::connect_client_networking()
     QObject::connect(d_client, &ClientConnection::avatar_move_message, this, &MainWindow::on_avatar_moved);
     QObject::connect(d_client, &ClientConnection::line_received, this, &MainWindow::on_incoming_line);
     QObject::connect(d_client, &ClientConnection::line_removed, this, &MainWindow::on_line_removed);
+
+    QObject::connect(d_client, &ClientConnection::token_removed, this, &MainWindow::on_token_removed);
+    QObject::connect(d_client, &ClientConnection::token_added, this, &MainWindow::on_token_added);
 }
 
 

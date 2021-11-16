@@ -36,8 +36,8 @@ void GridWidget::mouseReleaseEvent(QMouseEvent *event)
 
             if (!d_control->is_drawing() && !d_controlled_avatar.isEmpty()) // moving avatar
             {
-                int xpos = ((event->x() - d_offset_x) / 64) * 64;
-                int ypos = ((event->y() - d_offset_y) / 64) * 64;
+                int xpos = ((event->x() - d_offset_x - 64) / 64) * 64;
+                int ypos = ((event->y() - d_offset_y - 64) / 64) * 64;
 
                 d_avatars[d_controlled_avatar].position = {xpos, ypos};
                 avatar_moved(d_controlled_avatar, {xpos, ypos});

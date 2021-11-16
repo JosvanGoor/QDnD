@@ -15,7 +15,7 @@ void GridWidget::paint_avatars(QPainter *painter)
 void GridWidget::add_avatar(QString const &name, QPixmap const &avatar)
 {
     QPixmap scaled = avatar.scaled(64, 64);
-    d_avatars[name] = {scaled, {0, 0}};
+    d_avatars[name] = {scaled, {256*64, 256*64}};
     update();
 }
 

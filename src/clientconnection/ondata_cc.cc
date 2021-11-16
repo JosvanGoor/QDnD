@@ -19,4 +19,8 @@ void ClientConnection::on_data()
         line_received(doc);
     else if (doc["type"].toString() == "LINE_REMOVED")
         line_removed(doc["name"].toString());
+    else if (doc["type"].toString() == "MONSTER_REMOVED")
+        token_removed(doc["name"].toString());
+    else if (doc["type"].toString() == "MONSTER_ADDED")
+        token_added(doc);
 }

@@ -50,11 +50,15 @@ SOURCES += \
     src/mainwindow/connection_mw.cc \
     src/mainwindow/lines_mw.cc \
     src/mainwindow/mainwindow.cc \
+    src/mainwindow/monstercontrol.cc \
     src/mainwindow/network.cc \
     src/mainwindow/onselectpressed.cc \
     \
     src/menubar/getters_mb.cc \
     src/menubar/menubar.cc \
+    \
+    src/monstercontrolwidget/monstercontrolwidget.cc \
+    src/monstercontrolwidget/pressed_mcw.cc \
     \
     src/spellswidget/spell/formatteddescription.cc \
     src/spellswidget/spell/getters.cc \
@@ -89,6 +93,7 @@ HEADERS += \
     src/hostconnection/hostconnection.h \
     src/mainwindow/mainwindow.h \
     src/menubar/menubar.h \
+    src/monstercontrolwidget/monstercontrolwidget.h \
     src/spellswidget/spell/spell.h \
     src/spellswidget/spellswidget.h \
     src/startupwindow/startupwindow.h \

@@ -18,6 +18,18 @@ GridWidget *CentralWidget::grid_widget()
 }
 
 
+void CentralWidget::add_monster_control()
+{
+    d_right_tabs->addTab(d_monster_control = new MonsterControlWidget, "Monster Control");
+}
+
+
+MonsterControlWidget *CentralWidget::monster_control()
+{
+    return d_monster_control;
+}
+
+
 TextWidget *CentralWidget::text_widget()
 {
     return d_text_tab;

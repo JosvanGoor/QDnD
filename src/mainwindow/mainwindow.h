@@ -58,6 +58,15 @@ class MainWindow : public QMainWindow
         void on_avatar_moved(QString const &name, QPoint const &pos);
         void on_incoming_line(QJsonDocument const &doc);
         void on_line_removed(QString const &name);
+        
+        // client only
+        void on_token_added(QJsonDocument const &doc);
+        void on_token_removed(QString const &name);
+
+        // monster control (host only)
+        void on_monster_removed(QString const &name);
+        void on_monster_added(MonsterInfo const &info);
+        void on_monster_selected(QString const &name);
 };
 
 #endif

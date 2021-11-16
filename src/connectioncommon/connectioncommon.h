@@ -27,6 +27,9 @@ class ConnectionCommon : public QObject
         void avatar_move_message(QString const &name, QPoint const &pos);
         void line_received(QJsonDocument const &doc);
         void line_removed(QString const &name);
+
+        void token_removed(QString const &name);
+        void token_added(QJsonDocument const &doc);
 };
 
 #endif

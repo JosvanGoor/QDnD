@@ -8,6 +8,7 @@
 #include "../displaywidget/displaywidget.h"
 #include "../gridcontrolwidget/gridcontrolwidget.h"
 #include "../gridwidget/gridwidget.h"
+#include "../monstercontrolwidget/monstercontrolwidget.h"
 #include "../spellswidget/spellswidget.h"
 #include "../textwidget/textwidget.h"
 #include "../userswidget/userswidget.h"
@@ -23,6 +24,7 @@ class CentralWidget : public QSplitter
     QTabWidget *d_right_tabs;
         TextWidget *d_text_tab;
         UsersWidget *d_users_tab;
+        MonsterControlWidget *d_monster_control;
         QWidget *d_control_tab;
             GridControlWidget *d_grid_control;
             DisplayControlWidget *d_display_control;
@@ -37,6 +39,9 @@ class CentralWidget : public QSplitter
         GridWidget *grid_widget();
         TextWidget *text_widget();
         UsersWidget *user_widget();
+        MonsterControlWidget *monster_control();
+
+        void add_monster_control();
 };
 
 #endif
