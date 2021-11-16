@@ -12,7 +12,19 @@ DisplayControlWidget *CentralWidget::display_control_widget()
 }
 
 
+GridWidget *CentralWidget::grid_widget()
+{
+    return d_grid_tab;
+}
+
+
 TextWidget *CentralWidget::text_widget()
 {
     return d_text_tab;
+}
+
+
+UsersWidget *CentralWidget::user_widget()
+{
+    return d_users_tab;
 }

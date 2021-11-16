@@ -6,7 +6,7 @@ void GridWidget::paint_grid(QPainter *painter)
     int offset_x = static_cast<int>(d_offset_x * d_scale) % gridsize;
     int offset_y = static_cast<int>(d_offset_y * d_scale) % gridsize;
 
-    painter->setBrush(QBrush{d_foreground_color});
+    painter->setPen(QPen{d_foreground_color});
 
     // paint vertical
     for (int xpos = offset_x; xpos < size().width(); xpos += gridsize)

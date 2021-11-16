@@ -22,6 +22,11 @@ class ConnectionCommon : public QObject
         
         // network messages
         void display_update_message(QJsonDocument const &doc);
+        void new_connection(QJsonDocument const &doc);
+        void user_disconnected(QString const &name);
+        void avatar_move_message(QString const &name, QPoint const &pos);
+        void line_received(QJsonDocument const &doc);
+        void line_removed(QString const &name);
 };
 
 #endif

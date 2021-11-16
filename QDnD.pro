@@ -29,11 +29,16 @@ SOURCES += \
     src/displaywidget/getters_dcw.cc \
     src/displaywidget/paintevent_dw.cc \
     \
+    src/gridcontrolwidget/gridcontrolwidget.cc \
+    src/gridcontrolwidget/slots_gcw.cc \
+    \
+    src/gridwidget/avatar.cc \
     src/gridwidget/getters_gw.cc \
     src/gridwidget/gridwidget.cc \
-    src/gridwidget/mouseevents.cc \
+    src/gridwidget/inputevents.cc \
     src/gridwidget/paintevent.cc \
     src/gridwidget/paintgrid.cc \
+    src/gridwidget/paintline.cc \
     src/gridwidget/setters_gw.cc \
     \
     src/hostconnection/dispatch_hc.cc \
@@ -43,6 +48,7 @@ SOURCES += \
     src/hostconnection/onincomingdata.cc \
     \
     src/mainwindow/connection_mw.cc \
+    src/mainwindow/lines_mw.cc \
     src/mainwindow/mainwindow.cc \
     src/mainwindow/network.cc \
     src/mainwindow/onselectpressed.cc \
@@ -66,6 +72,8 @@ SOURCES += \
     src/textwidget/addtext.cc \
     src/textwidget/textwidget.cc \
     \
+    src/userswidget/userswidget.cc \
+    \
     src/utility/readfileb64.cc \
     \
     src/main.cc
@@ -76,6 +84,7 @@ HEADERS += \
     src/connectdialog/connectdialog.h \
     src/connectioncommon/connectioncommon.h \
     src/displaywidget/displaywidget.h \
+    src/gridcontrolwidget/gridcontrolwidget.h \
     src/gridwidget/gridwidget.h \
     src/hostconnection/hostconnection.h \
     src/mainwindow/mainwindow.h \
@@ -85,6 +94,7 @@ HEADERS += \
     src/startupwindow/startupwindow.h \
     src/statusbar/statusbar.h \
     src/textwidget/textwidget.h \
+    src/userswidget/userswidget.h \
     src/utility/utility.h
 
 RESOURCES   +=  resources.qrc

@@ -3,10 +3,12 @@
 void GridWidget::paintEvent([[maybe_unused]] QPaintEvent *event)
 {
     QPainter painter{this};
-    
     QSize canvas_size = size();
-    painter.setBackground(QBrush{d_background_color});
-    painter.drawRect(0, 0, canvas_size.width(), canvas_size.height());
+    
+    painter.fillRect(0, 0, canvas_size.width(), canvas_size.height(), QBrush{Qt::white});
 
     paint_grid(&painter);
+    paint_current_line(&painter);
+    paint_line_cache(&painter);
+    paint_avatars(&painter);
 }

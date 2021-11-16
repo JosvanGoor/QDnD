@@ -18,8 +18,19 @@ void HostConnection::on_incoming_connection()
     QTcpSocket *socket;
     while ((socket = d_server->nextPendingConnection()) != nullptr)
     {
-        d_clients[socket] = {"", {}, socket, 0, {}};
-        debug_message("Host: New connection!\n");
+        QVector<QJsonDocument> existing_users;
+        for (auto &it : d_clients)
+        {
+            QJsonObject obj;
+            obj["type"] = "HANDSHAKE";
+            obj["name"] = it.name;
+            obj["data"] = QString(it.raw_avatar.toBase64());
+            existing_users.push_back(QJsonDocument{obj});
+        }
+
+
+        d_clients[socket] = {"", {}, {}, socket, 0, {}};
+        debug_message("Host: New connection!");
         connection_status_update("Hosting @ " + QString::number(d_server->serverPort()) + " (" + QString::number(d_clients.size()) + " connected)");
 
         // connect new connection
@@ -38,5 +49,11 @@ void HostConnection::on_incoming_connection()
             this,
             &HostConnection::on_connection_closed
         );
+
+        for (auto &it : existing_users)
+        {
+            send_blob(socket, it.toJson());
+        }
+
     }
 }

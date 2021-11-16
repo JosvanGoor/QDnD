@@ -8,6 +8,13 @@ void HostConnection::on_connection_closed()
     if (auto it = d_clients.find(sender); it != d_clients.end())
     {
         it.value().d_socket->deleteLater();
+        user_disconnected(it.value().name);
+
+        QJsonObject obj;
+        obj["type"] = "USER_DISCONNECTED";
+        obj["name"] = it.value().name;
+        dispatch(QJsonDocument{obj});
+
         d_clients.erase(it);
     }
 

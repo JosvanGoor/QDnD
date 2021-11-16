@@ -7,6 +7,9 @@ MainWindow::MainWindow(QWidget *parent)
     d_server = nullptr;
     d_client = nullptr;
 
+    d_line_prefix = "Dungeon Master";
+    d_linecounter = 0;
+
     d_menu_bar = new MenuBar;
     setMenuBar(d_menu_bar);
 
@@ -31,6 +34,17 @@ MainWindow::MainWindow(QWidget *parent)
         d_central_widget->text_widget(),
         &TextWidget::add_text
     );
+
+    QObject::connect
+    (
+        d_central_widget->grid_widget(),
+        &GridWidget::line_drawn,
+        this,
+        &MainWindow::line_drawn
+    );
+
+    QObject::connect(d_central_widget->grid_widget(), &GridWidget::avatar_moved, this, &MainWindow::move_avatar);
+    QObject::connect(d_central_widget->grid_widget(), &GridWidget::line_removed, this, &MainWindow::line_removed);
 
     connect_connection_buttons();
 

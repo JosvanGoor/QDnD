@@ -13,6 +13,7 @@ struct ConnectionState
 {
     QString name;
     QPixmap avatar;
+    QByteArray raw_avatar;
     QTcpSocket *d_socket;
 
     uint32_t incoming_size;

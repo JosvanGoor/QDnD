@@ -82,11 +82,12 @@ void MainWindow::on_client_pressed([[maybe_unused]] bool triggered)
     // send first hello!
     QJsonObject document;
     document["type"] = "HANDSHAKE";
-    document["character_name"] = info.character_name;
-    QJsonObject avatar;
-    avatar["filename"] = info.pixmap_path;
-    avatar["data"] = read_file_conditionally_b64(info.pixmap_path);
-    document["avatar"] = avatar;
+    document["name"] = info.character_name;
+    document["filename"] = info.pixmap_path;
+    document["data"] = read_file_conditionally_b64(info.pixmap_path);
+
+    d_line_prefix = info.character_name;
+    d_central_widget->grid_widget()->set_controlled_avatar(info.character_name);
 
     QJsonDocument root{document};
     QString blob = root.toJson();
