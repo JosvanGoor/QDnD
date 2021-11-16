@@ -52,6 +52,14 @@ GridControlWidget::GridControlWidget(QWidget *parent)
         this,
         &GridControlWidget::on_unselect
     );
+
+    QObject::connect
+    (
+        d_reset_position,
+        &QPushButton::pressed,
+        this,
+        &GridControlWidget::on_reset_position
+    );
 }
 
 

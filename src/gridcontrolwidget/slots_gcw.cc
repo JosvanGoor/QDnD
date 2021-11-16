@@ -15,6 +15,7 @@ void GridControlWidget::on_delete_line()
 
     delete_line(d_selection_name);
     delete d_lines_list->item(d_selection);
+    on_unselect();
 }
 
 

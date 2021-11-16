@@ -50,3 +50,11 @@ void GridWidget::silent_remove_line(QString const &name)
     d_control->remove_entry_by_name(name);
     update();
 }
+
+
+void GridWidget::on_reset_position()
+{
+    d_offset_x = 64 * 256;
+    d_offset_y = d_offset_x;
+    update();
+}

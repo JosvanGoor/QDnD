@@ -55,6 +55,7 @@ class GridControlWidget : public QWidget
         void clear_grid();
 
         void delete_line(QString const &name);
+        void on_reset_position();
 };
 
 #endif

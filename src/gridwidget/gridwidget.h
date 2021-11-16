@@ -86,6 +86,7 @@ class GridWidget : public QWidget
         void add_line(QString const &name, QColor const &color, QVector<QLine> const &line);
         void remove_line(QString const &name);
         void silent_remove_line(QString const &name);
+        void on_reset_position();
 
     signals:
         void line_removed(QString const &name);
