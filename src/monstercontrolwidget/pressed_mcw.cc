@@ -7,7 +7,6 @@ void MonsterControlWidget::on_remove()
 
     monster_removed(d_monster_list->item(d_selection)->text());
     delete d_monster_list->item(d_selection);
-    d_selection = -1;
 }
 
 
