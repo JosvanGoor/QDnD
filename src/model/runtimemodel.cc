@@ -17,6 +17,22 @@ RuntimeModel::~RuntimeModel()
 
 
 ////////////////////
+//    Getters     //
+////////////////////
+
+PixmapCache &RuntimeModel::pixmap_cache() noexcept
+{
+    return d_pixmap_cache;
+}
+
+
+QMap<QString, Spell> &RuntimeModel::spells_cache() noexcept
+{
+    return d_spells_cache;
+}
+
+
+////////////////////
 //    Loading     //
 ////////////////////
 

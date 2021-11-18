@@ -4,5 +4,6 @@
         <file>data/spells.json</file>
         <file>data/display_default.jpg</file>
         <file>data/dmpic.png</file>
+        <file>data/missing_texture.jpg</file>
     </qresource>
 </RCC>

@@ -37,9 +37,12 @@ SpellsWidget::SpellsWidget(QWidget *parent)
 
     d_description_widget->layout()->addWidget(form_widget);
     d_description_widget->layout()->addWidget(d_description);
+    
     this->addWidget(d_description_widget);
-
     this->setSizes({200, 600});
+
+    QObject::connect(d_search, &QLineEdit::textChanged, this, &SpellsWidget::on_search_change);
+    QObject::connect(d_spells_list, &QListWidget::currentRowChanged, this, &SpellsWidget::on_selection_change);
 }
 
 

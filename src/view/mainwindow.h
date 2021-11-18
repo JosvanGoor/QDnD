@@ -9,6 +9,7 @@
 #include <QTextCursor>
 #include <QTextEdit>
 
+#include "chatwidget.h"
 #include "spellswidget.h"
 
 class MainWindow : public QMainWindow
@@ -21,6 +22,7 @@ class MainWindow : public QMainWindow
                 SpellsWidget *d_spells_tab;
             QTextEdit *d_debug_output;
         QTabWidget *d_left_tabs;
+            ChatWidget *d_chat_tab;
         
     public:
         explicit MainWindow(QWidget *parent = nullptr);
@@ -28,6 +30,7 @@ class MainWindow : public QMainWindow
 
         // getters
         SpellsWidget *spells_widget() noexcept;
+        ChatWidget *chat_widget() noexcept;
 
     public slots:
         void debug_message(QString const &message);

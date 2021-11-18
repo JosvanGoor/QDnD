@@ -15,12 +15,14 @@ QMAKE_CXXFLAGS = -Wall -pedantic
 
 SOURCES +=  src/control/applicationcontrol.cc \
             \
+            src/model/pixmapcache.cc \
             src/model/runtimemodel.cc \
             src/model/spell.cc \
             \
             src/utility/htmlformatting.cc \
             src/utility/loading.cc \
             \
+            src/view/chatwidget.cc \
             src/view/mainwindow.cc \
             src/view/spellswidget.cc \
             \
@@ -29,12 +31,14 @@ SOURCES +=  src/control/applicationcontrol.cc \
 
 HEADERS +=  src/control/applicationcontrol.h \
             \
+            src/model/pixmapcache.h \
             src/model/runtimemodel.h \
             src/model/spell.h \
             \
             src/utility/htmlformatting.h \
             src/utility/loading.h \
             \
+            src/view/chatwidget.h \
             src/view/mainwindow.h \
             src/view/spellswidget.h
 

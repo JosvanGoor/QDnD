@@ -17,10 +17,14 @@ MainWindow::MainWindow(QWidget *parent)
     d_middle_tabs->addTab(d_spells_tab = new SpellsWidget, "Spells");
     
     d_central_widget->addWidget(d_left_tabs = new QTabWidget);
+    d_left_tabs->addTab(d_chat_tab = new ChatWidget, "Chat");
 
     d_middle_widget->setOrientation(Qt::Vertical);
     d_middle_widget->setSizes({600, 100});
     d_debug_output->setReadOnly(true);
+
+    d_central_widget->setSizes({1200, 400});
+    resize(1600, 900);
 }
 
 
@@ -37,6 +41,12 @@ MainWindow::~MainWindow()
 SpellsWidget *MainWindow::spells_widget() noexcept
 {
     return d_spells_tab;
+}
+
+
+ChatWidget *MainWindow::chat_widget() noexcept
+{
+    return d_chat_tab;
 }
 
 

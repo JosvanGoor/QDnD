@@ -1,0 +1,35 @@
+#ifndef VIEW_CHATWIDGET_H
+#define VIEW_CHATWIDGET_H
+
+#include <QLineEdit>
+#include <QPushButton>
+#include <QScrollBar>
+#include <QTextBlock>
+#include <QTextCursor>
+#include <QTextEdit>
+#include <QWidget>
+
+class ChatWidget : public QWidget
+{
+    Q_OBJECT
+
+    QTextEdit *d_output;
+    QLineEdit *d_input;
+    QPushButton *d_send;
+
+    public:
+        explicit ChatWidget(QWidget *parent = nullptr);
+        ~ChatWidget();
+
+    public slots:
+        void on_send_pressed();
+
+        void on_info_message(QString const &message);
+
+    signals:
+        void message_entered(QString const &str);
+
+
+};
+
+#endif

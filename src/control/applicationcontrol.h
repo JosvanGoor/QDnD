@@ -22,11 +22,20 @@ class ApplicationControl : public QObject
     private:
         void load_settings() noexcept;
 
-        // connect stuff
-        void connect_to_mainwindow();
+        // mainwindow stuff
+        void mainwindow_setup();
+
+        // spellswidget stuff
+        void spellswidget_setup();
+        void on_spellswidget_selection_change(QString const &name);
+
+        // Chatwidget stuff
+        void chatwidget_setup();
+        void on_chatwidget_message_entered(QString const &msg);
 
     signals:
         void debug_output(QString const &message);
+        void chatmessage_info(QString const &message);
 };
 
 #endif
