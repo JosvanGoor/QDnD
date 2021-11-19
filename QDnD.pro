@@ -19,12 +19,21 @@ SOURCES +=  src/control/applicationcontrol.cc \
             src/model/runtimemodel.cc \
             src/model/spell.cc \
             \
+            src/network/clientconnection.cc \
+            src/network/connectionbase.cc \
+            src/network/messagebuilding.cc \
+            src/network/messagetypes.cc \
+            src/network/serverconnection.cc \
+            \
             src/utility/htmlformatting.cc \
             src/utility/loading.cc \
+            src/utility/networking.cc \
             \
             src/view/chatwidget.cc \
             src/view/mainwindow.cc \
+            src/view/menubar.cc \
             src/view/spellswidget.cc \
+            src/view/statusbar.cc \
             \
             src/main.cc
 
@@ -35,12 +44,21 @@ HEADERS +=  src/control/applicationcontrol.h \
             src/model/runtimemodel.h \
             src/model/spell.h \
             \
+            src/network/clientconnection.h \
+            src/network/connectionbase.h \
+            src/network/messagebuilding.h \
+            src/network/messagetypes.h \
+            src/network/serverconnection.h \
+            \
             src/utility/htmlformatting.h \
             src/utility/loading.h \
+            src/utility/networking.h \
             \
             src/view/chatwidget.h \
             src/view/mainwindow.h \
-            src/view/spellswidget.h
+            src/view/menubar.h \
+            src/view/spellswidget.h \
+            src/view/statusbar.h
 
 
 RESOURCES   +=  resources.qrc

@@ -30,7 +30,24 @@ ApplicationControl::~ApplicationControl()
 void ApplicationControl::load_settings() noexcept
 {
     debug_output("Started loading settings...");
-    debug_output("Actually this function is empty :3");
+    debug_output("SYKE persistent settings are not implemented yet");
+}
+
+
+////////////////////
+//   ChatWidget   //
+////////////////////
+
+void ApplicationControl::chatwidget_setup()
+{
+    QObject::connect(d_main_window->chat_widget(), &ChatWidget::message_entered, this, &ApplicationControl::on_chatwidget_message_entered);
+    QObject::connect(this, &ApplicationControl::chatmessage_info, d_main_window->chat_widget(), &ChatWidget::on_info_message);
+}
+
+
+void ApplicationControl::on_chatwidget_message_entered(QString const &msg)
+{
+    debug_output("From Chat: " + msg);
 }
 
 
@@ -44,6 +61,47 @@ void ApplicationControl::mainwindow_setup()
 
     chatwidget_setup();
     spellswidget_setup();
+    statusbar_setup();
+    menubar_setup();
+}
+
+
+////////////////////
+//    MenuBar     //
+////////////////////
+
+void ApplicationControl::menubar_setup()
+{
+    MenuBar *menubar = d_main_window->menu_bar();
+
+    QObject::connect(menubar->quit(), &QAction::triggered, this, &ApplicationControl::on_menubar_quit);
+    QObject::connect(menubar->host(), &QAction::triggered, this, &ApplicationControl::on_menubar_host);
+    QObject::connect(menubar->connect(), &QAction::triggered, this, &ApplicationControl::on_menubar_connect);
+    QObject::connect(menubar->disconnect(), &QAction::triggered, this, &ApplicationControl::on_menubar_disconnect);
+}
+
+
+void ApplicationControl::on_menubar_quit()
+{
+    QApplication::exit();
+}
+
+
+void ApplicationControl::on_menubar_host()
+{
+    debug_output("Host not implemented yet.");
+}
+
+
+void ApplicationControl::on_menubar_connect()
+{
+    debug_output("Connect not implemented yet.");
+}
+
+
+void ApplicationControl::on_menubar_disconnect()
+{
+    debug_output("Disconnect not implemented yet.");
 }
 
 
@@ -76,17 +134,13 @@ void ApplicationControl::on_spellswidget_selection_change(QString const &name)
 
 
 ////////////////////
-//   ChatWidget   //
+//   StatusBar    //
 ////////////////////
 
-void ApplicationControl::chatwidget_setup()
+void ApplicationControl::statusbar_setup()
 {
-    QObject::connect(d_main_window->chat_widget(), &ChatWidget::message_entered, this, &ApplicationControl::on_chatwidget_message_entered);
-    QObject::connect(this, &ApplicationControl::chatmessage_info, d_main_window->chat_widget(), &ChatWidget::on_info_message);
-}
+    StatusBar *status_bar = d_main_window->status_bar();
 
-
-void ApplicationControl::on_chatwidget_message_entered(QString const &msg)
-{
-    debug_output("From Chat: " + msg);
+    QObject::connect(this, &ApplicationControl::connection_info, status_bar, &StatusBar::update_connection_status);
+    QObject::connect(this, &ApplicationControl::statusbar_message, status_bar, &StatusBar::status_message);
 }

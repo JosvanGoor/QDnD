@@ -10,7 +10,9 @@
 #include <QTextEdit>
 
 #include "chatwidget.h"
+#include "menubar.h"
 #include "spellswidget.h"
+#include "statusbar.h"
 
 class MainWindow : public QMainWindow
 {
@@ -23,14 +25,19 @@ class MainWindow : public QMainWindow
             QTextEdit *d_debug_output;
         QTabWidget *d_left_tabs;
             ChatWidget *d_chat_tab;
-        
+    
+    MenuBar *d_menu_bar;
+    StatusBar *d_status_bar;
+
     public:
         explicit MainWindow(QWidget *parent = nullptr);
         ~MainWindow();
 
         // getters
-        SpellsWidget *spells_widget() noexcept;
         ChatWidget *chat_widget() noexcept;
+        MenuBar *menu_bar() noexcept;
+        SpellsWidget *spells_widget() noexcept;
+        StatusBar *status_bar() noexcept;
 
     public slots:
         void debug_message(QString const &message);

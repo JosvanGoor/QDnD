@@ -1,0 +1,32 @@
+#ifndef NETWORK_CLIENTCONNECTION_H
+#define NETWORK_CLIENTCONNECTION_H
+
+#include "connectionbase.h"
+
+#include "../utility/networking.h"
+
+class ClientConnection : public ConnectionBase
+{
+    Q_OBJECT
+
+    QTcpSocket *d_socket;
+    SocketState d_socket_state;
+
+    public:
+        explicit ClientConnection(QObject *parent = nullptr);
+        ~ClientConnection();
+
+        void connect(QString const &host, uint16_t port);
+        void disconnect() override;
+        bool is_connected() override;
+        bool is_server() override;
+
+        void send(QJsonDocument const &doc) override;
+
+    protected slots:
+        void on_connected();
+        void on_socket_error(QAbstractSocket::SocketError error);
+        void on_socket_readyread();
+};
+
+#endif

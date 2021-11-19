@@ -22,8 +22,11 @@ MainWindow::MainWindow(QWidget *parent)
     d_middle_widget->setOrientation(Qt::Vertical);
     d_middle_widget->setSizes({600, 100});
     d_debug_output->setReadOnly(true);
-
     d_central_widget->setSizes({1200, 400});
+
+    setMenuBar(d_menu_bar = new MenuBar);
+    setStatusBar(d_status_bar = new StatusBar);
+
     resize(1600, 900);
 }
 
@@ -38,15 +41,26 @@ MainWindow::~MainWindow()
 //     Slots      //
 ////////////////////
 
+ChatWidget *MainWindow::chat_widget() noexcept
+{
+    return d_chat_tab;
+}
+
+
+MenuBar *MainWindow::menu_bar() noexcept
+{
+    return d_menu_bar;
+}
+
+
 SpellsWidget *MainWindow::spells_widget() noexcept
 {
     return d_spells_tab;
 }
 
-
-ChatWidget *MainWindow::chat_widget() noexcept
+StatusBar *MainWindow::status_bar() noexcept
 {
-    return d_chat_tab;
+    return d_status_bar;
 }
 
 
