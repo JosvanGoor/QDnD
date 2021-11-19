@@ -23,10 +23,10 @@ void send_json_blob(QTcpSocket *socket, QJsonDocument const &document, bool limi
 }
 
 
-QJsonDocument read_connection(QTcpSocket *socket, SocketState &state)
+QJsonDocument read_connection(SocketState &state)
 {
     QJsonDocument document;
-    state.buffer.append(socket->readAll());
+    state.buffer.append(state.socket->readAll());
 
     // for some reason we received less then 1 int.
     if (state.incoming == 0 && state.buffer.size() < 4)

@@ -87,7 +87,7 @@ void ServerConnection::on_new_connection()
     {
         emit debug_message("New Connection!");
         
-        // request server state for new client
+        // TODO: request server state for new client
         d_connections[socket] = {socket, {}, 0, ""};
         QObject::connect(socket, &QTcpSocket::errorOccurred, this, &ServerConnection::on_socket_error);
         QObject::connect(socket, &QTcpSocket::readyRead, this, &ServerConnection::on_socket_readyread);
@@ -98,17 +98,31 @@ void ServerConnection::on_new_connection()
 
 void ServerConnection::on_socket_error(QAbstractSocket::SocketError error)
 {
-
+    QObject *id = QObject::sender();
+    SocketState &state = d_connections.find(id).value();
+    QString name = state.identifier.isEmpty() ? "[[Unknown]]" : state.identifier;
+    debug_message("SocketError " + QString::number(error) + " from " + name);
 }
 
 
 void ServerConnection::on_socket_readyread()
 {
+    QObject *id = QObject::sender();
+    SocketState &state = d_connections.find(id).value();
+    QJsonDocument doc = read_connection(state);
 
+    if (doc.isEmpty())
+        return; 
+
+    // TODO: handle message
+    debug_message("Received json doc: " + QString(doc.toJson()));
 }
 
 
 void ServerConnection::on_socket_disconnected()
 {
-
+    QObject *id = QObject::sender();
+    // TODO: notify app control
+    d_connections.remove(id);
+    delete id;
 }

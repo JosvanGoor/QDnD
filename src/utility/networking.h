@@ -16,6 +16,6 @@ struct SocketState
 
 void send_blob(QTcpSocket *socket, QByteArray const &blob, bool limited = true);
 void send_json_blob(QTcpSocket *socket, QJsonDocument const &document, bool limited = true);
-QJsonDocument read_connection(QTcpSocket *socket, SocketState &state);
+QJsonDocument read_connection(SocketState &state);
 
 #endif
