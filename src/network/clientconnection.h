@@ -1,6 +1,9 @@
 #ifndef NETWORK_CLIENTCONNECTION_H
 #define NETWORK_CLIENTCONNECTION_H
 
+#include <QHostAddress>
+#include <QMetaEnum>
+
 #include "connectionbase.h"
 
 #include "../utility/networking.h"

@@ -30,6 +30,8 @@ void ServerConnection::start_listening(uint16_t port)
     if (!d_server->listen(QHostAddress::Any, port))
         connection_status_update("Failed to start listening to port " + QString::number(port));
     
+    update_status();
+    debug_message("Successfully started hosting");
     d_ping_timer.setInterval(45'000);
     d_ping_timer.start(45'000);
 }
@@ -40,12 +42,15 @@ void ServerConnection::disconnect()
     for (auto it = d_connections.begin(); it != d_connections.end(); ++it)
     {
         it.value().socket->close();
-        delete it.key();
+        it.value().socket->deleteLater();
     }
 
     d_server->close();
     d_connections.clear();
     d_ping_timer.stop();
+
+    debug_message("Successfully stoped hosting");
+    update_status();
 }
 
 
@@ -70,12 +75,21 @@ void ServerConnection::send(QJsonDocument const &doc)
 }
 
 
+void ServerConnection::update_status()
+{
+    if (d_server->isListening())
+        connection_status_update("Hosting @ " + QString::number(d_server->serverPort()) + " (" + QString::number(d_connections.size()) + " clients connected)");
+    else
+        connection_status_update("No Connection");
+}
+
 ////////////////////
 //     Slots      //
 ////////////////////
 
 void ServerConnection::on_ping_timer()
 {
+    debug_message("ping!");
     send(ping_message());
 }
 
@@ -92,6 +106,7 @@ void ServerConnection::on_new_connection()
         QObject::connect(socket, &QTcpSocket::errorOccurred, this, &ServerConnection::on_socket_error);
         QObject::connect(socket, &QTcpSocket::readyRead, this, &ServerConnection::on_socket_readyread);
         QObject::connect(socket, &QTcpSocket::disconnected, this, &ServerConnection::on_socket_disconnected);
+        update_status();
     }
 }
 
@@ -101,7 +116,9 @@ void ServerConnection::on_socket_error(QAbstractSocket::SocketError error)
     QObject *id = QObject::sender();
     SocketState &state = d_connections.find(id).value();
     QString name = state.identifier.isEmpty() ? "[[Unknown]]" : state.identifier;
-    debug_message("SocketError " + QString::number(error) + " from " + name);
+    
+    QString errstr = QMetaEnum::fromType<QAbstractSocket::SocketError>().valueToKey(error);
+    debug_message(errstr + " from " + name);
 }
 
 
@@ -123,6 +140,8 @@ void ServerConnection::on_socket_disconnected()
 {
     QObject *id = QObject::sender();
     // TODO: notify app control
+    SocketState &state = d_connections.find(id).value();
+    state.socket->deleteLater();
     d_connections.remove(id);
-    delete id;
+    update_status();
 }

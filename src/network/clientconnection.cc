@@ -8,6 +8,10 @@ ClientConnection::ClientConnection(QObject *parent)
 :   ConnectionBase(parent)
 {
     d_socket = new QTcpSocket;
+
+    QObject::connect(d_socket, &QTcpSocket::connected, this, &ClientConnection::on_connected);
+    QObject::connect(d_socket, &QTcpSocket::errorOccurred, this, &ClientConnection::on_socket_error);
+    QObject::connect(d_socket, &QTcpSocket::readyRead, this, &ClientConnection::on_socket_readyread);
 }
 
 
@@ -30,6 +34,7 @@ void ClientConnection::connect(QString const &host, uint16_t port)
 void ClientConnection::disconnect()
 {
     d_socket->close();
+    connection_status_update("No Connection");
 }
 
 
@@ -56,26 +61,27 @@ void ClientConnection::send(QJsonDocument const &doc)
 
 void ClientConnection::on_connected()
 {
-    // update connection info
-    // send user info to server
+    debug_message("ClientConnection successfully established.");
+    connection_status_update("Connected to " + d_socket->peerAddress().toString());
 }
 
 
 void ClientConnection::on_socket_error(QAbstractSocket::SocketError error)
 {
-    // update connection info
-    // report error
+    QString errstr = QMetaEnum::fromType<QAbstractSocket::SocketError>().valueToKey(error);
+    debug_message("Connection: " + errstr);
+    disconnect();
 }
 
 
 void ClientConnection::on_socket_readyread()
 {
-    QJsonDocument doc = read_connection(d_socket, d_socket_state);
+    QJsonDocument doc = read_connection(d_socket_state);
     
     while (!doc.isEmpty()) // maybe we received more then 1 message.
     {
         // parse document
 
-        doc = read_connection(d_socket, d_socket_state);
+        doc = read_connection(d_socket_state);
     }
 }

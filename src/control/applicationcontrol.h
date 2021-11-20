@@ -3,11 +3,15 @@
 
 #include <QApplication>
 #include <QMap>
+#include <QMessageBox>
 #include <QObject>
 
 #include "../model/runtimemodel.h"
+#include "../view/connectdialog.h"
 #include "../view/mainwindow.h"
+#include "../network/clientconnection.h"
 #include "../network/connectionbase.h"
+#include "../network/serverconnection.h"
 
 class ApplicationControl : public QObject
 {
@@ -28,7 +32,11 @@ class ApplicationControl : public QObject
         // Chatwidget stuff
         void chatwidget_setup();
         void on_chatwidget_message_entered(QString const &msg);
-        
+
+        // networking  stuff
+        bool reconnect_confirmation();
+        void connection_setup();
+
         // mainwindow stuff
         void mainwindow_setup();
 

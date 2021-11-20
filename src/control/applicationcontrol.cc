@@ -9,6 +9,7 @@ ApplicationControl::ApplicationControl(QObject *parent)
 {
     d_main_window = new MainWindow;
     d_runtime_model = new RuntimeModel;
+    d_connection = nullptr;
     
     mainwindow_setup();
 
@@ -19,7 +20,9 @@ ApplicationControl::ApplicationControl(QObject *parent)
 
 ApplicationControl::~ApplicationControl()
 {
-    
+    delete d_main_window;
+    delete d_runtime_model;
+    delete d_connection;
 }
 
 
@@ -48,6 +51,34 @@ void ApplicationControl::chatwidget_setup()
 void ApplicationControl::on_chatwidget_message_entered(QString const &msg)
 {
     debug_output("From Chat: " + msg);
+}
+
+
+////////////////////
+//   Networking   //
+////////////////////
+
+bool ApplicationControl::reconnect_confirmation()
+{
+    if (d_connection)
+    {
+        QMessageBox confirm{d_main_window};
+        confirm.setText("This will disconnect your current connection, are you sure?");
+        confirm.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        if (confirm.exec() == QMessageBox::No)
+            return false;
+        delete d_connection;
+    }
+    
+    return true;
+}
+
+
+void ApplicationControl::connection_setup()
+{
+    QObject::connect(d_connection, &ConnectionBase::debug_message, this, &ApplicationControl::debug_output);
+    QObject::connect(d_connection, &ConnectionBase::connection_status_update, this, &ApplicationControl::connection_info);
+    QObject::connect(d_connection, &ConnectionBase::chat_connection_message, this, &ApplicationControl::chatmessage_info);
 }
 
 
@@ -89,13 +120,49 @@ void ApplicationControl::on_menubar_quit()
 
 void ApplicationControl::on_menubar_host()
 {
-    debug_output("Host not implemented yet.");
+    if (!reconnect_confirmation())
+        return;
+
+    d_connection = new ServerConnection;
+    connection_setup();
+
+    reinterpret_cast<ServerConnection*>(d_connection)->start_listening(4144);
 }
 
 
 void ApplicationControl::on_menubar_connect()
 {
-    debug_output("Connect not implemented yet.");
+    if (!reconnect_confirmation())
+        return;
+
+    ConnectDialog dialog{d_main_window};
+    if (dialog.exec() == QDialog::Rejected)
+    {
+        debug_output("Connection canceled.");
+        return;
+    }
+
+    if (dialog.hostname().isEmpty())
+    {
+        debug_output("Needs Hostname");
+        return;
+    }
+    if (dialog.port() == 0)
+    {
+        debug_output("Invalid port");
+        return;
+    }
+    if (dialog.character_name().isEmpty())
+    {
+        debug_output("Needs character name");
+        return;
+    }
+
+    d_connection = new ClientConnection;
+    connection_setup();
+
+    reinterpret_cast<ClientConnection*>(d_connection)->connect(dialog.hostname(), dialog.port());
+    // TODO: send handshake.
 }
 
 

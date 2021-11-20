@@ -30,6 +30,7 @@ SOURCES +=  src/control/applicationcontrol.cc \
             src/utility/networking.cc \
             \
             src/view/chatwidget.cc \
+            src/view/connectdialog.cc \
             src/view/mainwindow.cc \
             src/view/menubar.cc \
             src/view/spellswidget.cc \
@@ -55,6 +56,7 @@ HEADERS +=  src/control/applicationcontrol.h \
             src/utility/networking.h \
             \
             src/view/chatwidget.h \
+            src/view/connectdialog.h \
             src/view/mainwindow.h \
             src/view/menubar.h \
             src/view/spellswidget.h \

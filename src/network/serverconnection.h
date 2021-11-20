@@ -3,6 +3,7 @@
 
 #include <QJsonObject>
 #include <QMap>
+#include <QMetaEnum>
 #include <QTcpServer>
 #include <QTimer>
 
@@ -29,6 +30,7 @@ class ServerConnection : public ConnectionBase
         bool is_server() override;
 
         void send(QJsonDocument const &doc) override;
+        void update_status();
 
     protected slots:
         void on_ping_timer();
