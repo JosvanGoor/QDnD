@@ -16,8 +16,9 @@ MainWindow::MainWindow(QWidget *parent)
     
     d_middle_tabs->addTab(d_spells_tab = new SpellsWidget, "Spells");
     
-    d_central_widget->addWidget(d_left_tabs = new QTabWidget);
-    d_left_tabs->addTab(d_chat_tab = new ChatWidget, "Chat");
+    d_central_widget->addWidget(d_right_tabs = new QTabWidget);
+    d_right_tabs->addTab(d_chat_tab = new ChatWidget, "Chat");
+    d_right_tabs->addTab(d_players_widget = new PlayersWidget, "Players");
 
     d_middle_widget->setOrientation(Qt::Vertical);
     d_middle_widget->setSizes({600, 100});
@@ -50,6 +51,11 @@ ChatWidget *MainWindow::chat_widget() noexcept
 MenuBar *MainWindow::menu_bar() noexcept
 {
     return d_menu_bar;
+}
+
+PlayersWidget *MainWindow::players_widget() noexcept
+{
+    return d_players_widget;
 }
 
 

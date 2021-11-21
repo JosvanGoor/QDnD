@@ -16,7 +16,7 @@ QJsonDocument handshake_message(QString const &name, QByteArray b64_avatar, QCol
     obj["type"] = as_int(MessageType::HANDSHAKE);
     obj["name"] = name;
     obj["avatar"] = QString(b64_avatar);
-    obj["color"] = static_cast<int>(color.rgb());
+    obj["color"] = QString::number(color.rgb(), 16);
     return QJsonDocument{obj};
 }
 

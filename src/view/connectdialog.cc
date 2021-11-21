@@ -34,7 +34,8 @@ ConnectDialog::ConnectDialog(QWidget *parent)
     layout()->addWidget(form);
     layout()->addWidget(buttons);
     layout()->addWidget(group_box);
-
+    
+    d_avatar_file = ":data/default_avatar.png";
     QObject::connect(d_connect, &QPushButton::pressed, this, &ConnectDialog::on_connect);
     QObject::connect(d_cancel, &QPushButton::pressed, this, &ConnectDialog::on_cancel);
     QObject::connect(d_select_avatar, &QPushButton::pressed, this, &ConnectDialog::on_select_avatar);
@@ -91,10 +92,19 @@ void ConnectDialog::on_cancel()
     reject();
 }
 
+#include <QApplication>
+#include <QThread>
+#include <iostream>
 
 void ConnectDialog::on_select_avatar()
 {
     d_avatar_file = QFileDialog::getOpenFileName(this, "Select Image File", "", "");
-    QPixmap new_avatar{d_avatar_file};
+    
+    QFile file{d_avatar_file};
+    file.open(QIODevice::ReadOnly);
+    QByteArray arr = file.readAll();
+    
+    QPixmap new_avatar;
+    new_avatar.loadFromData(arr);
     d_avatar_display->setPixmap(new_avatar.scaled(256, 256));
 }

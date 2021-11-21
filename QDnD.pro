@@ -33,6 +33,7 @@ SOURCES +=  src/control/applicationcontrol.cc \
             src/view/connectdialog.cc \
             src/view/mainwindow.cc \
             src/view/menubar.cc \
+            src/view/playerswidget.cc \
             src/view/spellswidget.cc \
             src/view/statusbar.cc \
             \
@@ -59,6 +60,7 @@ HEADERS +=  src/control/applicationcontrol.h \
             src/view/connectdialog.h \
             src/view/mainwindow.h \
             src/view/menubar.h \
+            src/view/playerswidget.h \
             src/view/spellswidget.h \
             src/view/statusbar.h
 

@@ -16,7 +16,6 @@ ServerConnection::ServerConnection(QObject *parent)
 
 ServerConnection::~ServerConnection()
 {
-    disconnect();
     delete d_server;
 }
 
@@ -128,19 +127,23 @@ void ServerConnection::on_socket_readyread()
     SocketState &state = d_connections.find(id).value();
     QJsonDocument doc = read_connection(state);
 
-    if (doc.isEmpty())
-        return; 
-
-    // TODO: handle message
-    debug_message("Received json doc: " + QString(doc.toJson()));
+    while (!doc.isEmpty())
+    {
+        send(doc);
+        signal_message(doc, state);
+        doc = read_connection(state);
+    }
 }
 
 
 void ServerConnection::on_socket_disconnected()
 {
     QObject *id = QObject::sender();
-    // TODO: notify app control
     SocketState &state = d_connections.find(id).value();
+
+    if (!state.identifier.isEmpty())
+        player_disconnected(state.identifier);
+
     state.socket->deleteLater();
     d_connections.remove(id);
     update_status();

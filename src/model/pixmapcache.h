@@ -38,6 +38,7 @@ class PixmapCache
         bool load_pixmap(QString const &name, QByteArray const &b64_data) noexcept;
         QPixmap const &get_pixmap(QString const &name) const noexcept;
 
+        QString load_from_memory(QByteArray const &b64_avatar) noexcept;
         TransferableImage load_from_file(QString const &filename) noexcept;
 
     private:

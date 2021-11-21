@@ -7,17 +7,17 @@
 ClientConnection::ClientConnection(QObject *parent)
 :   ConnectionBase(parent)
 {
-    d_socket = new QTcpSocket;
+    d_socket_state.socket = new QTcpSocket;
 
-    QObject::connect(d_socket, &QTcpSocket::connected, this, &ClientConnection::on_connected);
-    QObject::connect(d_socket, &QTcpSocket::errorOccurred, this, &ClientConnection::on_socket_error);
-    QObject::connect(d_socket, &QTcpSocket::readyRead, this, &ClientConnection::on_socket_readyread);
+    QObject::connect(d_socket_state.socket, &QTcpSocket::connected, this, &ClientConnection::on_connected);
+    QObject::connect(d_socket_state.socket, &QTcpSocket::errorOccurred, this, &ClientConnection::on_socket_error);
+    QObject::connect(d_socket_state.socket, &QTcpSocket::readyRead, this, &ClientConnection::on_socket_readyread);
 }
 
 
 ClientConnection::~ClientConnection()
 {
-    delete d_socket;
+    delete d_socket_state.socket;
 }
 
 
@@ -27,20 +27,20 @@ ClientConnection::~ClientConnection()
 
 void ClientConnection::connect(QString const &host, uint16_t port)
 {
-    d_socket->connectToHost(host, port);
+    d_socket_state.socket->connectToHost(host, port);
 }
 
 
 void ClientConnection::disconnect()
 {
-    d_socket->close();
+    d_socket_state.socket->close();
     connection_status_update("No Connection");
 }
 
 
 bool ClientConnection::is_connected()
 {
-    return d_socket->state() == QTcpSocket::ConnectedState;
+    return d_socket_state.socket->state() == QTcpSocket::ConnectedState;
 }
 
 
@@ -52,7 +52,7 @@ bool ClientConnection::is_server()
 
 void ClientConnection::send(QJsonDocument const &doc)
 {
-    send_json_blob(d_socket, doc);
+    send_json_blob(d_socket_state.socket, doc);
 }
 
 ////////////////////
@@ -62,7 +62,7 @@ void ClientConnection::send(QJsonDocument const &doc)
 void ClientConnection::on_connected()
 {
     debug_message("ClientConnection successfully established.");
-    connection_status_update("Connected to " + d_socket->peerAddress().toString());
+    connection_status_update("Connected to " + d_socket_state.socket->peerAddress().toString());
 }
 
 
@@ -80,8 +80,7 @@ void ClientConnection::on_socket_readyread()
     
     while (!doc.isEmpty()) // maybe we received more then 1 message.
     {
-        // parse document
-
+        signal_message(doc, d_socket_state);
         doc = read_connection(d_socket_state);
     }
 }

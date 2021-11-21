@@ -1,7 +1,12 @@
 #ifndef NETWORK_CONNECTIONBASE_H
 #define NETWORK_CONNECTIONBASE_H
 
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QObject>
+
+#include "messagetypes.h"
+#include "../utility/networking.h"
 
 class ConnectionBase : public QObject
 {
@@ -16,11 +21,18 @@ class ConnectionBase : public QObject
         virtual bool is_server() = 0;
         virtual void send(QJsonDocument const &doc) = 0;
 
+        // dispatch
+        void signal_message(QJsonDocument const &doc, SocketState &state);
+
     signals:
         // general signals
         void debug_message(QString const &message);
         void chat_connection_message(QString const &message);
         void connection_status_update(QString const &state);
+
+        // connect / disconnect
+        void player_disconnected(QString const &name);
+        void player_connected(QString const &name, QByteArray const &b64_avatar, QColor const &color);
 };
 
 #endif

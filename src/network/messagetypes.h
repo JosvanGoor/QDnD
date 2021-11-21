@@ -9,6 +9,7 @@ enum class MessageType
     // system messages
     WELCOME,
     HANDSHAKE,
+    DISCONNECTED,
     PING,
     PONG,
 

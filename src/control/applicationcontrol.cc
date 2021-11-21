@@ -79,6 +79,21 @@ void ApplicationControl::connection_setup()
     QObject::connect(d_connection, &ConnectionBase::debug_message, this, &ApplicationControl::debug_output);
     QObject::connect(d_connection, &ConnectionBase::connection_status_update, this, &ApplicationControl::connection_info);
     QObject::connect(d_connection, &ConnectionBase::chat_connection_message, this, &ApplicationControl::chatmessage_info);
+    QObject::connect(d_connection, &ConnectionBase::player_disconnected, this, &ApplicationControl::player_disconnected);
+    QObject::connect(d_connection, &ConnectionBase::player_connected, this, &ApplicationControl::player_connected);
+}
+
+
+void ApplicationControl::player_connected(QString const &name, QByteArray const &b64_avatar, QColor const &color)
+{
+    QString avatar_id = d_runtime_model->pixmap_cache().load_from_memory(b64_avatar);
+    d_main_window->players_widget()->add_user(name, d_runtime_model->pixmap_cache().get_pixmap(avatar_id), color);
+}
+
+
+void ApplicationControl::player_disconnected(QString const &name)
+{
+    d_main_window->players_widget()->remove_user(name);
 }
 
 
@@ -158,11 +173,18 @@ void ApplicationControl::on_menubar_connect()
         return;
     }
 
+    TransferableImage avatar = d_runtime_model->pixmap_cache().load_from_file(dialog.avatar_file());
+    if (avatar.name.isEmpty())
+    {
+        debug_output("Needs avatar");
+        return;
+    }
+
     d_connection = new ClientConnection;
     connection_setup();
 
     reinterpret_cast<ClientConnection*>(d_connection)->connect(dialog.hostname(), dialog.port());
-    // TODO: send handshake.
+    d_connection->send(handshake_message(dialog.character_name(), avatar.b64_data));
 }
 
 
@@ -181,8 +203,8 @@ void ApplicationControl::spellswidget_setup()
     SpellsWidget *spells_widget = d_main_window->spells_widget();
     for (auto &spell : d_runtime_model->spells_cache())
         spells_widget->add_spell(spell.name());
-    on_spellswidget_selection_change("Abi-Dalzim's Horrid Wilting"); // HACKY AF
     debug_output("Loaded " + QString::number(d_runtime_model->d_spells_cache.size()) + " spells.");
+    on_spellswidget_selection_change("Abi-Dalzim's Horrid Wilting"); // HACKY AF
 
     connect(d_main_window->spells_widget(), &SpellsWidget::selection_changed, this, &ApplicationControl::on_spellswidget_selection_change);
 }

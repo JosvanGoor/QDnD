@@ -12,7 +12,6 @@ class ClientConnection : public ConnectionBase
 {
     Q_OBJECT
 
-    QTcpSocket *d_socket;
     SocketState d_socket_state;
 
     public:
@@ -30,6 +29,7 @@ class ClientConnection : public ConnectionBase
         void on_connected();
         void on_socket_error(QAbstractSocket::SocketError error);
         void on_socket_readyread();
+
 };
 
 #endif

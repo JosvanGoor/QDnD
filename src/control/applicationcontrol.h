@@ -10,6 +10,7 @@
 #include "../view/connectdialog.h"
 #include "../view/mainwindow.h"
 #include "../network/clientconnection.h"
+#include "../network/messagebuilding.h"
 #include "../network/connectionbase.h"
 #include "../network/serverconnection.h"
 
@@ -36,6 +37,8 @@ class ApplicationControl : public QObject
         // networking  stuff
         bool reconnect_confirmation();
         void connection_setup();
+        void player_connected(QString const &name, QByteArray const &b64_avatar, QColor const &color);
+        void player_disconnected(QString const &name);
 
         // mainwindow stuff
         void mainwindow_setup();
