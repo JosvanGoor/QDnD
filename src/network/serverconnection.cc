@@ -193,6 +193,7 @@ void ServerConnection::on_new_connection()
         QObject::connect(socket, &QTcpSocket::errorOccurred, this, &ServerConnection::on_socket_error);
         QObject::connect(socket, &QTcpSocket::readyRead, this, &ServerConnection::on_socket_readyread);
         QObject::connect(socket, &QTcpSocket::disconnected, this, &ServerConnection::on_socket_disconnected);
+        QObject::connect(socket, &QTcpSocket::bytesWritten, this, &ServerConnection::on_socket_readywrite);
         update_status();
     }
 }

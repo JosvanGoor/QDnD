@@ -136,30 +136,30 @@ void ApplicationControl::on_menubar_connect()
     ConnectDialog dialog{d_main_window};
     if (dialog.exec() == QDialog::Rejected)
     {
-        debug_output("Connection canceled.");
+        emit debug_output("Connection canceled.");
         return;
     }
 
     if (dialog.hostname().isEmpty())
     {
-        debug_output("Needs Hostname");
+        emit debug_output("Needs Hostname");
         return;
     }
     if (dialog.port() == 0)
     {
-        debug_output("Invalid port");
+        emit debug_output("Invalid port");
         return;
     }
     if (dialog.character_name().isEmpty())
     {
-        debug_output("Needs character name");
+        emit debug_output("Needs character name");
         return;
     }
 
     TransferableImage avatar = d_runtime_model->pixmap_cache().load_from_file(dialog.avatar_file());
     if (avatar.name.isEmpty())
     {
-        debug_output("Needs avatar");
+        emit debug_output("Needs avatar");
         return;
     }
 

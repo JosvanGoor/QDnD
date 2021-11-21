@@ -45,9 +45,7 @@ void ConnectionBase::signal_message(QJsonDocument const &doc, SocketState &state
             send(pong_message());
         break;
 
-        case MessageType::PONG:
-            emit debug_message("Pong received!");
-        break;
+        case MessageType::PONG: break;
 
         case MessageType::PIXMAP_TRANSFER:
             emit pixmap_tranfer(obj["name"].toString(), obj["data"].toString().toLocal8Bit());
@@ -58,7 +56,6 @@ void ConnectionBase::signal_message(QJsonDocument const &doc, SocketState &state
         break;
 
         case MessageType::DISPLAY_UPDATE:
-            emit debug_message("Received display update.");
             emit display_updated(obj["name"].toString());
         break;
 
