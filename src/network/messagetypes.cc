@@ -12,6 +12,7 @@ QString as_string(MessageType type)
     {
         case MessageType::WELCOME:          return "WELCOME";
         case MessageType::HANDSHAKE:        return "HANDSHAKE";
+        case MessageType::DISCONNECTED:     return "DISCONNECTED";
         case MessageType::PING:             return "PING";
         case MessageType::PONG:             return "PONG";
 
