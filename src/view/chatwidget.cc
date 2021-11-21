@@ -44,15 +44,8 @@ void ChatWidget::on_send_pressed()
 }
 
 
-void ChatWidget::on_info_message(QString const &message)
+void ChatWidget::scroll_down()
 {
-    QTextCursor cursor{d_output->document()};
-    cursor.movePosition(QTextCursor::End);
-
-    cursor.beginEditBlock();
-    cursor.insertText(message + "\n");
-    cursor.endEditBlock();
-
     while (d_output->document()->blockCount() > 1000)
     {
         QTextCursor cursor{d_output->document()->firstBlock()};
@@ -62,6 +55,19 @@ void ChatWidget::on_info_message(QString const &message)
     }
 
     d_output->verticalScrollBar()->setValue(d_output->verticalScrollBar()->maximum());
+}
+
+
+void ChatWidget::on_info_message(QString const &message)
+{
+    QTextCursor cursor{d_output->document()};
+    cursor.movePosition(QTextCursor::End);
+
+    cursor.beginEditBlock();
+    cursor.insertText(message + "\n");
+    cursor.endEditBlock();
+
+    scroll_down();
 }
 
 
@@ -75,13 +81,20 @@ void ChatWidget::on_user_message(QString const &name, QString const &message)
     cursor.insertText(message + "\n");
     cursor.endEditBlock();
 
-    while (d_output->document()->blockCount() > 1000)
-    {
-        QTextCursor cursor{d_output->document()->firstBlock()};
-        cursor.select(QTextCursor::BlockUnderCursor);
-        cursor.removeSelectedText();
-        cursor.deleteChar();
-    }
+    scroll_down();
+}
 
-    d_output->verticalScrollBar()->setValue(d_output->verticalScrollBar()->maximum());
+
+void ChatWidget::on_roll_message(QString const &user, QString const &expression, QString const &result)
+{
+    QTextCursor cursor{d_output->document()};
+    cursor.movePosition(QTextCursor::End);
+
+    cursor.beginEditBlock();
+    cursor.insertText(user + " rolling " + expression + "\n");
+    cursor.insertHtml(result);
+    cursor.insertText("\n");
+    cursor.endEditBlock();
+
+    scroll_down();
 }

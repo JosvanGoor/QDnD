@@ -15,6 +15,11 @@ QMAKE_CXXFLAGS = -Wall -pedantic
 
 SOURCES +=  src/control/applicationcontrol.cc \
             \
+            src/expressions/diceexpression.cc \
+            src/expressions/diceparser.cc \
+            src/expressions/dicetokenizer.cc \
+            src/expressions/parserstate.cc \
+            \
             src/model/pixmapcache.cc \
             src/model/runtimemodel.cc \
             src/model/spell.cc \
@@ -42,6 +47,11 @@ SOURCES +=  src/control/applicationcontrol.cc \
 
 
 HEADERS +=  src/control/applicationcontrol.h \
+            \
+            src/expressions/diceexpression.h \
+            src/expressions/diceparser.h \
+            src/expressions/dicetokenizer.h \
+            src/expressions/parserstate.h \
             \
             src/model/pixmapcache.h \
             src/model/runtimemodel.h \

@@ -36,6 +36,7 @@ class ApplicationControl : public QObject
         void chatwidget_setup();
         void on_chatwidget_message_entered(QString const &msg);
         void on_chatwidget_user_message(QString const &name, QString const &message);
+        void on_chatwidget_dieroll_message(QString const &name, QString const &expression, QString const &result);
         
         // mainwindow stuff
         void mainwindow_setup();

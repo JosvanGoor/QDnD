@@ -54,6 +54,13 @@ void ApplicationControl::on_chatwidget_message_entered(QString const &msg)
     if (d_connection)
     {
         QJsonDocument doc = chat_message(d_identifier, msg);
+
+        if (d_connection->is_server() && msg.startsWith("/roll", Qt::CaseInsensitive))
+        {
+            reinterpret_cast<ServerConnection*>(d_connection)->host_special_message(doc);
+            return;
+        }
+
         d_connection->send(doc, true);
     }
 }
@@ -61,6 +68,12 @@ void ApplicationControl::on_chatwidget_message_entered(QString const &msg)
 void ApplicationControl::on_chatwidget_user_message(QString const &name, QString const &message)
 {
     d_main_window->chat_widget()->on_user_message(name, message);
+}
+
+
+void ApplicationControl::on_chatwidget_dieroll_message(QString const &name, QString const &expression, QString const &result)
+{
+    d_main_window->chat_widget()->on_roll_message(name, expression, result);
 }
 
 
@@ -219,6 +232,7 @@ void ApplicationControl::connection_setup()
     QObject::connect(d_connection, &ConnectionBase::chat_message, this, &ApplicationControl::on_chatwidget_user_message);
     QObject::connect(d_connection, &ConnectionBase::display_updated, this, &ApplicationControl::display_updated);
     QObject::connect(d_connection, &ConnectionBase::pixmap_tranfer, this, &ApplicationControl::pixmap_transferred);
+    QObject::connect(d_connection, &ConnectionBase::roll_performed, this, &ApplicationControl::on_chatwidget_dieroll_message);
 }
 
 

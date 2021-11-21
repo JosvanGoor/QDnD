@@ -22,6 +22,7 @@ QJsonDocument pixmap_not_found(QString const &id);
 // Simple
 QJsonDocument chat_message(QString const &name, QString const &message);
 QJsonDocument display_update(QString const &file_id);
+QJsonDocument roll_message(QString const &name, QString const &expression, QString const &result);
 
 
 #endif

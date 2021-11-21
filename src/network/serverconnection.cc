@@ -92,6 +92,12 @@ void ServerConnection::update_status()
 //    Incoming    //
 ////////////////////
 
+void ServerConnection::host_special_message(QJsonDocument const &doc)
+{
+    handle_incoming_messages(doc, d_self);
+}
+
+
 void ServerConnection::handle_incoming_messages(QJsonDocument const &doc, SocketState &state)
 {
     QJsonObject obj = doc.object();
@@ -112,6 +118,31 @@ void ServerConnection::handle_incoming_messages(QJsonDocument const &doc, Socket
             if (start) // we are already uploading as is
                 transfer_pixmap(state);
         }
+        break;
+
+        case MessageType::CHAT_MESSAGE:
+            if (obj["message"].toString().startsWith("/roll", Qt::CaseInsensitive))
+            {
+                QString name = obj["name"].toString();
+                QString expression = obj["message"].toString().mid(6);
+                QString result = "";
+                try
+                {
+                    DiceExpressionPtr expr = DiceParser::parse(expression);
+                    DiceResult score = expr->evaluate();
+                    result = score.text + " -> " + QString::number(score.result);
+                }
+                catch(std::runtime_error &err)
+                {
+                    result = err.what();
+                }
+
+                send(roll_message(name, expression, result), true);
+                break;
+            }
+            
+            signal_message(doc, state);
+            send(doc); // dispatch to all clients.
         break;
 
         default:

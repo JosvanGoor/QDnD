@@ -38,6 +38,7 @@ class ConnectionBase : public QObject
         void player_disconnected(QString const &name);
         void player_connected(QString const &name, QByteArray const &b64_avatar, QColor const &color);
         void chat_message(QString const &name, QString const &message);
+        void roll_performed(QString const &name, QString const &expression, QString const &result);
 };
 
 #endif

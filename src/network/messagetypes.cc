@@ -20,6 +20,7 @@ QString as_string(MessageType type)
         case MessageType::PIXMAP_NOT_FOUND: return "PIXMAP_NOT_FOUND";
 
         case MessageType::CHAT_MESSAGE:     return "CHAT_MESSAGE";
+        case MessageType::DIEROLL_MESSSAGE: return "DIEROLL_MESSSAGE";
         case MessageType::DISPLAY_UPDATE:   return "DISPLAY_UPDATE";
     }
 

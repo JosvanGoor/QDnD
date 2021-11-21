@@ -62,6 +62,9 @@ void ConnectionBase::signal_message(QJsonDocument const &doc, SocketState &state
             emit display_updated(obj["name"].toString());
         break;
 
+        case MessageType::DIEROLL_MESSSAGE:
+            emit roll_performed(obj["name"].toString(), obj["expression"].toString(), obj["result"].toString());
+        break;
 
         default:
             emit debug_message("Received unknown message type: " + as_string(type));

@@ -20,6 +20,7 @@ enum class MessageType
 
     // simple messages
     CHAT_MESSAGE,
+    DIEROLL_MESSSAGE,
     DISPLAY_UPDATE,
 };
 

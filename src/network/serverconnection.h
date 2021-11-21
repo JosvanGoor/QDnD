@@ -7,10 +7,11 @@
 #include <QTcpServer>
 #include <QTimer>
 
-#include "../model/runtimemodel.h"
 #include "connectionbase.h"
 #include "messagebuilding.h"
 #include "messagetypes.h"
+#include "../expressions/diceparser.h"
+#include "../model/runtimemodel.h"
 #include "../utility/networking.h"
 
 class ServerConnection : public ConnectionBase
@@ -37,6 +38,7 @@ class ServerConnection : public ConnectionBase
         void update_status();
 
         // handle incoming
+        void host_special_message(QJsonDocument const &doc);
         void handle_incoming_messages(QJsonDocument const &doc, SocketState &state);
         void transfer_pixmap(SocketState &state);
 

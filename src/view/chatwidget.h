@@ -23,9 +23,11 @@ class ChatWidget : public QWidget
 
     public slots:
         void on_send_pressed();
+        void scroll_down();
 
         void on_info_message(QString const &message);
         void on_user_message(QString const &user, QString const &message);
+        void on_roll_message(QString const &user, QString const &expression, QString const &result);
 
     signals:
         void message_entered(QString const &str);

@@ -102,3 +102,14 @@ QJsonDocument display_update(QString const &fileid)
     obj["name"] = fileid;
     return QJsonDocument{obj};
 }
+
+
+QJsonDocument roll_message(QString const &name, QString const &expression, QString const &result)
+{
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::DIEROLL_MESSSAGE);
+    obj["name"] = name;
+    obj["expression"] = expression;
+    obj["result"] = result;
+    return QJsonDocument{obj};
+}
