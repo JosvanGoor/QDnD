@@ -14,8 +14,14 @@ QJsonDocument disconnect_message(QString const &name);
 QJsonDocument ping_message();
 QJsonDocument pong_message();
 
-// chat
+// transfer
+QJsonDocument pixmap_request(QVector<QString> const &ids);
+QJsonDocument pixmap_transfer(QString const &id, QByteArray const &b64_pixmap);
+QJsonDocument pixmap_not_found(QString const &id);
+
+// Simple
 QJsonDocument chat_message(QString const &name, QString const &message);
+QJsonDocument display_update(QString const &file_id);
 
 
 #endif

@@ -65,52 +65,6 @@ void ApplicationControl::on_chatwidget_user_message(QString const &name, QString
 
 
 ////////////////////
-//   Networking   //
-////////////////////
-
-bool ApplicationControl::reconnect_confirmation()
-{
-    if (d_connection)
-    {
-        QMessageBox confirm{d_main_window};
-        confirm.setText("This will disconnect your current connection, are you sure?");
-        confirm.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-        if (confirm.exec() == QMessageBox::No)
-            return false;
-        d_connection->disconnect();
-        delete d_connection;
-    }
-    
-    return true;
-}
-
-
-void ApplicationControl::connection_setup()
-{
-    QObject::connect(d_connection, &ConnectionBase::debug_message, this, &ApplicationControl::debug_output);
-    QObject::connect(d_connection, &ConnectionBase::connection_status_update, this, &ApplicationControl::connection_info);
-    QObject::connect(d_connection, &ConnectionBase::player_disconnected, this, &ApplicationControl::player_disconnected);
-    QObject::connect(d_connection, &ConnectionBase::player_connected, this, &ApplicationControl::player_connected);
-    QObject::connect(d_connection, &ConnectionBase::chat_message, this, &ApplicationControl::on_chatwidget_user_message);
-}
-
-
-void ApplicationControl::player_connected(QString const &name, QByteArray const &b64_avatar, QColor const &color)
-{
-    QString avatar_id = d_runtime_model->pixmap_cache().load_from_memory(b64_avatar);
-    d_main_window->players_widget()->add_user(name, d_runtime_model->pixmap_cache().get_pixmap(avatar_id), color);
-    d_main_window->chat_widget()->on_info_message(name + " has connected.");
-}
-
-
-void ApplicationControl::player_disconnected(QString const &name)
-{
-    d_main_window->players_widget()->remove_user(name);
-    d_main_window->chat_widget()->on_info_message(name + " has been disconnected.");
-}
-
-
-////////////////////
 //   MainWindow   //
 ////////////////////
 
@@ -151,8 +105,11 @@ void ApplicationControl::on_menubar_host()
     if (!reconnect_confirmation())
         return;
 
-    d_connection = new ServerConnection;
+    d_connection = new ServerConnection{d_runtime_model};
     connection_setup();
+
+    d_main_window->menu_bar()->add_server_menus();
+    QObject::connect(d_main_window->menu_bar()->update_display(), &QAction::triggered, this, &ApplicationControl::on_menubar_display_update);
 
     reinterpret_cast<ServerConnection*>(d_connection)->start_listening(4144);
 }
@@ -209,6 +166,96 @@ void ApplicationControl::on_menubar_disconnect()
     d_connection = nullptr;
 }
 
+
+void ApplicationControl::on_menubar_display_update()
+{
+    debug_output("display update clicked.");
+    QString file = QFileDialog::getOpenFileName(d_main_window, "Choose Image");
+
+    if (file.isEmpty())
+        return;
+
+    TransferableImage image = d_runtime_model->pixmap_cache().load_from_file(file);
+    if (image.name.isEmpty())
+    {
+        debug_output("Invalid image file.");
+        return;
+    }
+
+    d_main_window->display_widget()->set_pixmap(d_runtime_model->pixmap_cache().get_pixmap(image.name));
+    d_connection->send(display_update(image.name));
+}
+
+
+////////////////////
+//   Networking   //
+////////////////////
+
+bool ApplicationControl::reconnect_confirmation()
+{
+    if (d_connection)
+    {
+        QMessageBox confirm{d_main_window};
+        confirm.setText("This will disconnect your current connection, are you sure?");
+        confirm.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        if (confirm.exec() == QMessageBox::No)
+            return false;
+        
+        d_connection->disconnect();
+        d_main_window->menu_bar()->remove_server_menus();
+        delete d_connection;
+    }
+    
+    return true;
+}
+
+
+void ApplicationControl::connection_setup()
+{
+    QObject::connect(d_connection, &ConnectionBase::debug_message, this, &ApplicationControl::debug_output);
+    QObject::connect(d_connection, &ConnectionBase::connection_status_update, this, &ApplicationControl::connection_info);
+    QObject::connect(d_connection, &ConnectionBase::player_disconnected, this, &ApplicationControl::player_disconnected);
+    QObject::connect(d_connection, &ConnectionBase::player_connected, this, &ApplicationControl::player_connected);
+    QObject::connect(d_connection, &ConnectionBase::chat_message, this, &ApplicationControl::on_chatwidget_user_message);
+    QObject::connect(d_connection, &ConnectionBase::display_updated, this, &ApplicationControl::display_updated);
+    QObject::connect(d_connection, &ConnectionBase::pixmap_tranfer, this, &ApplicationControl::pixmap_transferred);
+}
+
+
+void ApplicationControl::player_connected(QString const &name, QByteArray const &b64_avatar, QColor const &color)
+{
+    QString avatar_id = d_runtime_model->pixmap_cache().load_from_memory(b64_avatar);
+    d_main_window->players_widget()->add_user(name, d_runtime_model->pixmap_cache().get_pixmap(avatar_id), color);
+    d_main_window->chat_widget()->on_info_message(name + " has connected.");
+}
+
+
+void ApplicationControl::player_disconnected(QString const &name)
+{
+    d_main_window->players_widget()->remove_user(name);
+    d_main_window->chat_widget()->on_info_message(name + " has been disconnected.");
+}
+
+
+void ApplicationControl::display_updated(QString const &id)
+{
+    if (d_runtime_model->pixmap_cache().has_pixmap(id))
+    {
+        d_main_window->display_widget()->set_pixmap(d_runtime_model->pixmap_cache().get_pixmap(id));
+        return;
+    }
+
+    d_main_window->display_widget()->set_incoming_pixmap(id);
+    d_connection->send(pixmap_request({id}));
+}
+
+
+void ApplicationControl::pixmap_transferred(QString const &id, QByteArray const &b64_pixmap)
+{
+    d_runtime_model->pixmap_cache().load_pixmap(id, b64_pixmap);
+    if (d_main_window->display_widget()->waiting_for_pixmap(id))
+        d_main_window->display_widget()->set_pixmap(d_runtime_model->pixmap_cache().get_pixmap(id));
+}
 
 ////////////////////
 //  SpellsWidget  //

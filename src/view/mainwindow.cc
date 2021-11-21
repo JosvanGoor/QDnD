@@ -49,6 +49,12 @@ ChatWidget *MainWindow::chat_widget() noexcept
 }
 
 
+DisplayWidget *MainWindow::display_widget() noexcept
+{
+    return d_display_tab;
+}
+
+
 MenuBar *MainWindow::menu_bar() noexcept
 {
     return d_menu_bar;

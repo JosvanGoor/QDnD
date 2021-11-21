@@ -40,6 +40,7 @@ class MainWindow : public QMainWindow
 
         // getters
         ChatWidget *chat_widget() noexcept;
+        DisplayWidget *display_widget() noexcept;
         MenuBar *menu_bar() noexcept;
         PlayersWidget *players_widget() noexcept;
         SpellsWidget *spells_widget() noexcept;

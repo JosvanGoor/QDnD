@@ -13,6 +13,12 @@ enum class MessageType
     PING,
     PONG,
 
+    // file transfer
+    PIXMAP_REQUEST,
+    PIXMAP_TRANSFER,
+    PIXMAP_NOT_FOUND,
+
+    // simple messages
     CHAT_MESSAGE,
     DISPLAY_UPDATE,
 };

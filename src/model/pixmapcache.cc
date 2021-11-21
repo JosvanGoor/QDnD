@@ -85,6 +85,23 @@ TransferableImage PixmapCache::load_from_file(QString const &filename) noexcept
 }
 
 
+TransferableImage PixmapCache::prepare_for_transfer(QString const &name) noexcept
+{
+    TransferableImage rval;
+    auto it = d_pixmaps.find(name);
+    if (it == d_pixmaps.end())
+        return rval;
+
+    
+    QBuffer buffer{&rval.b64_data};
+    buffer.open(QIODevice::WriteOnly);
+    it.value().save(&buffer, "PNG");
+    rval.name = name;
+    rval.b64_data = rval.b64_data.toBase64();
+    return rval;
+}
+
+
 ////////////////////
 //    Private     //
 ////////////////////

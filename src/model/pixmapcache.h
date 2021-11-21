@@ -1,6 +1,7 @@
 #ifndef MODEL_PIXMAPCACHE_H
 #define MODEL_PIXMAPCACHE_H
 
+#include <QBuffer>
 #include <QCryptographicHash>
 #include <QDir>
 #include <QFile>
@@ -40,6 +41,7 @@ class PixmapCache
 
         QString load_from_memory(QByteArray const &b64_avatar) noexcept;
         TransferableImage load_from_file(QString const &filename) noexcept;
+        TransferableImage prepare_for_transfer(QString const &name) noexcept;
 
     private:
         QPixmap load_from_b64(QByteArray const &b64_data) const noexcept;

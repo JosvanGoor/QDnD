@@ -14,7 +14,13 @@ QString as_string(MessageType type)
         case MessageType::HANDSHAKE:        return "HANDSHAKE";
         case MessageType::PING:             return "PING";
         case MessageType::PONG:             return "PONG";
+
+        case MessageType::PIXMAP_REQUEST:   return "PIXMAP_REQUEST";
+        case MessageType::PIXMAP_TRANSFER:  return "PIXMAP_TRANSFER";
+        case MessageType::PIXMAP_NOT_FOUND: return "PIXMAP_NOT_FOUND";
+
         case MessageType::CHAT_MESSAGE:     return "CHAT_MESSAGE";
+        case MessageType::DISPLAY_UPDATE:   return "DISPLAY_UPDATE";
     }
 
     return "If you read this Jos fucked up.";

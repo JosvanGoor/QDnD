@@ -4,10 +4,11 @@
 //  Constructors  //
 ////////////////////
 
-ServerConnection::ServerConnection(QObject *parent)
+ServerConnection::ServerConnection(RuntimeModel *runtime_model, QObject *parent)
 :   ConnectionBase(parent)
 {
     d_server = new QTcpServer;
+    d_runtime_model = runtime_model;
 
     QObject::connect(d_server, &QTcpServer::newConnection, this, &ServerConnection::on_new_connection);
     QObject::connect(&d_ping_timer, &QTimer::timeout, this, &ServerConnection::on_ping_timer);
@@ -91,17 +92,50 @@ void ServerConnection::update_status()
 //    Incoming    //
 ////////////////////
 
-void ServerConnection::handle_incoming_messages(QJsonDocument const &doc)
+void ServerConnection::handle_incoming_messages(QJsonDocument const &doc, SocketState &state)
 {
     QJsonObject obj = doc.object();
     MessageType type = static_cast<MessageType>(obj["type"].toInt());
+    debug_message("Handeling " + as_string(type));
 
     switch (type)
     {
         case MessageType::PONG: break; // we guchi
+        
+        case MessageType::PIXMAP_REQUEST:
+        {
+            bool start = state.file_queue.isEmpty();
+            QJsonArray arr = obj["requests"].toArray();
+            for (auto val : arr)
+                state.file_queue.push_back(val.toString());
+
+            if (start) // we are already uploading as is
+                transfer_pixmap(state);
+        }
+        break;
+
         default:
+            signal_message(doc, state);
             send(doc); // dispatch to all clients.
     }
+}
+
+
+void ServerConnection::transfer_pixmap(SocketState &state)
+{
+    debug_message("Transferring pixmap to " + state.identifier + ": " + state.file_queue.back());
+    QString file = state.file_queue.back();
+    state.file_queue.pop_back();
+
+    TransferableImage img = d_runtime_model->pixmap_cache().prepare_for_transfer(file);
+    if (img.name.isEmpty())
+    {
+        debug_message("Could not satisfy file request " + img.name);
+        send_json_blob(state.socket, pixmap_not_found(file));
+        return;
+    }
+
+    send_json_blob(state.socket, pixmap_transfer(img.name, img.b64_data));
 }
 
 
@@ -124,7 +158,7 @@ void ServerConnection::on_new_connection()
         emit debug_message("New Connection!");
         
         // TODO: request server state for new client
-        d_connections[socket] = {socket, {}, 0, ""};
+        d_connections[socket] = {socket, {}, 0, "", {}};
         QObject::connect(socket, &QTcpSocket::errorOccurred, this, &ServerConnection::on_socket_error);
         QObject::connect(socket, &QTcpSocket::readyRead, this, &ServerConnection::on_socket_readyread);
         QObject::connect(socket, &QTcpSocket::disconnected, this, &ServerConnection::on_socket_disconnected);
@@ -152,10 +186,26 @@ void ServerConnection::on_socket_readyread()
 
     while (!doc.isEmpty())
     {
-        handle_incoming_messages(doc);
-        signal_message(doc, state);
+        handle_incoming_messages(doc, state);
         doc = read_connection(state);
     }
+}
+
+
+void ServerConnection::on_socket_readywrite([[maybe_unused]] uint64_t written)
+{
+    QObject *id = QObject::sender();
+    SocketState &state = d_connections.find(id).value();
+    
+    // nothing to send, so we dont care
+    if (state.file_queue.isEmpty())
+        return;
+
+    // socket is currently idle, so we can send a file
+    if (state.socket->bytesToWrite() != 0)
+        return;
+
+    transfer_pixmap(state);
 }
 
 

@@ -30,6 +30,10 @@ class ConnectionBase : public QObject
         void debug_message(QString const &message);
         void connection_status_update(QString const &state);
 
+        // display
+        void display_updated(QString const &id);
+        void pixmap_tranfer(QString const &name, QByteArray const &b64_pixmap);
+
         // connect / disconnect
         void player_disconnected(QString const &name);
         void player_connected(QString const &name, QByteArray const &b64_avatar, QColor const &color);

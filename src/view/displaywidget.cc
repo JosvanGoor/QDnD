@@ -21,9 +21,26 @@ DisplayWidget::~DisplayWidget()
 //    Display     //
 ////////////////////
 
+bool DisplayWidget::waiting_for_pixmap(QString const &id)
+{
+    if (d_incoming_pixmap_name.isEmpty())
+        return false;
+    
+    return d_incoming_pixmap_name == id;
+}
+
+
+void DisplayWidget::set_incoming_pixmap(QString const &id)
+{
+    d_incoming_pixmap_name = id;
+}
+
+
 void DisplayWidget::set_pixmap(QPixmap const &pixmap)
 {
     d_current_display = pixmap;
+    d_incoming_pixmap_name = "";
+    update();
 }
 
 

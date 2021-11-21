@@ -7,6 +7,7 @@
 #include <QTcpServer>
 #include <QTimer>
 
+#include "../model/runtimemodel.h"
 #include "connectionbase.h"
 #include "messagebuilding.h"
 #include "messagetypes.h"
@@ -19,10 +20,12 @@ class ServerConnection : public ConnectionBase
     QTimer d_ping_timer;
     QTcpServer *d_server;
     QMap<QObject*, SocketState> d_connections;
+    
     SocketState d_self;
+    RuntimeModel *d_runtime_model;
 
     public:
-        explicit ServerConnection(QObject *parent = nullptr);
+        explicit ServerConnection(RuntimeModel *runtime_model, QObject *parent = nullptr);
         ~ServerConnection();
 
         void start_listening(uint16_t port);
@@ -34,13 +37,15 @@ class ServerConnection : public ConnectionBase
         void update_status();
 
         // handle incoming
-        void handle_incoming_messages(QJsonDocument const &doc);
+        void handle_incoming_messages(QJsonDocument const &doc, SocketState &state);
+        void transfer_pixmap(SocketState &state);
 
     protected slots:
         void on_ping_timer();
         void on_new_connection();
         void on_socket_error(QAbstractSocket::SocketError error);
         void on_socket_readyread();
+        void on_socket_readywrite(uint64_t written);
         void on_socket_disconnected();
 };
 

@@ -15,6 +15,8 @@ class MenuBar : public QMenuBar
         QAction *d_host;
         QAction *d_connect;
         QAction *d_disconnect;
+    QMenu *d_display;
+        QAction *d_update_display;
 
     public:
         explicit MenuBar(QWidget *parent = nullptr);
@@ -29,6 +31,7 @@ class MenuBar : public QMenuBar
         QAction *host();
         QAction *connect();
         QAction *disconnect();
+        QAction *update_display();
 
 };
 

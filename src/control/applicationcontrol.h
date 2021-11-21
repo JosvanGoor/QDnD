@@ -37,12 +37,6 @@ class ApplicationControl : public QObject
         void on_chatwidget_message_entered(QString const &msg);
         void on_chatwidget_user_message(QString const &name, QString const &message);
         
-        // networking  stuff
-        bool reconnect_confirmation();
-        void connection_setup();
-        void player_connected(QString const &name, QByteArray const &b64_avatar, QColor const &color);
-        void player_disconnected(QString const &name);
-
         // mainwindow stuff
         void mainwindow_setup();
 
@@ -52,6 +46,15 @@ class ApplicationControl : public QObject
         void on_menubar_host();
         void on_menubar_connect();
         void on_menubar_disconnect();
+        void on_menubar_display_update();
+
+        // networking  stuff
+        bool reconnect_confirmation();
+        void connection_setup();
+        void player_connected(QString const &name, QByteArray const &b64_avatar, QColor const &color);
+        void player_disconnected(QString const &name);
+        void display_updated(QString const &id);
+        void pixmap_transferred(QString const &id, QByteArray const &b64_pixmap);
 
         // spellswidget stuff
         void spellswidget_setup();

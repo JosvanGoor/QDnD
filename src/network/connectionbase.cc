@@ -21,6 +21,7 @@ void ConnectionBase::signal_message(QJsonDocument const &doc, SocketState &state
 {
     QJsonObject obj = doc.object();
     MessageType type = static_cast<MessageType>(obj["type"].toInt());
+    debug_message("Received " + as_string(type));
 
     switch (type)
     {
@@ -48,9 +49,19 @@ void ConnectionBase::signal_message(QJsonDocument const &doc, SocketState &state
             emit debug_message("Pong received!");
         break;
 
+        case MessageType::PIXMAP_TRANSFER:
+            emit pixmap_tranfer(obj["name"].toString(), obj["data"].toString().toLocal8Bit());
+        break;
+
         case MessageType::CHAT_MESSAGE:
             emit chat_message(obj["name"].toString(), obj["message"].toString());
         break;
+
+        case MessageType::DISPLAY_UPDATE:
+            emit debug_message("Received display update.");
+            emit display_updated(obj["name"].toString());
+        break;
+
 
         default:
             emit debug_message("Received unknown message type: " + as_string(type));

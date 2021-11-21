@@ -4,6 +4,7 @@
 #include <QByteArray>
 #include <QJsonDocument>
 #include <QTcpSocket>
+#include <QVector>
 
 struct SocketState
 {
@@ -11,6 +12,7 @@ struct SocketState
     QByteArray buffer;
     uint32_t incoming = 0;
     QString identifier = "";
+    QVector<QString> file_queue;
 };
 
 
