@@ -28,10 +28,10 @@ ServerConnection::~ServerConnection()
 void ServerConnection::start_listening(uint16_t port)
 {
     if (!d_server->listen(QHostAddress::Any, port))
-        connection_status_update("Failed to start listening to port " + QString::number(port));
+        emit connection_status_update("Failed to start listening to port " + QString::number(port));
     
     update_status();
-    debug_message("Successfully started hosting");
+    emit debug_message("Successfully started hosting");
     d_ping_timer.setInterval(45'000);
     d_ping_timer.start(45'000);
 }
@@ -41,7 +41,7 @@ void ServerConnection::disconnect()
 {
     for (auto it = d_connections.begin(); it != d_connections.end(); ++it)
     {
-        it.value().socket->close();
+        it.value().socket->disconnect(this);
         it.value().socket->deleteLater();
     }
 
@@ -49,7 +49,7 @@ void ServerConnection::disconnect()
     d_connections.clear();
     d_ping_timer.stop();
 
-    debug_message("Successfully stoped hosting");
+    emit debug_message("Successfully stoped hosting");
     update_status();
 }
 
@@ -81,10 +81,29 @@ void ServerConnection::send(QJsonDocument const &doc, bool signal_self)
 void ServerConnection::update_status()
 {
     if (d_server->isListening())
-        connection_status_update("Hosting @ " + QString::number(d_server->serverPort()) + " (" + QString::number(d_connections.size()) + " clients connected)");
+        emit connection_status_update("Hosting @ " + QString::number(d_server->serverPort()) + " (" + QString::number(d_connections.size()) + " clients connected)");
     else
-        connection_status_update("No Connection");
+        emit connection_status_update("No Connection");
 }
+
+
+////////////////////
+//    Incoming    //
+////////////////////
+
+void ServerConnection::handle_incoming_messages(QJsonDocument const &doc)
+{
+    QJsonObject obj = doc.object();
+    MessageType type = static_cast<MessageType>(obj["type"].toInt());
+
+    switch (type)
+    {
+        case MessageType::PONG: break; // we guchi
+        default:
+            send(doc); // dispatch to all clients.
+    }
+}
+
 
 ////////////////////
 //     Slots      //
@@ -92,7 +111,7 @@ void ServerConnection::update_status()
 
 void ServerConnection::on_ping_timer()
 {
-    debug_message("ping!");
+    emit debug_message("ping!");
     send(ping_message());
 }
 
@@ -121,7 +140,7 @@ void ServerConnection::on_socket_error(QAbstractSocket::SocketError error)
     QString name = state.identifier.isEmpty() ? "[[Unknown]]" : state.identifier;
     
     QString errstr = QMetaEnum::fromType<QAbstractSocket::SocketError>().valueToKey(error);
-    debug_message(errstr + " from " + name);
+    emit debug_message(errstr + " from " + name);
 }
 
 
@@ -133,7 +152,7 @@ void ServerConnection::on_socket_readyread()
 
     while (!doc.isEmpty())
     {
-        send(doc);
+        handle_incoming_messages(doc);
         signal_message(doc, state);
         doc = read_connection(state);
     }
@@ -146,7 +165,9 @@ void ServerConnection::on_socket_disconnected()
     SocketState &state = d_connections.find(id).value();
 
     if (!state.identifier.isEmpty())
-        player_disconnected(state.identifier);
+    {
+        send(disconnect_message(state.identifier), true);
+    }
 
     state.socket->deleteLater();
     d_connections.remove(id);

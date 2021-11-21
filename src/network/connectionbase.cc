@@ -32,14 +32,12 @@ void ConnectionBase::signal_message(QJsonDocument const &doc, SocketState &state
             QByteArray b64_avatar = obj["avatar"].toString().toLocal8Bit();
             QColor color = obj["color"].toString().toUInt(nullptr, 16);
             state.identifier = name;
-            player_connected(name, b64_avatar, color);
-            chat_connection_message(name + " has connected.");
+            emit player_connected(name, b64_avatar, color);
         }
         break;
 
         case MessageType::DISCONNECTED:
-            player_disconnected(obj["name"].toString());
-            chat_connection_message(obj["name"].toString() + " has been disconnected.");
+            emit player_disconnected(obj["name"].toString());
         break;
 
         case MessageType::PING:
@@ -47,15 +45,15 @@ void ConnectionBase::signal_message(QJsonDocument const &doc, SocketState &state
         break;
 
         case MessageType::PONG:
-            debug_message("Pong received!");
+            emit debug_message("Pong received!");
         break;
 
         case MessageType::CHAT_MESSAGE:
-            chat_message(obj["name"].toString(), obj["message"].toString());
+            emit chat_message(obj["name"].toString(), obj["message"].toString());
         break;
 
         default:
-            debug_message("Received unknown message type: " + as_string(type));
+            emit debug_message("Received unknown message type: " + as_string(type));
         break;
     }
 }

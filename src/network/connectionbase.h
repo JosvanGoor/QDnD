@@ -28,7 +28,6 @@ class ConnectionBase : public QObject
     signals:
         // general signals
         void debug_message(QString const &message);
-        void chat_connection_message(QString const &message);
         void connection_status_update(QString const &state);
 
         // connect / disconnect

@@ -20,6 +20,10 @@ class MenuBar : public QMenuBar
         explicit MenuBar(QWidget *parent = nullptr);
         ~MenuBar();
 
+        // Host stuff
+        void add_server_menus();
+        void remove_server_menus();
+
         // getters
         QAction *quit();
         QAction *host();

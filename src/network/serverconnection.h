@@ -29,9 +29,12 @@ class ServerConnection : public ConnectionBase
         void disconnect() override;
         bool is_connected() override;
         bool is_server() override;
-
+        
         void send(QJsonDocument const &doc, bool signal_self = false) override;
         void update_status();
+
+        // handle incoming
+        void handle_incoming_messages(QJsonDocument const &doc);
 
     protected slots:
         void on_ping_timer();

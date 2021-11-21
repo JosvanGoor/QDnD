@@ -10,6 +10,7 @@
 #include <QTextEdit>
 
 #include "chatwidget.h"
+#include "displaywidget.h"
 #include "menubar.h"
 #include "playerswidget.h"
 #include "spellswidget.h"
@@ -22,6 +23,7 @@ class MainWindow : public QMainWindow
     QSplitter *d_central_widget;
         QSplitter *d_middle_widget;
             QTabWidget *d_middle_tabs;
+                DisplayWidget *d_display_tab;
                 SpellsWidget *d_spells_tab;
             QTextEdit *d_debug_output;
         QTabWidget *d_right_tabs;

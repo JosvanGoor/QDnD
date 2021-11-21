@@ -21,6 +21,15 @@ QJsonDocument handshake_message(QString const &name, QByteArray b64_avatar, QCol
 }
 
 
+QJsonDocument disconnect_message(QString const &name)
+{
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::DISCONNECTED);
+    obj["name"] = name;
+    return QJsonDocument{obj};
+}
+
+
 QJsonDocument ping_message()
 {
     QJsonObject obj;

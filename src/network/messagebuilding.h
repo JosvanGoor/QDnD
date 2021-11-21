@@ -10,6 +10,7 @@
 // system
 QJsonDocument welcome_message();
 QJsonDocument handshake_message(QString const &name, QByteArray b64_avatar, QColor color = Qt::black);
+QJsonDocument disconnect_message(QString const &name);
 QJsonDocument ping_message();
 QJsonDocument pong_message();
 

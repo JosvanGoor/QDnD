@@ -14,6 +14,7 @@ enum class MessageType
     PONG,
 
     CHAT_MESSAGE,
+    DISPLAY_UPDATE,
 };
 
 int as_int(MessageType type);

@@ -77,6 +77,7 @@ bool ApplicationControl::reconnect_confirmation()
         confirm.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         if (confirm.exec() == QMessageBox::No)
             return false;
+        d_connection->disconnect();
         delete d_connection;
     }
     
@@ -88,7 +89,6 @@ void ApplicationControl::connection_setup()
 {
     QObject::connect(d_connection, &ConnectionBase::debug_message, this, &ApplicationControl::debug_output);
     QObject::connect(d_connection, &ConnectionBase::connection_status_update, this, &ApplicationControl::connection_info);
-    QObject::connect(d_connection, &ConnectionBase::chat_connection_message, this, &ApplicationControl::chatmessage_info);
     QObject::connect(d_connection, &ConnectionBase::player_disconnected, this, &ApplicationControl::player_disconnected);
     QObject::connect(d_connection, &ConnectionBase::player_connected, this, &ApplicationControl::player_connected);
     QObject::connect(d_connection, &ConnectionBase::chat_message, this, &ApplicationControl::on_chatwidget_user_message);
@@ -99,12 +99,14 @@ void ApplicationControl::player_connected(QString const &name, QByteArray const 
 {
     QString avatar_id = d_runtime_model->pixmap_cache().load_from_memory(b64_avatar);
     d_main_window->players_widget()->add_user(name, d_runtime_model->pixmap_cache().get_pixmap(avatar_id), color);
+    d_main_window->chat_widget()->on_info_message(name + " has connected.");
 }
 
 
 void ApplicationControl::player_disconnected(QString const &name)
 {
     d_main_window->players_widget()->remove_user(name);
+    d_main_window->chat_widget()->on_info_message(name + " has been disconnected.");
 }
 
 
@@ -202,7 +204,9 @@ void ApplicationControl::on_menubar_connect()
 
 void ApplicationControl::on_menubar_disconnect()
 {
-    debug_output("Disconnect not implemented yet.");
+    if (!reconnect_confirmation())
+        return;
+    d_connection = nullptr;
 }
 
 

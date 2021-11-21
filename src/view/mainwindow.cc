@@ -13,7 +13,8 @@ MainWindow::MainWindow(QWidget *parent)
     
     d_middle_widget->addWidget(d_middle_tabs = new QTabWidget);
     d_middle_widget->addWidget(d_debug_output = new QTextEdit);
-    
+
+    d_middle_tabs->addTab(d_display_tab = new DisplayWidget, "Display");
     d_middle_tabs->addTab(d_spells_tab = new SpellsWidget, "Spells");
     
     d_central_widget->addWidget(d_right_tabs = new QTabWidget);
