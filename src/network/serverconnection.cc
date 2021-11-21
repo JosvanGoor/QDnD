@@ -11,6 +11,7 @@ ServerConnection::ServerConnection(QObject *parent)
 
     QObject::connect(d_server, &QTcpServer::newConnection, this, &ServerConnection::on_new_connection);
     QObject::connect(&d_ping_timer, &QTimer::timeout, this, &ServerConnection::on_ping_timer);
+    d_self.identifier = "Dungeon Master";
 }
 
 
@@ -65,12 +66,15 @@ bool ServerConnection::is_server()
 }
 
 
-void ServerConnection::send(QJsonDocument const &doc)
+void ServerConnection::send(QJsonDocument const &doc, bool signal_self)
 {
     QByteArray blob = doc.toJson();
 
     for (auto it = d_connections.begin(); it != d_connections.end(); ++it)
         send_blob(it.value().socket, blob);
+
+    if (signal_self)
+        signal_message(doc, d_self);
 }
 
 

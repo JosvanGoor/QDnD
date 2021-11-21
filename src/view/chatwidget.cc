@@ -63,3 +63,25 @@ void ChatWidget::on_info_message(QString const &message)
 
     d_output->verticalScrollBar()->setValue(d_output->verticalScrollBar()->maximum());
 }
+
+
+void ChatWidget::on_user_message(QString const &name, QString const &message)
+{
+    QTextCursor cursor{d_output->document()};
+    cursor.movePosition(QTextCursor::End);
+
+    cursor.beginEditBlock();
+    cursor.insertText(name + ": ");
+    cursor.insertText(message + "\n");
+    cursor.endEditBlock();
+
+    while (d_output->document()->blockCount() > 1000)
+    {
+        QTextCursor cursor{d_output->document()->firstBlock()};
+        cursor.select(QTextCursor::BlockUnderCursor);
+        cursor.removeSelectedText();
+        cursor.deleteChar();
+    }
+
+    d_output->verticalScrollBar()->setValue(d_output->verticalScrollBar()->maximum());
+}

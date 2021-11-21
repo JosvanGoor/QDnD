@@ -23,6 +23,8 @@ class ApplicationControl : public QObject
     RuntimeModel *d_runtime_model;
     QMap<QString, QString> d_settings;
 
+    QString d_identifier; // own name
+
     public:
         explicit ApplicationControl(QObject *parent = nullptr);
         ~ApplicationControl();
@@ -33,7 +35,8 @@ class ApplicationControl : public QObject
         // Chatwidget stuff
         void chatwidget_setup();
         void on_chatwidget_message_entered(QString const &msg);
-
+        void on_chatwidget_user_message(QString const &name, QString const &message);
+        
         // networking  stuff
         bool reconnect_confirmation();
         void connection_setup();

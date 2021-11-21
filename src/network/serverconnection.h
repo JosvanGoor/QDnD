@@ -19,6 +19,7 @@ class ServerConnection : public ConnectionBase
     QTimer d_ping_timer;
     QTcpServer *d_server;
     QMap<QObject*, SocketState> d_connections;
+    SocketState d_self;
 
     public:
         explicit ServerConnection(QObject *parent = nullptr);
@@ -29,7 +30,7 @@ class ServerConnection : public ConnectionBase
         bool is_connected() override;
         bool is_server() override;
 
-        void send(QJsonDocument const &doc) override;
+        void send(QJsonDocument const &doc, bool signal_self = false) override;
         void update_status();
 
     protected slots:

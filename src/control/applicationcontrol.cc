@@ -10,6 +10,7 @@ ApplicationControl::ApplicationControl(QObject *parent)
     d_main_window = new MainWindow;
     d_runtime_model = new RuntimeModel;
     d_connection = nullptr;
+    d_identifier = "Dungeon Master";
     
     mainwindow_setup();
 
@@ -50,7 +51,16 @@ void ApplicationControl::chatwidget_setup()
 
 void ApplicationControl::on_chatwidget_message_entered(QString const &msg)
 {
-    debug_output("From Chat: " + msg);
+    if (d_connection)
+    {
+        QJsonDocument doc = chat_message(d_identifier, msg);
+        d_connection->send(doc, true);
+    }
+}
+
+void ApplicationControl::on_chatwidget_user_message(QString const &name, QString const &message)
+{
+    d_main_window->chat_widget()->on_user_message(name, message);
 }
 
 
@@ -81,6 +91,7 @@ void ApplicationControl::connection_setup()
     QObject::connect(d_connection, &ConnectionBase::chat_connection_message, this, &ApplicationControl::chatmessage_info);
     QObject::connect(d_connection, &ConnectionBase::player_disconnected, this, &ApplicationControl::player_disconnected);
     QObject::connect(d_connection, &ConnectionBase::player_connected, this, &ApplicationControl::player_connected);
+    QObject::connect(d_connection, &ConnectionBase::chat_message, this, &ApplicationControl::on_chatwidget_user_message);
 }
 
 
@@ -184,6 +195,7 @@ void ApplicationControl::on_menubar_connect()
     connection_setup();
 
     reinterpret_cast<ClientConnection*>(d_connection)->connect(dialog.hostname(), dialog.port());
+    d_identifier = dialog.character_name();
     d_connection->send(handshake_message(dialog.character_name(), avatar.b64_data));
 }
 

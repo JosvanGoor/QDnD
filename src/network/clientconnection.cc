@@ -50,9 +50,11 @@ bool ClientConnection::is_server()
 }
 
 
-void ClientConnection::send(QJsonDocument const &doc)
+void ClientConnection::send(QJsonDocument const &doc, bool signal_self)
 {
     send_json_blob(d_socket_state.socket, doc);
+    // if (signal_self)
+    //     signal_message(doc, d_socket_state);
 }
 
 ////////////////////

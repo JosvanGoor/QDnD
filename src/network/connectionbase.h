@@ -5,6 +5,7 @@
 #include <QJsonObject>
 #include <QObject>
 
+#include "messagebuilding.h"
 #include "messagetypes.h"
 #include "../utility/networking.h"
 
@@ -19,7 +20,7 @@ class ConnectionBase : public QObject
         virtual void disconnect() = 0;
         virtual bool is_connected() = 0;
         virtual bool is_server() = 0;
-        virtual void send(QJsonDocument const &doc) = 0;
+        virtual void send(QJsonDocument const &doc, bool signal_self = false) = 0;
 
         // dispatch
         void signal_message(QJsonDocument const &doc, SocketState &state);
@@ -33,6 +34,7 @@ class ConnectionBase : public QObject
         // connect / disconnect
         void player_disconnected(QString const &name);
         void player_connected(QString const &name, QByteArray const &b64_avatar, QColor const &color);
+        void chat_message(QString const &name, QString const &message);
 };
 
 #endif

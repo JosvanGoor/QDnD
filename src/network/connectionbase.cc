@@ -33,11 +33,25 @@ void ConnectionBase::signal_message(QJsonDocument const &doc, SocketState &state
             QColor color = obj["color"].toString().toUInt(nullptr, 16);
             state.identifier = name;
             player_connected(name, b64_avatar, color);
+            chat_connection_message(name + " has connected.");
         }
         break;
 
         case MessageType::DISCONNECTED:
             player_disconnected(obj["name"].toString());
+            chat_connection_message(obj["name"].toString() + " has been disconnected.");
+        break;
+
+        case MessageType::PING:
+            send(pong_message());
+        break;
+
+        case MessageType::PONG:
+            debug_message("Pong received!");
+        break;
+
+        case MessageType::CHAT_MESSAGE:
+            chat_message(obj["name"].toString(), obj["message"].toString());
         break;
 
         default:

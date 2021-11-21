@@ -25,6 +25,7 @@ class ChatWidget : public QWidget
         void on_send_pressed();
 
         void on_info_message(QString const &message);
+        void on_user_message(QString const &user, QString const &message);
 
     signals:
         void message_entered(QString const &str);

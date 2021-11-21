@@ -23,7 +23,7 @@ class ClientConnection : public ConnectionBase
         bool is_connected() override;
         bool is_server() override;
 
-        void send(QJsonDocument const &doc) override;
+        void send(QJsonDocument const &doc, bool signal_self = false) override;
 
     protected slots:
         void on_connected();
