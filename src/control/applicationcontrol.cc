@@ -271,6 +271,7 @@ void ApplicationControl::pixmap_transferred(QString const &id, QByteArray const 
         d_main_window->display_widget()->set_pixmap(d_runtime_model->pixmap_cache().get_pixmap(id));
 }
 
+
 ////////////////////
 //  SpellsWidget  //
 ////////////////////

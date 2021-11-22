@@ -20,6 +20,10 @@ SOURCES +=  src/control/applicationcontrol.cc \
             src/expressions/dicetokenizer.cc \
             src/expressions/parserstate.cc \
             \
+            src/grid/gridbuilderwidget.cc \
+            src/grid/gridmousestate.cc \
+            src/grid/gridwidget.cc \
+            \
             src/model/pixmapcache.cc \
             src/model/runtimemodel.cc \
             src/model/spell.cc \
@@ -52,6 +56,10 @@ HEADERS +=  src/control/applicationcontrol.h \
             src/expressions/diceparser.h \
             src/expressions/dicetokenizer.h \
             src/expressions/parserstate.h \
+            \
+            src/grid/gridbuilderwidget.h \
+            src/grid/gridmousestate.h \
+            src/grid/gridwidget.h \
             \
             src/model/pixmapcache.h \
             src/model/runtimemodel.h \

@@ -16,10 +16,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     d_middle_tabs->addTab(d_display_tab = new DisplayWidget, "Display");
     d_middle_tabs->addTab(d_spells_tab = new SpellsWidget, "Spells");
+    d_middle_tabs->addTab(d_grid_widget = new GridWidget, "Grid");
     
     d_central_widget->addWidget(d_right_tabs = new QTabWidget);
     d_right_tabs->addTab(d_chat_tab = new ChatWidget, "Chat");
-    d_right_tabs->addTab(d_players_widget = new PlayersWidget, "Players");
+    d_right_tabs->addTab(d_players_tab = new PlayersWidget, "Players");
+    d_right_tabs->addTab(d_grid_builder_tab = new GridBuilderWidget{d_grid_widget}, "Grid/Build");
 
     d_middle_widget->setOrientation(Qt::Vertical);
     d_middle_widget->setSizes({600, 100});
@@ -55,6 +57,12 @@ DisplayWidget *MainWindow::display_widget() noexcept
 }
 
 
+GridWidget *MainWindow::grid_widget() noexcept
+{
+    return d_grid_widget;
+}
+
+
 MenuBar *MainWindow::menu_bar() noexcept
 {
     return d_menu_bar;
@@ -62,7 +70,7 @@ MenuBar *MainWindow::menu_bar() noexcept
 
 PlayersWidget *MainWindow::players_widget() noexcept
 {
-    return d_players_widget;
+    return d_players_tab;
 }
 
 
