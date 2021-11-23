@@ -10,7 +10,7 @@ struct SocketState
 {
     QTcpSocket *socket;
     QByteArray buffer;
-    uint32_t incoming = 0;
+    int incoming = 0;
     QString identifier = "";
     QVector<QString> file_queue;
 };
