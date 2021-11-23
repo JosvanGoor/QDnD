@@ -36,6 +36,10 @@ void HostConnection::on_incoming_data()
             dispatch(doc);
             line_removed(doc["name"].toString());
         }
+        else if (doc["type"].toString() == "PONG")
+        {
+            debug_message("Pong from " + conn.d_socket->peerAddress().toString());
+        }
     }
     else
         emit debug_message("Connection not found frowny face");

@@ -6,6 +6,7 @@
 #include <QPixmap>
 #include <QTcpServer>
 #include <QTcpSocket>
+#include <QTimer>
 
 #include "../connectioncommon/connectioncommon.h"
 
@@ -24,6 +25,7 @@ class HostConnection : public ConnectionCommon
 {
     Q_OBJECT
 
+    QTimer d_ping_timer;
     QTcpServer *d_server;
     QMap<QObject*, ConnectionState> d_clients;
 
@@ -36,6 +38,7 @@ class HostConnection : public ConnectionCommon
         void dispatch(QJsonDocument const &doc);
 
     private slots:
+        void on_ping_timer();
         void on_incoming_data();
         void on_incoming_connection();
         void on_connection_closed();

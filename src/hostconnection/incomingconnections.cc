@@ -9,6 +9,9 @@ void HostConnection::start_listening(uint16_t port)
         d_server = nullptr;
         return;
     }
+
+    d_ping_timer.setInterval(45'000);
+    d_ping_timer.start(45'000);
     connection_status_update("Hosting @ " + QString::number(port) + " (0 connected)");
 }
 

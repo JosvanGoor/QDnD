@@ -23,4 +23,9 @@ void ClientConnection::on_data()
         token_removed(doc["name"].toString());
     else if (doc["type"].toString() == "MONSTER_ADDED")
         token_added(doc);
+    else if (doc["type"].toString() == "PING")
+    {
+        send_blob(d_connection, "{\"type\": \"PONG\"}");
+        debug_message("Ping! sent pong to host");
+    }
 }
