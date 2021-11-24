@@ -9,9 +9,9 @@
 
 #include "connectionbase.h"
 #include "messagebuilding.h"
-#include "messagetypes.h"
 #include "../expressions/diceparser.h"
 #include "../model/runtimemodel.h"
+#include "../utility/enums.h"
 #include "../utility/networking.h"
 
 class ServerConnection : public ConnectionBase

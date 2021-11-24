@@ -20,7 +20,7 @@ SOURCES +=  src/control/applicationcontrol.cc \
             src/expressions/dicetokenizer.cc \
             src/expressions/parserstate.cc \
             \
-            \
+            src/model/gridmodel.cc \
             src/model/pixmapcache.cc \
             src/model/runtimemodel.cc \
             src/model/spell.cc \
@@ -28,9 +28,9 @@ SOURCES +=  src/control/applicationcontrol.cc \
             src/network/clientconnection.cc \
             src/network/connectionbase.cc \
             src/network/messagebuilding.cc \
-            src/network/messagetypes.cc \
             src/network/serverconnection.cc \
             \
+            src/utility/enums.cc \
             src/utility/htmlformatting.cc \
             src/utility/loading.cc \
             src/utility/networking.cc \
@@ -38,6 +38,7 @@ SOURCES +=  src/control/applicationcontrol.cc \
             src/view/chatwidget.cc \
             src/view/connectdialog.cc \
             src/view/displaywidget.cc \
+            src/view/gridwidget.cc \
             src/view/mainwindow.cc \
             src/view/menubar.cc \
             src/view/playerswidget.cc \
@@ -54,7 +55,7 @@ HEADERS +=  src/control/applicationcontrol.h \
             src/expressions/dicetokenizer.h \
             src/expressions/parserstate.h \
             \
-            \
+            src/model/gridmodel.h \
             src/model/pixmapcache.h \
             src/model/runtimemodel.h \
             src/model/spell.h \
@@ -62,9 +63,9 @@ HEADERS +=  src/control/applicationcontrol.h \
             src/network/clientconnection.h \
             src/network/connectionbase.h \
             src/network/messagebuilding.h \
-            src/network/messagetypes.h \
             src/network/serverconnection.h \
             \
+            src/utility/enums.h \
             src/utility/htmlformatting.h \
             src/utility/loading.h \
             src/utility/networking.h \
@@ -72,6 +73,7 @@ HEADERS +=  src/control/applicationcontrol.h \
             src/view/chatwidget.h \
             src/view/connectdialog.h \
             src/view/displaywidget.h \
+            src/view/gridwidget.h \
             src/view/mainwindow.h \
             src/view/menubar.h \
             src/view/playerswidget.h \

@@ -6,7 +6,7 @@
 #include <QObject>
 
 #include "messagebuilding.h"
-#include "messagetypes.h"
+#include "../utility/enums.h"
 #include "../utility/networking.h"
 
 class ConnectionBase : public QObject

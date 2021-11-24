@@ -11,6 +11,7 @@
 
 #include "chatwidget.h"
 #include "displaywidget.h"
+#include "gridwidget.h"
 #include "menubar.h"
 #include "playerswidget.h"
 #include "spellswidget.h"
@@ -25,6 +26,7 @@ class MainWindow : public QMainWindow
             QTabWidget *d_middle_tabs;
                 DisplayWidget *d_display_tab;
                 SpellsWidget *d_spells_tab;
+                GridWidget *d_grid_tab;
             QTextEdit *d_debug_output;
         QTabWidget *d_right_tabs;
             PlayersWidget *d_players_tab;
@@ -40,6 +42,7 @@ class MainWindow : public QMainWindow
         // getters
         ChatWidget *chat_widget() noexcept;
         DisplayWidget *display_widget() noexcept;
+        GridWidget *grid_widget() noexcept;
         MenuBar *menu_bar() noexcept;
         PlayersWidget *players_widget() noexcept;
         SpellsWidget *spells_widget() noexcept;

@@ -1,11 +1,12 @@
 #ifndef NETWORK_MESSAGEBUILDING_H
 #define NETWORK_MESSAGEBUILDING_H
 
+#include <QColor>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 
-#include "messagetypes.h"
+#include "../utility/enums.h"
 
 // system
 QJsonDocument welcome_message();
