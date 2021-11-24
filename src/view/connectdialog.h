@@ -12,6 +12,8 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
+#include "dropwidget.h"
+
 class ConnectDialog : public QDialog
 {
     Q_OBJECT
@@ -24,6 +26,8 @@ class ConnectDialog : public QDialog
     QPushButton *d_select_avatar;
     QLabel *d_avatar_display;
     QString d_avatar_file;
+    DropWidget *d_drop_widget;
+
 
     public:
         explicit ConnectDialog(QWidget *parent = nullptr);

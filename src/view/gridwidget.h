@@ -29,6 +29,10 @@ class GridWidget : public QWidget
         // painting
         void paintEvent(QPaintEvent *event);
         void paint_grid(QPainter &painter);
+
+        // utility
+        QColor foreground_color();
+        QColor background_color();
 };
 
 #endif

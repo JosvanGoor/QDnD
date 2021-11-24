@@ -6,5 +6,8 @@
         <file>data/dmpic.png</file>
         <file>data/missing_texture.jpg</file>
         <file>data/default_avatar.png</file>
+        <file>data/accept.png</file>
+        <file>data/deny.png</file>
+        <file>data/neutral.png</file>
     </qresource>
 </RCC>

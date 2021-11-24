@@ -20,6 +20,7 @@ struct GridItem
 struct GridItemGroup
 {
     QString d_name;
+    VisibilityMode d_visibility;
     QVector<GridItem> d_items;
     QVector<GridItemGroup> d_subgroups;
 

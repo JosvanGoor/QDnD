@@ -20,6 +20,7 @@ SOURCES +=  src/control/applicationcontrol.cc \
             src/expressions/dicetokenizer.cc \
             src/expressions/parserstate.cc \
             \
+            src/model/griditemgroup.cc \
             src/model/gridmodel.cc \
             src/model/pixmapcache.cc \
             src/model/runtimemodel.cc \
@@ -38,6 +39,7 @@ SOURCES +=  src/control/applicationcontrol.cc \
             src/view/chatwidget.cc \
             src/view/connectdialog.cc \
             src/view/displaywidget.cc \
+            src/view/dropwidget.cc \
             src/view/gridwidget.cc \
             src/view/mainwindow.cc \
             src/view/menubar.cc \
@@ -55,6 +57,7 @@ HEADERS +=  src/control/applicationcontrol.h \
             src/expressions/dicetokenizer.h \
             src/expressions/parserstate.h \
             \
+            src/model/griditemgroup.h \
             src/model/gridmodel.h \
             src/model/pixmapcache.h \
             src/model/runtimemodel.h \
@@ -73,6 +76,7 @@ HEADERS +=  src/control/applicationcontrol.h \
             src/view/chatwidget.h \
             src/view/connectdialog.h \
             src/view/displaywidget.h \
+            src/view/dropwidget.h \
             src/view/gridwidget.h \
             src/view/mainwindow.h \
             src/view/menubar.h \

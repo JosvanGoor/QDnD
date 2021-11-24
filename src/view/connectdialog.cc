@@ -34,6 +34,7 @@ ConnectDialog::ConnectDialog(QWidget *parent)
     layout()->addWidget(form);
     layout()->addWidget(buttons);
     layout()->addWidget(group_box);
+    layout()->addWidget(d_drop_widget = new DropWidget);
     
     d_avatar_file = ":data/default_avatar.png";
     QObject::connect(d_connect, &QPushButton::pressed, this, &ConnectDialog::on_connect);
