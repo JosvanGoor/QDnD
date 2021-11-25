@@ -33,6 +33,10 @@ class GridWidget : public QWidget
         // utility
         QColor foreground_color();
         QColor background_color();
+
+        // gridmodel
+        GridModel *model() noexcept;
+        void set_gridmodel(GridModel *model);
 };
 
 #endif

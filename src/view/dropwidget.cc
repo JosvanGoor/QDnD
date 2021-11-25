@@ -41,16 +41,10 @@ void DropWidget::set_display(QPixmap const &pixmap)
 ////////////////////
 //    Filedrop    //
 ////////////////////
-#include <iostream> // TODO: remove
 
 void DropWidget::dragEnterEvent(QDragEnterEvent *event)
 {
     QMimeData const *mime = event->mimeData();
-
-    for (auto &format : mime->formats())
-    {
-        std::cout << format.toStdString() << "\n" << std::flush;
-    }
 
     if (mime->hasUrls())
     {
@@ -72,13 +66,13 @@ void DropWidget::dragEnterEvent(QDragEnterEvent *event)
 }
 
 
-void DropWidget::dragLeaveEvent(QDragLeaveEvent *event)
+void DropWidget::dragLeaveEvent([[maybe_unused]] QDragLeaveEvent *event)
 {
     setPixmap(d_display);
 }
 
 
-void DropWidget::dropEvent(QDropEvent *event)
+void DropWidget::dropEvent([[maybe_unused]] QDropEvent *event)
 {
     QString filename = d_file_to_accept.toLocalFile();
     QPixmap pixmap = QPixmap{filename}.scaled(256, 256);

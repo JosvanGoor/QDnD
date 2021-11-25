@@ -10,13 +10,13 @@ GridWidget::GridWidget(QWidget *parent)
     d_gridsize = 64;
     d_offset = {};
     d_mouse_old = {};
-    d_grid_model = nullptr;
+    d_grid_model = new GridModel{};
 }
 
 
 GridWidget::~GridWidget()
 {
-
+    delete d_grid_model;
 }
 
 
@@ -61,4 +61,21 @@ QColor GridWidget::foreground_color()
 QColor GridWidget::background_color()
 {
     return !d_grid_model ? QColor{Qt::white} : d_grid_model->background_color();
+}
+
+
+////////////////////
+//   GridModel    //
+////////////////////
+
+GridModel *GridWidget::model() noexcept
+{
+    return d_grid_model;
+}
+
+
+void GridWidget::set_gridmodel(GridModel *model)
+{
+    delete d_grid_model;
+    d_grid_model = model;
 }
