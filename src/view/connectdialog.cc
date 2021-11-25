@@ -23,9 +23,9 @@ ConnectDialog::ConnectDialog(QWidget *parent)
     QGroupBox *group_box = new QGroupBox{"Avatar"};
     group_box->setLayout(new QHBoxLayout);
     group_box->layout()->setAlignment(Qt::AlignCenter);
-    group_box->layout()->addWidget(d_avatar_display = new QLabel);
+    group_box->layout()->addWidget(d_drop_widget = new DropWidget);
     QPixmap pixmap{":data/default_avatar.png"};
-    d_avatar_display->setPixmap(pixmap.scaled(256, 256));
+    d_drop_widget->set_display(pixmap);
 
     d_hostname->setText("jbvg.nl");
     d_port->setText("4144");
@@ -34,8 +34,8 @@ ConnectDialog::ConnectDialog(QWidget *parent)
     layout()->addWidget(form);
     layout()->addWidget(buttons);
     layout()->addWidget(group_box);
-    layout()->addWidget(d_drop_widget = new DropWidget);
     
+    layout()->setAlignment(Qt::AlignHCenter);
     d_avatar_file = ":data/default_avatar.png";
     QObject::connect(d_connect, &QPushButton::pressed, this, &ConnectDialog::on_connect);
     QObject::connect(d_cancel, &QPushButton::pressed, this, &ConnectDialog::on_cancel);
@@ -93,9 +93,6 @@ void ConnectDialog::on_cancel()
     reject();
 }
 
-#include <QApplication>
-#include <QThread>
-#include <iostream>
 
 void ConnectDialog::on_select_avatar()
 {
@@ -107,5 +104,11 @@ void ConnectDialog::on_select_avatar()
     
     QPixmap new_avatar;
     new_avatar.loadFromData(arr);
-    d_avatar_display->setPixmap(new_avatar.scaled(256, 256));
+    d_drop_widget->setPixmap(new_avatar);
+}
+
+
+void ConnectDialog::on_avatar_dragged(QString const &file)
+{
+    d_avatar_file = file;
 }

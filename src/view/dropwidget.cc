@@ -8,15 +8,16 @@ DropWidget::DropWidget(QWidget *parent)
 :   QLabel(parent)
 {
     if (d_accept.isNull())
-        d_accept = QPixmap{":data/accept.png"}.scaled(128, 128);
+        d_accept = QPixmap{":data/accept.png"}.scaled(256, 256);
     if (d_deny.isNull())
-        d_deny = QPixmap{":data/deny.png"}.scaled(128, 128);
+        d_deny = QPixmap{":data/deny.png"}.scaled(256, 256);
 
     set_display(QPixmap{":data/neutral.png"});
-    d_accept_state = true;
 
     setAlignment(Qt::AlignCenter);
     setAcceptDrops(true);
+    setMinimumSize(256, 256);
+    setMaximumSize(256, 256);
 }
 
 
@@ -32,8 +33,8 @@ DropWidget::~DropWidget()
 
 void DropWidget::set_display(QPixmap const &pixmap)
 {
-    d_display = pixmap;
-    setPixmap(pixmap.scaled(128, 128));
+    d_display = pixmap.scaled(256, 256);
+    setPixmap(pixmap.scaled(256, 256));
 }
 
 
@@ -51,10 +52,21 @@ void DropWidget::dragEnterEvent(QDragEnterEvent *event)
         std::cout << format.toStdString() << "\n" << std::flush;
     }
 
-    if (mime->formats().size() > 1 || !mime->hasImage())
-        setPixmap(d_deny);
-    else
-        setPixmap(d_accept);
+    if (mime->hasUrls())
+    {
+        QList<QUrl> urls = mime->urls();
+        if (urls.size() == 1 && urls[0].scheme() == "file")
+        {
+            d_file_to_accept = urls[0];
+            setPixmap(d_accept);
+        }
+        else
+        {
+            d_file_to_accept = QUrl{};
+            setPixmap(d_deny);
+        }
+
+    }
 
     event->acceptProposedAction();
 }
@@ -62,12 +74,21 @@ void DropWidget::dragEnterEvent(QDragEnterEvent *event)
 
 void DropWidget::dragLeaveEvent(QDragLeaveEvent *event)
 {
-    std::cout << "dragLeaveEvent\n" << std::flush;
     setPixmap(d_display);
 }
 
 
 void DropWidget::dropEvent(QDropEvent *event)
 {
-    std::cout << "dropEvent\n" << std::flush;
+    QString filename = d_file_to_accept.toLocalFile();
+    QPixmap pixmap = QPixmap{filename}.scaled(256, 256);
+
+    if (pixmap.isNull())
+    {
+        d_file_to_accept = "";
+        return;
+    }
+
+    setPixmap(pixmap);
+    emit pixmap_dropped(filename);
 }

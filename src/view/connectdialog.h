@@ -24,9 +24,8 @@ class ConnectDialog : public QDialog
     QPushButton *d_connect;
     QPushButton *d_cancel;
     QPushButton *d_select_avatar;
-    QLabel *d_avatar_display;
-    QString d_avatar_file;
     DropWidget *d_drop_widget;
+    QString d_avatar_file;
 
 
     public:
@@ -43,6 +42,7 @@ class ConnectDialog : public QDialog
         void on_connect();
         void on_cancel();
         void on_select_avatar();
+        void on_avatar_dragged(QString const &file);
 };
 
 #endif
