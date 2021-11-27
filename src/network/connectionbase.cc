@@ -116,5 +116,7 @@ void ConnectionBase::handle_message(QJsonDocument const &doc)
         case MessageType::DISPLAY_UPDATE:
             // TODO: DISPLAY_UPDATE
         break;
+
+        default: break;
     }
 }

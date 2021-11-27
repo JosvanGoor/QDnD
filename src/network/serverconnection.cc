@@ -96,6 +96,8 @@ void ServerConnection::pre_handle_message(QJsonDocument const &doc)
         case MessageType::PONG:
             // TODO: PING
         break;
+
+        default: break;
     }
 
     handle_message(doc);

@@ -4,7 +4,7 @@
 //     System     //
 ////////////////////
 
-QJsonDocument ping() noexcept
+QJsonDocument ping_message() noexcept
 {
     QJsonObject obj;
     obj["type"] = as_int(MessageType::PING);
@@ -12,7 +12,7 @@ QJsonDocument ping() noexcept
 }
 
 
-QJsonDocument pong() noexcept
+QJsonDocument pong_message() noexcept
 {
     QJsonObject obj;
     obj["type"] = as_int(MessageType::PONG);

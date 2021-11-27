@@ -13,7 +13,9 @@ QMAKE_CXXFLAGS = -Wall -pedantic
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 
-SOURCES +=  src/expressions/diceexpression.cc \
+SOURCES +=  src/control/applicationcontrol.cc \
+            \
+            src/expressions/diceexpression.cc \
             src/expressions/diceparser.cc \
             src/expressions/dicetokenizer.cc \
             src/expressions/parserstate.cc \
@@ -23,6 +25,11 @@ SOURCES +=  src/expressions/diceexpression.cc \
             src/model/pixmapcache.cc \
             src/model/runtimemodel.cc \
             src/model/spell.cc \
+            \
+            src/network/clientconnection.cc \
+            src/network/connectionbase.cc \
+            src/network/messagebuilder.cc \
+            src/network/serverconnection.cc \
             \
             src/utility/enums.cc \
             src/utility/htmlformatting.cc \
@@ -42,7 +49,9 @@ SOURCES +=  src/expressions/diceexpression.cc \
             src/main.cc
 
 
-HEADERS +=  src/expressions/diceexpression.h \
+HEADERS +=  src/control/applicationcontrol.h \
+            \
+            src/expressions/diceexpression.h \
             src/expressions/diceparser.h \
             src/expressions/dicetokenizer.h \
             src/expressions/parserstate.h \
@@ -52,6 +61,11 @@ HEADERS +=  src/expressions/diceexpression.h \
             src/model/pixmapcache.h \
             src/model/runtimemodel.h \
             src/model/spell.h \
+            \
+            src/network/clientconnection.h \
+            src/network/connectionbase.h \
+            src/network/messagebuilder.h \
+            src/network/serverconnection.h \
             \
             src/utility/enums.h \
             src/utility/htmlformatting.h \
