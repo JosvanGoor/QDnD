@@ -57,6 +57,7 @@ QString as_string(MessageType type)
 {
     switch (type)
     {
+        case MessageType::ERROR:            return "ERROR";
         case MessageType::WELCOME:          return "WELCOME";
         case MessageType::HANDSHAKE:        return "HANDSHAKE";
         case MessageType::DISCONNECTED:     return "DISCONNECTED";

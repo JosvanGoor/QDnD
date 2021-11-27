@@ -1,13 +1,13 @@
 #ifndef NETWORK_CONNECTIONBASE_H
 #define NETWORK_CONNECTIONBASE_H
 
+#include <QByteArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QObject>
+#include <QTcpSocket>
 
-#include "messagebuilding.h"
 #include "../utility/enums.h"
-#include "../utility/networking.h"
 
 class ConnectionBase : public QObject
 {
@@ -17,29 +17,27 @@ class ConnectionBase : public QObject
         explicit ConnectionBase(QObject *parent = nullptr);
         ~ConnectionBase();
 
+        virtual void send(QByteArray const &data) = 0;
+        virtual void send(QJsonDocument const &doc) = 0;
+        virtual void connect(QString const &host, uint16_t port = 4144) = 0;
         virtual void disconnect() = 0;
-        virtual bool is_connected() = 0;
-        virtual bool is_server() = 0;
-        virtual void send(QJsonDocument const &doc, bool signal_self = false) = 0;
 
-        // dispatch
-        void signal_message(QJsonDocument const &doc, SocketState &state);
+    protected:
+        // base IO
+        void write_blob(QTcpSocket *socket, QByteArray const &data, bool limited);
+        void write_json(QTcpSocket *socket, QJsonDocument const &doc, bool limited = true);
+        QJsonDocument read(QTcpSocket *socket, int &incoming, QByteArray &buffer);
+
+        // messages
+        void handle_message(QJsonDocument const &doc);
 
     signals:
-        // general signals
+        // system
         void debug_message(QString const &message);
-        void connection_status_update(QString const &state);
+        void connection_status(QString const &status);
 
-        // display
-        void display_updated(QString const &id);
-        void pixmap_tranfer(QString const &name, QByteArray const &b64_pixmap);
+        // messages
 
-        // connect / disconnect
-        void player_handshook(QString const &name, QString const &avatar_key, QColor const &color);
-        void player_disconnected(QString const &name);
-        void player_connected(QString const &name, QByteArray const &b64_avatar, QColor const &color);
-        void chat_message(QString const &name, QString const &message);
-        void roll_performed(QString const &name, QString const &expression, QString const &result);
-};
+};  
 
 #endif

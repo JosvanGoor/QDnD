@@ -1,38 +1,60 @@
 #include "serverconnection.h"
 
 ////////////////////
-//  Constructors  //
+//  Constructor   //
 ////////////////////
 
-ServerConnection::ServerConnection(RuntimeModel *runtime_model, QObject *parent)
+ServerConnection::ServerConnection(QObject *parent)
 :   ConnectionBase(parent)
 {
     d_server = new QTcpServer;
-    d_runtime_model = runtime_model;
-
-    QObject::connect(d_server, &QTcpServer::newConnection, this, &ServerConnection::on_new_connection);
-    QObject::connect(&d_ping_timer, &QTimer::timeout, this, &ServerConnection::on_ping_timer);
-    d_self.identifier = "Dungeon Master";
 }
 
 
 ServerConnection::~ServerConnection()
 {
-    delete d_server;
+    d_server->deleteLater();
 }
 
 
 ////////////////////
-//     Public     //
+//       IO       //
 ////////////////////
 
-void ServerConnection::start_listening(uint16_t port)
+void ServerConnection::dispatch(QByteArray const &data)
 {
-    if (!d_server->listen(QHostAddress::Any, port))
-        emit connection_status_update("Failed to start listening to port " + QString::number(port));
-    
+    for (auto &val : d_connections)
+        write_blob(val.socket, data, true);
+}
+
+
+void ServerConnection::send(QByteArray const &data)
+{
+    dispatch(data);
+}
+
+
+void ServerConnection::send(QJsonDocument const &doc)
+{
+    dispatch(doc.toJson());
+}
+
+
+void ServerConnection::connect(QString const &host, uint16_t port)
+{
+    if (!host.isEmpty())
+        emit debug_message("ServerConnection: received hostname for connect, this will be ignored.");
+
+    bool success = d_server->listen(QHostAddress::Any, port);
     update_status();
-    emit debug_message("Successfully started hosting");
+
+    if (!success)
+    {
+        emit debug_message("Failed to start listening on port " + QString::number(port));
+        return;
+    }
+
+    emit debug_message("Host successfully started listening");
     d_ping_timer.setInterval(45'000);
     d_ping_timer.start(45'000);
 }
@@ -40,171 +62,67 @@ void ServerConnection::start_listening(uint16_t port)
 
 void ServerConnection::disconnect()
 {
-    for (auto it = d_connections.begin(); it != d_connections.end(); ++it)
+    for (auto &val : d_connections)
     {
-        it.value().socket->disconnect(this);
-        it.value().socket->deleteLater();
+        val.socket->disconnect(this);
+        val.socket->deleteLater();
     }
 
     d_server->close();
     d_connections.clear();
     d_ping_timer.stop();
 
-    emit debug_message("Successfully stoped hosting");
+    emit debug_message("Stopped hosting.");
     update_status();
 }
 
 
-bool ServerConnection::is_connected()
+////////////////////
+//    Messages    //
+////////////////////
+
+void ServerConnection::pre_handle_message(QJsonDocument const &doc)
 {
-    return d_server->isListening();
+    QJsonObject obj = doc.object();
+    MessageType type = static_cast<MessageType>(obj["type"].toInt());
+
+    // handles only server specific messages, dispatches the rest.
+    switch (type)
+    {
+        case MessageType::HANDSHAKE:
+            // TODO: HANDSHAKE
+        break;
+
+        case MessageType::PONG:
+            // TODO: PING
+        break;
+    }
+
+    handle_message(doc);
+    dispatch(doc.toJson());
 }
 
 
-bool ServerConnection::is_server()
-{
-    return true;
-}
-
-
-void ServerConnection::send(QJsonDocument const &doc, bool signal_self)
-{
-    QByteArray blob = doc.toJson();
-
-    for (auto it = d_connections.begin(); it != d_connections.end(); ++it)
-        send_blob(it.value().socket, blob);
-
-    if (signal_self)
-        signal_message(doc, d_self);
-}
-
+////////////////////
+//    Utility     //
+////////////////////
 
 void ServerConnection::update_status()
 {
     if (d_server->isListening())
-        emit connection_status_update("Hosting @ " + QString::number(d_server->serverPort()) + " (" + QString::number(d_connections.size()) + " clients connected)");
+        emit connection_status("Hosting @ " + QString::number(d_server->serverPort()) + " (" + QString::number(d_connections.size()) + " connected).");
     else
-        emit connection_status_update("No Connection");
+        emit connection_status("No connection");
 }
 
 
 ////////////////////
-//    Incoming    //
-////////////////////
-
-void ServerConnection::host_special_message(QJsonDocument const &doc)
-{
-    handle_incoming_messages(doc, d_self);
-}
-
-
-void ServerConnection::handle_incoming_messages(QJsonDocument const &doc, SocketState &state)
-{
-    QJsonObject obj = doc.object();
-    MessageType type = static_cast<MessageType>(obj["type"].toInt());
-    debug_message("Handeling " + as_string(type));
-
-    switch (type)
-    {
-        case MessageType::HANDSHAKE:
-        {
-            // prep welcome message
-            QJsonArray users;
-            for (auto &user : d_connections)
-            {
-                if (user.identifier.isEmpty())
-                    continue;
-                
-                QJsonObject user_obj;
-                user_obj["name"] = user.identifier;
-                user_obj["color"] = QString::number(user.color.rgb(), 16);
-                user_obj["avatar_key"] = user.avatar_key;
-                users.push_back(user_obj);
-            }
-            
-            QJsonObject msg;
-            msg["type"] = as_int(MessageType::WELCOME);
-            msg["users"] = users;
-            send_json_blob(state.socket, QJsonDocument{msg});
-
-            // load new user settings
-            state.identifier = obj["name"].toString();
-            state.avatar_key = d_runtime_model->pixmap_cache().load_from_memory(obj["avatar"].toString().toLocal8Bit());
-            player_handshook(state.identifier, state.avatar_key, obj["color"].toString().toUInt(nullptr, 16));
-        }
-        break;
-        
-        case MessageType::PONG: break; // we guchi
-        
-        case MessageType::PIXMAP_REQUEST:
-        {
-            bool start = state.file_queue.isEmpty();
-            QJsonArray arr = obj["requests"].toArray();
-            for (auto val : arr)
-                state.file_queue.push_back(val.toString());
-
-            if (start) // we are already uploading as is
-                transfer_pixmap(state);
-        }
-        break;
-
-        case MessageType::CHAT_MESSAGE:
-            if (obj["message"].toString().startsWith("/roll", Qt::CaseInsensitive))
-            {
-                QString name = obj["name"].toString();
-                QString expression = obj["message"].toString().mid(6);
-                QString result = "";
-                try
-                {
-                    DiceExpressionPtr expr = DiceParser::parse(expression);
-                    DiceResult score = expr->evaluate();
-                    result = score.text + " -> " + QString::number(score.result);
-                }
-                catch(std::runtime_error &err)
-                {
-                    result = err.what();
-                }
-
-                send(roll_message(name, expression, result), true);
-                break;
-            }
-            
-            signal_message(doc, state);
-            send(doc); // dispatch to all clients.
-        break;
-
-        default:
-            signal_message(doc, state);
-            send(doc); // dispatch to all clients.
-    }
-}
-
-
-void ServerConnection::transfer_pixmap(SocketState &state)
-{
-    debug_message("Transferring pixmap to " + state.identifier + ": " + state.file_queue.back());
-    QString file = state.file_queue.back();
-    state.file_queue.pop_back();
-
-    TransferableImage img = d_runtime_model->pixmap_cache().prepare_for_transfer(file);
-    if (img.name.isEmpty())
-    {
-        debug_message("Could not satisfy file request " + img.name);
-        send_json_blob(state.socket, pixmap_not_found(file));
-        return;
-    }
-
-    send_json_blob(state.socket, pixmap_transfer(img.name, img.b64_data));
-}
-
-
-////////////////////
-//     Slots      //
+// Internal Slots //
 ////////////////////
 
 void ServerConnection::on_ping_timer()
 {
-    emit debug_message("ping!");
+    // TODO: ping tracking
     send(ping_message());
 }
 
@@ -214,13 +132,14 @@ void ServerConnection::on_new_connection()
     QTcpSocket *socket;
     while ((socket = d_server->nextPendingConnection()) != nullptr)
     {
-        emit debug_message("New Connection!");
-        
-        // TODO: request server state for new client
-        d_connections[socket] = {socket, {}, 0, Qt::black, "", "", {}};
+        emit debug_message("New connection from " + socket->peerAddress().toString());
+
+        // server->client state update will emitted from user manager after
+        // the new client has sent handshake
+        d_connections[socket] = {0, 0, socket, {}};
         QObject::connect(socket, &QTcpSocket::errorOccurred, this, &ServerConnection::on_socket_error);
         QObject::connect(socket, &QTcpSocket::readyRead, this, &ServerConnection::on_socket_readyread);
-        QObject::connect(socket, &QTcpSocket::disconnected, this, &ServerConnection::on_socket_disconnected);
+        QObject::connect(socket, &QTcpSocket::disconnected, this, &ServerConnection::on_socket_disconnect);
         QObject::connect(socket, &QTcpSocket::bytesWritten, this, &ServerConnection::on_socket_readywrite);
         update_status();
     }
@@ -229,12 +148,13 @@ void ServerConnection::on_new_connection()
 
 void ServerConnection::on_socket_error(QAbstractSocket::SocketError error)
 {
+    //TODO: signal user manager of disconnect
     QObject *id = QObject::sender();
     SocketState &state = d_connections.find(id).value();
-    QString name = state.identifier.isEmpty() ? "[[Unknown]]" : state.identifier;
-    
-    QString errstr = QMetaEnum::fromType<QAbstractSocket::SocketError>().valueToKey(error);
-    emit debug_message(errstr + " from " + name);
+
+    QString error_string = QMetaEnum::fromType<QAbstractSocket::SocketError>().valueToKey(error);
+    emit debug_message(error_string + " from " + state.socket->peerAddress().toString());
+    //TODO: disconnect
 }
 
 
@@ -242,42 +162,28 @@ void ServerConnection::on_socket_readyread()
 {
     QObject *id = QObject::sender();
     SocketState &state = d_connections.find(id).value();
-    QJsonDocument doc = read_connection(state);
+    QJsonDocument doc = read(state.socket, state.incoming, state.buffer);
 
     while (!doc.isEmpty())
     {
-        handle_incoming_messages(doc, state);
-        doc = read_connection(state);
+        pre_handle_message(doc);
+        doc = read(state.socket, state.incoming, state.buffer);
     }
 }
 
 
 void ServerConnection::on_socket_readywrite([[maybe_unused]] uint64_t written)
 {
-    QObject *id = QObject::sender();
-    SocketState &state = d_connections.find(id).value();
-    
-    // nothing to send, so we dont care
-    if (state.file_queue.isEmpty())
-        return;
-
-    // socket is currently idle, so we can send a file
-    if (state.socket->bytesToWrite() != 0)
-        return;
-
-    transfer_pixmap(state);
+    // TODO: queue pixmap request
 }
 
 
-void ServerConnection::on_socket_disconnected()
+void ServerConnection::on_socket_disconnect()
 {
     QObject *id = QObject::sender();
     SocketState &state = d_connections.find(id).value();
 
-    if (!state.identifier.isEmpty())
-    {
-        send(disconnect_message(state.identifier), true);
-    }
+    // TODO: notify user manager of disconnect
 
     state.socket->deleteLater();
     d_connections.remove(id);

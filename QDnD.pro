@@ -13,9 +13,7 @@ QMAKE_CXXFLAGS = -Wall -pedantic
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 
-SOURCES +=  src/control/applicationcontrol.cc \
-            \
-            src/expressions/diceexpression.cc \
+SOURCES +=  src/expressions/diceexpression.cc \
             src/expressions/diceparser.cc \
             src/expressions/dicetokenizer.cc \
             src/expressions/parserstate.cc \
@@ -26,15 +24,9 @@ SOURCES +=  src/control/applicationcontrol.cc \
             src/model/runtimemodel.cc \
             src/model/spell.cc \
             \
-            src/network/clientconnection.cc \
-            src/network/connectionbase.cc \
-            src/network/messagebuilding.cc \
-            src/network/serverconnection.cc \
-            \
             src/utility/enums.cc \
             src/utility/htmlformatting.cc \
             src/utility/loading.cc \
-            src/utility/networking.cc \
             \
             src/view/chatwidget.cc \
             src/view/connectdialog.cc \
@@ -50,9 +42,7 @@ SOURCES +=  src/control/applicationcontrol.cc \
             src/main.cc
 
 
-HEADERS +=  src/control/applicationcontrol.h \
-            \
-            src/expressions/diceexpression.h \
+HEADERS +=  src/expressions/diceexpression.h \
             src/expressions/diceparser.h \
             src/expressions/dicetokenizer.h \
             src/expressions/parserstate.h \
@@ -63,15 +53,9 @@ HEADERS +=  src/control/applicationcontrol.h \
             src/model/runtimemodel.h \
             src/model/spell.h \
             \
-            src/network/clientconnection.h \
-            src/network/connectionbase.h \
-            src/network/messagebuilding.h \
-            src/network/serverconnection.h \
-            \
             src/utility/enums.h \
             src/utility/htmlformatting.h \
             src/utility/loading.h \
-            src/utility/networking.h \
             \
             src/view/chatwidget.h \
             src/view/connectdialog.h \

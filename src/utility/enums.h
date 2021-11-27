@@ -22,9 +22,11 @@ QString as_string(GridScale scale);
 // MessageType
 enum class MessageType
 {
+    ERROR, // 0, so it will be this on failure to parse.
+
     // system messages
-    WELCOME,
     HANDSHAKE,
+    WELCOME,
     DISCONNECTED,
     PING,
     PONG,
