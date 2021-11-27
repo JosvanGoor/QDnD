@@ -15,6 +15,17 @@ GridItemGroup::GridItemGroup(QString const &name)
 //   Serialize    //
 ////////////////////
 
+void GridItemGroup::clear()
+{
+    d_items.clear();
+    d_visibility = VisibilityMode::HIDDEN;
+}
+
+
+////////////////////
+//   Serialize    //
+////////////////////
+
 QJsonObject GridItemGroup::serialize() const noexcept
 {
     QJsonArray items;

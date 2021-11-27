@@ -2,6 +2,7 @@
 #define UTILITY_NETWORKING_H
 
 #include <QByteArray>
+#include <QColor>
 #include <QJsonDocument>
 #include <QTcpSocket>
 #include <QVector>
@@ -11,6 +12,8 @@ struct SocketState
     QTcpSocket *socket;
     QByteArray buffer;
     int incoming = 0;
+    QColor color = Qt::black;
+    QString avatar_key = "";
     QString identifier = "";
     QVector<QString> file_queue;
 };

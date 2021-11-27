@@ -44,6 +44,16 @@ int as_int(MessageType type);
 QString as_string(MessageType type);
 
 
+// Mouse Modes
+enum class MouseMode
+{
+    SELECT,
+    DRAW
+};
+
+QString as_string(MouseMode mode);
+
+
 // VisibilityMode
 enum class VisibilityMode
 {

@@ -35,6 +35,7 @@ class ConnectionBase : public QObject
         void pixmap_tranfer(QString const &name, QByteArray const &b64_pixmap);
 
         // connect / disconnect
+        void player_handshook(QString const &name, QString const &avatar_key, QColor const &color);
         void player_disconnected(QString const &name);
         void player_connected(QString const &name, QByteArray const &b64_avatar, QColor const &color);
         void chat_message(QString const &name, QString const &message);

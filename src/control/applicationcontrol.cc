@@ -229,6 +229,7 @@ void ApplicationControl::connection_setup()
     QObject::connect(d_connection, &ConnectionBase::connection_status_update, this, &ApplicationControl::connection_info);
     QObject::connect(d_connection, &ConnectionBase::player_disconnected, this, &ApplicationControl::player_disconnected);
     QObject::connect(d_connection, &ConnectionBase::player_connected, this, &ApplicationControl::player_connected);
+    QObject::connect(d_connection, &ConnectionBase::player_handshook, this, &ApplicationControl::player_handshook);
     QObject::connect(d_connection, &ConnectionBase::chat_message, this, &ApplicationControl::on_chatwidget_user_message);
     QObject::connect(d_connection, &ConnectionBase::display_updated, this, &ApplicationControl::display_updated);
     QObject::connect(d_connection, &ConnectionBase::pixmap_tranfer, this, &ApplicationControl::pixmap_transferred);
@@ -248,6 +249,19 @@ void ApplicationControl::player_disconnected(QString const &name)
 {
     d_main_window->players_widget()->remove_user(name);
     d_main_window->chat_widget()->on_info_message(name + " has been disconnected.");
+}
+
+
+void ApplicationControl::player_handshook(QString const &name, QString const &avatar_key, QColor color)
+{
+    if (!d_runtime_model->pixmap_cache().has_pixmap(avatar_key))
+        d_connection->send(pixmap_request({avatar_key}));
+
+    // TODO: DISPATCH to user manager
+    debug_output("Handshake: " + name);
+
+    d_main_window->players_widget()->add_user(name, d_runtime_model->pixmap_cache().get_pixmap(avatar_key), color);
+    d_main_window->chat_widget()->on_info_message(name + " has connected.");
 }
 
 

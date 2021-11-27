@@ -25,7 +25,18 @@ void ConnectionBase::signal_message(QJsonDocument const &doc, SocketState &state
 
     switch (type)
     {
-        case MessageType::WELCOME: break; // TODO: implement
+        case MessageType::WELCOME:
+        {
+            QJsonArray users = obj["users"].toArray();
+
+            for (auto user : users)
+            {
+                QJsonObject user_obj = user.toObject();
+                QColor color = user_obj["color"].toString().toUInt(nullptr, 16);
+                player_handshook(user_obj["name"].toString(), user_obj["avatar_key"].toString(), color);
+            }
+        }
+        break;
         
         case MessageType::HANDSHAKE:
         {

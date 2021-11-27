@@ -106,6 +106,34 @@ void ServerConnection::handle_incoming_messages(QJsonDocument const &doc, Socket
 
     switch (type)
     {
+        case MessageType::HANDSHAKE:
+        {
+            // prep welcome message
+            QJsonArray users;
+            for (auto &user : d_connections)
+            {
+                if (user.identifier.isEmpty())
+                    continue;
+                
+                QJsonObject user_obj;
+                user_obj["name"] = user.identifier;
+                user_obj["color"] = QString::number(user.color.rgb(), 16);
+                user_obj["avatar_key"] = user.avatar_key;
+                users.push_back(user_obj);
+            }
+            
+            QJsonObject msg;
+            msg["type"] = as_int(MessageType::WELCOME);
+            msg["users"] = users;
+            send_json_blob(state.socket, QJsonDocument{msg});
+
+            // load new user settings
+            state.identifier = obj["name"].toString();
+            state.avatar_key = d_runtime_model->pixmap_cache().load_from_memory(obj["avatar"].toString().toLocal8Bit());
+            player_handshook(state.identifier, state.avatar_key, obj["color"].toString().toUInt(nullptr, 16));
+        }
+        break;
+        
         case MessageType::PONG: break; // we guchi
         
         case MessageType::PIXMAP_REQUEST:
@@ -189,7 +217,7 @@ void ServerConnection::on_new_connection()
         emit debug_message("New Connection!");
         
         // TODO: request server state for new client
-        d_connections[socket] = {socket, {}, 0, "", {}};
+        d_connections[socket] = {socket, {}, 0, Qt::black, "", "", {}};
         QObject::connect(socket, &QTcpSocket::errorOccurred, this, &ServerConnection::on_socket_error);
         QObject::connect(socket, &QTcpSocket::readyRead, this, &ServerConnection::on_socket_readyread);
         QObject::connect(socket, &QTcpSocket::disconnected, this, &ServerConnection::on_socket_disconnected);

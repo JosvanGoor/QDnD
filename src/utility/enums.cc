@@ -73,8 +73,24 @@ QString as_string(MessageType type)
     }
 
     return "MessageType: If you read this Jos fucked up.";
-
 }
+
+
+////////////////////
+//   MouseMode    //
+////////////////////
+
+QString as_string(MouseMode mode)
+{
+    switch (mode)
+    {
+        case MouseMode::SELECT:     return "SELECT";
+        case MouseMode::DRAW:       return "DRAW";
+    }
+    
+    return "MouseMode: If you read this Jos fucked up.";
+}
+
 
 ////////////////////
 //   Visibility   //

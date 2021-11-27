@@ -54,6 +54,7 @@ class ApplicationControl : public QObject
         void connection_setup();
         void player_connected(QString const &name, QByteArray const &b64_avatar, QColor const &color);
         void player_disconnected(QString const &name);
+        void player_handshook(QString const &name, QString const &avatar_key, QColor color);
         void display_updated(QString const &id);
         void pixmap_transferred(QString const &id, QByteArray const &b64_pixmap);
 
