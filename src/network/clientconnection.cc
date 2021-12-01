@@ -9,12 +9,23 @@ ClientConnection::ClientConnection(QObject *parent)
 {
     d_incoming = 0;
     d_socket = new QTcpSocket;
+
+    QObject::connect(d_socket, &QTcpSocket::connected, this, &ClientConnection::on_connected);
+    QObject::connect(d_socket, &QTcpSocket::disconnected, this, &ClientConnection::on_disconnected);
+    QObject::connect(d_socket, &QTcpSocket::errorOccurred, this, &ClientConnection::on_socket_error);
+    QObject::connect(d_socket, &QTcpSocket::readyRead, this, &ClientConnection::on_socket_readyread);
 }
 
 
 ClientConnection::~ClientConnection()
 {
     d_socket->deleteLater();
+}
+
+
+bool ClientConnection::is_server()
+{
+    return false;
 }
 
 
@@ -44,4 +55,39 @@ void ClientConnection::disconnect()
 {
     d_socket->close();
     emit connection_status("No connection");
+}
+
+
+////////////////////
+// Internal Slots //
+////////////////////
+
+void ClientConnection::on_connected()
+{
+    connection_status("Connected to " + d_socket->peerAddress().toString());
+}
+
+
+void ClientConnection::on_disconnected()
+{
+    connection_status("No connection");
+}
+
+
+void ClientConnection::on_socket_error(QAbstractSocket::SocketError error)
+{
+    QString error_string = QMetaEnum::fromType<QAbstractSocket::SocketError>().valueToKey(error);
+    emit debug_message("ClientConnectionError: " + error_string);
+}
+
+
+void ClientConnection::on_socket_readyread()
+{
+    QJsonDocument doc = read(d_socket, d_incoming, d_buffer);
+
+    while (!doc.isEmpty())
+    {
+        handle_message(doc);
+        doc = read(d_socket, d_incoming, d_buffer);
+    }
 }

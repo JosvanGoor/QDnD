@@ -40,6 +40,7 @@ ConnectDialog::ConnectDialog(QWidget *parent)
     QObject::connect(d_connect, &QPushButton::pressed, this, &ConnectDialog::on_connect);
     QObject::connect(d_cancel, &QPushButton::pressed, this, &ConnectDialog::on_cancel);
     QObject::connect(d_select_avatar, &QPushButton::pressed, this, &ConnectDialog::on_select_avatar);
+    QObject::connect(d_drop_widget, &DropWidget::pixmap_dropped, this, &ConnectDialog::on_avatar_dragged);
 }
 
 

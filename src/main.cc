@@ -1,14 +1,12 @@
 #include <QApplication>
 
-#include <iostream>
-#include "expressions/diceparser.h"
-#include "expressions/dicetokenizer.h"
+#include "control/applicationcontrol.h"
 
 int main(int argv, char *argc[])
 {
     QApplication application{argv, argc};
 
-    
+    ApplicationControl control;
 
     return application.exec();
 }

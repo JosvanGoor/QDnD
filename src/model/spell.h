@@ -22,6 +22,7 @@ class Spell
     QString d_description;
 
     public:
+        Spell();
         Spell(QJsonObject const &object, QString const &source = "Unknown");
 
         QString name() const noexcept;

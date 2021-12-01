@@ -4,6 +4,9 @@
 //  Constructor //
 //////////////////
 
+Spell::Spell()
+{ }
+
 Spell::Spell(QJsonObject const &object, QString const &source)
 {
     d_source = source;

@@ -8,6 +8,8 @@ ServerConnection::ServerConnection(QObject *parent)
 :   ConnectionBase(parent)
 {
     d_server = new QTcpServer;
+
+    QObject::connect(d_server, &QTcpServer::newConnection, this, &ServerConnection::on_new_connection);
 }
 
 
@@ -85,17 +87,24 @@ void ServerConnection::pre_handle_message(QJsonDocument const &doc)
 {
     QJsonObject obj = doc.object();
     MessageType type = static_cast<MessageType>(obj["type"].toInt());
+    debug_message("ServerConnection::handle_message [[" + as_string(type) + "]].");
 
     // handles only server specific messages, dispatches the rest.
     switch (type)
     {
         case MessageType::HANDSHAKE:
-            // TODO: HANDSHAKE
-        break;
+        {
+            QString avatar_key = b64_pixmap_hash(obj["avatar"].toString().toLocal8Bit());
+            QPixmap avatar_pixmap = pixmap_from_b64(obj["avatar"].toString().toLocal8Bit());
+            emit pixmap_received(avatar_key, avatar_pixmap);
+            obj["avatar"] = avatar_key;
+            player_joins(obj);
+        }
+        return;
 
         case MessageType::PONG:
-            // TODO: PING
-        break;
+            // we actually dont do anything here
+        return;
 
         default: break;
     }
@@ -105,9 +114,37 @@ void ServerConnection::pre_handle_message(QJsonDocument const &doc)
 }
 
 
+void ServerConnection::message_to(QString const &identifier, QJsonDocument const &doc)
+{
+    SocketState *state = nullptr;
+    for (auto &conn : d_connections)
+    {
+        if (conn.identifier == identifier)
+        {
+            state = &conn;
+            break;
+        }
+    }
+
+    if (state == nullptr)
+    {
+        debug_message("Failed to find connection for " + identifier + ", message not sent.");
+        return;
+    }
+
+    write_json(state->socket, doc);
+}
+
+
 ////////////////////
 //    Utility     //
 ////////////////////
+
+bool ServerConnection::is_server()
+{
+    return true;
+}
+
 
 void ServerConnection::update_status()
 {
@@ -138,7 +175,7 @@ void ServerConnection::on_new_connection()
 
         // server->client state update will emitted from user manager after
         // the new client has sent handshake
-        d_connections[socket] = {0, 0, socket, {}};
+        d_connections.insert(socket, {0, 0, socket, {}, ""});
         QObject::connect(socket, &QTcpSocket::errorOccurred, this, &ServerConnection::on_socket_error);
         QObject::connect(socket, &QTcpSocket::readyRead, this, &ServerConnection::on_socket_readyread);
         QObject::connect(socket, &QTcpSocket::disconnected, this, &ServerConnection::on_socket_disconnect);

@@ -17,6 +17,8 @@ class ConnectionBase : public QObject
         explicit ConnectionBase(QObject *parent = nullptr);
         ~ConnectionBase();
 
+        virtual bool is_server() = 0;
+
         virtual void send(QByteArray const &data) = 0;
         virtual void send(QJsonDocument const &doc) = 0;
         virtual void connect(QString const &host, uint16_t port = 4144) = 0;
@@ -36,7 +38,14 @@ class ConnectionBase : public QObject
         void debug_message(QString const &message);
         void connection_status(QString const &status);
 
-        // messages
+        // maintenance
+        void synchronization(QJsonObject const &object);
+        void pixmap_received(QString const &key, QPixmap const &pixmap);
+
+        // player stuff
+        void player_joins(QJsonObject const &object);
+        void player_leaves(QString const &identifier);
+
 
 };  
 

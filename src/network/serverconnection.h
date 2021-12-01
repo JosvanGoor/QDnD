@@ -5,9 +5,11 @@
 #include <QMetaEnum>
 #include <QTcpServer>
 #include <QTimer>
+#include <QPixmap>
 
 #include "connectionbase.h"
 #include "messagebuilder.h"
+#include "../utility/loading.h"
 
 struct SocketState
 {
@@ -15,6 +17,7 @@ struct SocketState
     uint64_t ping_time = -1;
     QTcpSocket *socket = nullptr;
     QByteArray buffer;
+    QString identifier;
 };
 
 class ServerConnection : public ConnectionBase
@@ -38,8 +41,10 @@ class ServerConnection : public ConnectionBase
 
         // messages
         void pre_handle_message(QJsonDocument const &doc);
+        void message_to(QString const &identifier, QJsonDocument const &doc);
 
         // utility
+        bool is_server() override;
         void update_status();
 
     private slots:

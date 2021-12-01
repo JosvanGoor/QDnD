@@ -57,20 +57,21 @@ QString as_string(MessageType type)
 {
     switch (type)
     {
-        case MessageType::ERROR:            return "ERROR";
-        case MessageType::WELCOME:          return "WELCOME";
-        case MessageType::HANDSHAKE:        return "HANDSHAKE";
-        case MessageType::DISCONNECTED:     return "DISCONNECTED";
-        case MessageType::PING:             return "PING";
-        case MessageType::PONG:             return "PONG";
+        case MessageType::ERROR:                return "ERROR";
+        case MessageType::SYNCHRONIZE:          return "SYNCHRONIZE";
+        case MessageType::HANDSHAKE:            return "HANDSHAKE";
+        case MessageType::PLAYER_CONNECTED:     return "PLAYER_CONNECTED";
+        case MessageType::PLAYER_DISCONNECTED:  return "PLAYER_DISCONNECTED";
+        case MessageType::PING:                 return "PING";
+        case MessageType::PONG:                 return "PONG";
 
-        case MessageType::PIXMAP_REQUEST:   return "PIXMAP_REQUEST";
-        case MessageType::PIXMAP_TRANSFER:  return "PIXMAP_TRANSFER";
-        case MessageType::PIXMAP_NOT_FOUND: return "PIXMAP_NOT_FOUND";
+        case MessageType::PIXMAP_REQUEST:       return "PIXMAP_REQUEST";
+        case MessageType::PIXMAP_TRANSFER:      return "PIXMAP_TRANSFER";
+        case MessageType::PIXMAP_NOT_FOUND:     return "PIXMAP_NOT_FOUND";
 
-        case MessageType::CHAT_MESSAGE:     return "CHAT_MESSAGE";
-        case MessageType::DIEROLL_MESSSAGE: return "DIEROLL_MESSSAGE";
-        case MessageType::DISPLAY_UPDATE:   return "DISPLAY_UPDATE";
+        case MessageType::CHAT_MESSAGE:         return "CHAT_MESSAGE";
+        case MessageType::DIEROLL_MESSSAGE:     return "DIEROLL_MESSSAGE";
+        case MessageType::DISPLAY_UPDATE:       return "DISPLAY_UPDATE";
     }
 
     return "MessageType: If you read this Jos fucked up.";

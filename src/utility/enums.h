@@ -26,8 +26,9 @@ enum class MessageType
 
     // system messages
     HANDSHAKE,
-    WELCOME,
-    DISCONNECTED,
+    SYNCHRONIZE,
+    PLAYER_CONNECTED,
+    PLAYER_DISCONNECTED,
     PING,
     PONG,
 

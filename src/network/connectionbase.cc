@@ -89,12 +89,16 @@ void ConnectionBase::handle_message(QJsonDocument const &doc)
     */
     switch(type)
     {
-        case MessageType::WELCOME:
-            // TODO: WELCOME
+        case MessageType::SYNCHRONIZE:
+            // TODO: SYNCHRONIZE
         break;
 
-        case MessageType::DISCONNECTED:
+        case MessageType::PLAYER_CONNECTED:
             // TODO: DISCONNECTED
+        break;
+
+        case MessageType::PLAYER_DISCONNECTED:
+            // TODO: PLAYER_DISCONNECTED
         break;
 
         case MessageType::PING:
