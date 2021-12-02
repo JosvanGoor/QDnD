@@ -167,6 +167,8 @@ void ApplicationControl::on_player_connected(Player const &player)
         d_main_window.players_widget()->add_user(player.identifier(), d_pixmap_cache.get_pixmap(player.avatar_key()), player.color());
     else 
         d_main_window.players_widget()->add_user(player.identifier(), player.avatar_key(), player.color());
+
+    d_main_window.chat_widget()->on_info_message(player.identifier() + " has joined the game.");
 }
 
 
@@ -174,6 +176,7 @@ void ApplicationControl::on_player_disconnected(QString const &id)
 {
     debug_message("Player disconnected: " + id);
     d_main_window.players_widget()->remove_user(id);
+    d_main_window.chat_widget()->on_info_message(id + " has left.");
 }
 
 
