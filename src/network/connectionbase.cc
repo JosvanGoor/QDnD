@@ -90,23 +90,32 @@ void ConnectionBase::handle_message(QJsonDocument const &doc)
     switch(type)
     {
         case MessageType::SYNCHRONIZE:
-            // TODO: SYNCHRONIZE
+        {
+            QJsonArray players = obj["players"].toArray();
+            for (auto player : players)
+                emit player_joins(player.toObject());
+        }
         break;
 
         case MessageType::PLAYER_CONNECTED:
-            // TODO: DISCONNECTED
+            emit player_joins(obj);
         break;
 
         case MessageType::PLAYER_DISCONNECTED:
-            // TODO: PLAYER_DISCONNECTED
+            emit player_leaves(obj["id"].toString());
         break;
 
         case MessageType::PING:
-            // TODO: PING
+            send(pong_message());
         break;        
 
         case MessageType::PIXMAP_TRANSFER:
-            // TODO: PIXMAP_TRANSFER
+        {
+            QPixmap avatar = pixmap_from_b64(obj["data"].toString().toLocal8Bit());
+            QString key = obj["key"].toString();
+            emit debug_message("pixmap received: " + key);
+            emit pixmap_received(key, avatar);
+        }
         break;
 
         case MessageType::CHAT_MESSAGE:

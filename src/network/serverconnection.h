@@ -18,6 +18,7 @@ struct SocketState
     QTcpSocket *socket = nullptr;
     QByteArray buffer;
     QString identifier;
+    QVector<QByteArray> lowprio_queue;
 };
 
 class ServerConnection : public ConnectionBase
@@ -33,15 +34,17 @@ class ServerConnection : public ConnectionBase
         ~ServerConnection();
 
         // io
-        void dispatch(QByteArray const &data);
+        void dispatch(QByteArray const &data, bool full_connections_only = false);
         void send(QByteArray const &data) override;
         void send(QJsonDocument const &doc) override;
         void connect(QString const &host, uint16_t port = 4144) override;
         void disconnect() override;
 
         // messages
-        void pre_handle_message(QJsonDocument const &doc);
+        void pre_handle_message(QJsonDocument const &doc, SocketState &state);
+        void message_to(QString const &identifier, QByteArray const &data);
         void message_to(QString const &identifier, QJsonDocument const &doc);
+        void queue_message(QString const &identifier, QByteArray const &data);
 
         // utility
         bool is_server() override;

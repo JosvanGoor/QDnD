@@ -29,6 +29,12 @@ bool PixmapCache::has_pixmap(QString const &name) const noexcept
 }
 
 
+void PixmapCache::put_pixmap(QString const &name, QPixmap const &pixmap)
+{
+    d_pixmaps[name] = pixmap;
+}
+
+
 bool PixmapCache::load_pixmap(QString const &name, QByteArray const &b64_data) noexcept
 {
     QPixmap map = load_from_b64(b64_data);
@@ -91,7 +97,6 @@ TransferableImage PixmapCache::prepare_for_transfer(QString const &name) noexcep
     auto it = d_pixmaps.find(name);
     if (it == d_pixmaps.end())
         return rval;
-
     
     QBuffer buffer{&rval.b64_data};
     buffer.open(QIODevice::WriteOnly);

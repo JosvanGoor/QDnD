@@ -2,12 +2,16 @@
 #define NETWORK_CONNECTIONBASE_H
 
 #include <QByteArray>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QObject>
+#include <QPixmap>
 #include <QTcpSocket>
 
+#include "messagebuilder.h"
 #include "../utility/enums.h"
+#include "../utility/loading.h"
 
 class ConnectionBase : public QObject
 {
@@ -41,6 +45,7 @@ class ConnectionBase : public QObject
         // maintenance
         void synchronization(QJsonObject const &object);
         void pixmap_received(QString const &key, QPixmap const &pixmap);
+        void pixmap_requested(QString const &id, QString const &key);
 
         // player stuff
         void player_joins(QJsonObject const &object);

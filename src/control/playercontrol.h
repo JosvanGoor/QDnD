@@ -16,6 +16,7 @@ class PlayerControl : public QObject
 {
     Q_OBJECT
 
+    QString d_own_identifier;
     QMap<QString, Player> d_players;
 
     public:
@@ -25,6 +26,10 @@ class PlayerControl : public QObject
         // utility
         QMap<QString, Player> &players();
         Player &player(QString const &identifier);
+
+        // self
+        QString const &own_identifier() const noexcept;
+        void set_own_identifier(QString const &id) noexcept;
 
     public slots:
         void on_player_joins(QJsonObject const &doc);

@@ -15,6 +15,7 @@ class Player
     GridScale d_size;
 
     public:
+        Player();
         Player(QString const &id, QString const &key, QColor const &col, GridScale size = GridScale::MEDIUM);
         ~Player();
 

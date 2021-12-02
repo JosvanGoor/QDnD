@@ -11,7 +11,7 @@
 
 QString b64_pixmap_hash(QByteArray const &b64)
 {
-    return QCryptographicHash::hash(b64, QCryptographicHash::Sha1);
+    return QCryptographicHash::hash(b64, QCryptographicHash::Sha1).toHex();
 }
 
 

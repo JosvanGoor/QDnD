@@ -34,6 +34,10 @@ void ApplicationControl::create_default_connections()
     QObject::connect(d_main_window.spells_widget(), &SpellsWidget::selection_changed, this, &ApplicationControl::on_spell_selection);
     QObject::connect(d_main_window.menu_bar()->host(), &QAction::triggered, this, &ApplicationControl::start_hosting);
     QObject::connect(d_main_window.menu_bar()->connect(), &QAction::triggered, this, &ApplicationControl::connect_to_host);
+    
+    QObject::connect(&d_player_control, &PlayerControl::pixmap_required, this, &ApplicationControl::on_pixmap_required);
+    QObject::connect(&d_player_control, &PlayerControl::player_connected, this, &ApplicationControl::on_player_connected);
+    QObject::connect(&d_player_control, &PlayerControl::player_disconnected, this, &ApplicationControl::on_player_disconnected);
 }
 
 
@@ -62,7 +66,7 @@ void ApplicationControl::load_spells(QString const &filename)
 
 
 ////////////////////
-//   Networking   //    // TODO: verify no connection is open.
+//   Networking   //
 ////////////////////
 
 bool ApplicationControl::verify_close_connection()
@@ -91,11 +95,11 @@ void ApplicationControl::start_hosting()
     d_connection = new ServerConnection;
 
     // TODO: connect rest
-    QObject::connect(d_connection, &ConnectionBase::debug_message, &d_main_window, &MainWindow::debug_message);
-    QObject::connect(d_connection, &ConnectionBase::connection_status, d_main_window.status_bar(), &StatusBar::update_connection_status);
-    QObject::connect(d_connection, &ConnectionBase::player_joins, &d_player_control, &PlayerControl::on_player_joins);
-    QObject::connect(d_connection, &ConnectionBase::player_leaves, &d_player_control, &PlayerControl::on_player_leaves);
+    // TODO: set id to "Dungeon Master".
+    d_player_control.set_own_identifier("Dungeon Master");
     QObject::connect(&d_player_control, &PlayerControl::trigger_synchronization, this, &ApplicationControl::on_trigger_synchronization);
+    QObject::connect(d_connection, &ConnectionBase::pixmap_requested, this, &ApplicationControl::pixmap_requested);
+    set_connectionbase_signals();
 
     d_connection->connect("", 4144);
 }
@@ -114,18 +118,26 @@ void ApplicationControl::connect_to_host()
     }
 
     d_connection = new ClientConnection;
+    set_connectionbase_signals();
 
+    d_connection->connect(dialog.hostname(), dialog.port());
+    
+    // TODO: add extra settings to connection dialog
+    d_player_control.set_own_identifier(dialog.character_name());
+    TransferableImage avatar = d_pixmap_cache.load_from_file(dialog.avatar_file());
+    debug_message("My avatar hash: " + avatar.name);
+    d_connection->send(handshake_message(dialog.character_name(), avatar.b64_data, Qt::black, GridScale::MEDIUM));
+}
+
+
+void ApplicationControl::set_connectionbase_signals()
+{
     QObject::connect(d_connection, &ConnectionBase::debug_message, &d_main_window, &MainWindow::debug_message);
     QObject::connect(d_connection, &ConnectionBase::connection_status, d_main_window.status_bar(), &StatusBar::update_connection_status);
     QObject::connect(d_connection, &ConnectionBase::player_joins, &d_player_control, &PlayerControl::on_player_joins);
     QObject::connect(d_connection, &ConnectionBase::player_leaves, &d_player_control, &PlayerControl::on_player_leaves);
-
-    d_connection->connect(dialog.hostname(), dialog.port());
-    
-    // TODO: log own identifier
-    // TODO: add extra settings to connection dialog
-    TransferableImage avatar = d_pixmap_cache.load_from_file(dialog.avatar_file());
-    d_connection->send(handshake_message(dialog.character_name(), avatar.b64_data, Qt::black, GridScale::MEDIUM));
+    QObject::connect(d_connection, &ConnectionBase::pixmap_received, &d_pixmap_cache, &PixmapCache::put_pixmap);
+    QObject::connect(d_connection, &ConnectionBase::pixmap_received, d_main_window.players_widget(), &PlayersWidget::pixmap_received);
 }
 
 
@@ -133,9 +145,34 @@ void ApplicationControl::connect_to_host()
 //  Server Slots  //
 ////////////////////
 
+void ApplicationControl::pixmap_requested(QString const &id, QString const &key)
+{
+    ServerConnection *server = reinterpret_cast<ServerConnection*>(d_connection);
+
+    if (!d_pixmap_cache.has_pixmap(key))
+    {
+        server->message_to(id, pixmap_not_found_message(key));
+        debug_message("Failed to serve pixmap to " + id + ", " + key);
+        return;
+    }
+
+    TransferableImage transfer = d_pixmap_cache.prepare_for_transfer(key);
+    server->queue_message(id, pixmap_transfer_message(transfer.name, transfer.b64_data).toJson());
+}
+
+
 void ApplicationControl::on_trigger_synchronization(QString const &id)
 {
     debug_message("Sync request for " + id + " triggered.");
+    
+    QJsonArray players;
+    for (auto &player : d_player_control.players())
+        players.push_back(player.serialize());
+    
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::SYNCHRONIZE);
+    obj["players"] = players;
+    reinterpret_cast<ServerConnection*>(d_connection)->message_to(id, QJsonDocument{obj});
 }
 
 
@@ -147,22 +184,28 @@ void ApplicationControl::on_pixmap_required(QString const &key)
 {
     if (!d_pixmap_cache.has_pixmap(key))
     {
-        debug_message("TODO: request pixmap");
+        d_connection->send(pixmap_request_message({key}));
+        debug_message("Requested pixmap " + key);
     }
+    else
+        debug_message("Pixmap " + key + " not requested, found in cache.");
 }
 
 
 void ApplicationControl::on_player_connected(Player const &player)
 {
     debug_message("New player connected: " + player.identifier());
-    // TODO: connect to ui
+    if (d_pixmap_cache.has_pixmap(player.avatar_key()))
+        d_main_window.players_widget()->add_user(player.identifier(), d_pixmap_cache.get_pixmap(player.avatar_key()), player.color());
+    else 
+        d_main_window.players_widget()->add_user(player.identifier(), player.avatar_key(), player.color());
 }
 
 
 void ApplicationControl::on_player_disconnected(QString const &id)
 {
     debug_message("Player disconnected: " + id);
-    // TODO: connect to ui
+    d_main_window.players_widget()->remove_user(id);
 }
 
 

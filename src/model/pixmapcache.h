@@ -26,8 +26,10 @@ struct TransferableImage
     QByteArray b64_data;
 };
 
-class PixmapCache
+class PixmapCache : public QObject
 {
+    Q_OBJECT
+
     QPixmap d_missing_texture;
     QMap<QString, QPixmap> d_pixmaps;
 
@@ -36,6 +38,7 @@ class PixmapCache
         ~PixmapCache();
 
         bool has_pixmap(QString const &name) const noexcept; // either in cache or memory
+        void put_pixmap(QString const &name, QPixmap const &pixmap);
         bool load_pixmap(QString const &name, QByteArray const &b64_data) noexcept;
         QPixmap const &get_pixmap(QString const &name) const noexcept;
 

@@ -51,3 +51,39 @@ QJsonDocument pong_message() noexcept
     obj["type"] = as_int(MessageType::PONG);
     return QJsonDocument{obj};
 }
+
+
+////////////////////
+// File Transfer  //
+////////////////////
+
+QJsonDocument pixmap_request_message(QVector<QString> const &keys)
+{
+    QJsonArray requests;
+    for (auto const &str : keys)
+        requests.push_back(str);
+
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::PIXMAP_REQUEST);
+    obj["requests"] = requests;
+    return QJsonDocument{obj};
+}
+
+
+QJsonDocument pixmap_transfer_message(QString const &key, QByteArray const &b64_data)
+{
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::PIXMAP_TRANSFER);
+    obj["key"] = key;
+    obj["data"] = QString{b64_data};
+    return QJsonDocument{obj};
+}
+
+
+QJsonDocument pixmap_not_found_message(QString const &key)
+{
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::PIXMAP_NOT_FOUND);
+    obj["key"] = key;
+    return QJsonDocument{obj};
+}

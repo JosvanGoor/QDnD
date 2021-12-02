@@ -2,6 +2,7 @@
 #define NETWORK_MESSAGEBUILDER_H
 
 #include <QColor>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 
@@ -15,7 +16,9 @@ QJsonDocument ping_message() noexcept;
 QJsonDocument pong_message() noexcept;
 
 // file transfer
-
+QJsonDocument pixmap_request_message(QVector<QString> const &keys);
+QJsonDocument pixmap_transfer_message(QString const &key, QByteArray const &b64_avatar);
+QJsonDocument pixmap_not_found_message(QString const &key);
 
 // simple
 

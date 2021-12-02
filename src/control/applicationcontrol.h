@@ -44,6 +44,8 @@ class ApplicationControl : public QObject
         bool verify_close_connection();
         void start_hosting();
         void connect_to_host();
+        void set_connectionbase_signals();
+        // void pixmap_received(QString const &key, QPixmap const &pixmap);
 
         void on_pixmap_required(QString const &key);
         void on_player_connected(Player const &player);
@@ -51,11 +53,11 @@ class ApplicationControl : public QObject
         void on_spell_selection(QString const &name);
 
         // server only slots
+        void pixmap_requested(QString const &id, QString const &key);
         void on_trigger_synchronization(QString const &identifier);
 
     signals:
         void debug_message(QString const &key);
-        void pixmap_received(QString const &key, QPixmap const &pixmap);
 
 };
 
