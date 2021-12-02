@@ -8,6 +8,7 @@ MenuBar::MenuBar(QWidget *parent)
 :   QMenuBar(parent)
 {
     addMenu(d_file = new QMenu{"File"});
+    d_file->addAction(d_update_display = new QAction{"Update Display"});
     d_file->addAction(d_quit = new QAction{"Quit"});
 
     addMenu(d_connection = new QMenu{"Connection"});
@@ -17,7 +18,7 @@ MenuBar::MenuBar(QWidget *parent)
     d_connection->addAction(d_disconnect = new QAction{"Disconnect"});
 
     d_display = nullptr;
-    d_update_display = nullptr;
+    // d_update_display = nullptr;
 }
 
 

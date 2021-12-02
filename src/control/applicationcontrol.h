@@ -1,6 +1,7 @@
 #ifndef CONTROL_APPLICATIONCONTROL_H
 #define CONTROL_APPLICATIONCONTROL_H
 
+#include <QFileDialog>
 #include <QMessageBox>
 #include <QObject>
 
@@ -52,9 +53,13 @@ class ApplicationControl : public QObject
         void on_player_connected(Player const &player);
         void on_player_disconnected(QString const &id);
         void on_spell_selection(QString const &name);
+        void on_display_update(QString const &key);
 
         // chat
         void chat_entered(QString const &chat);
+
+        // menu's
+        void display_update_clicked();
         
         // server only slots
         void pixmap_requested(QString const &id, QString const &key);

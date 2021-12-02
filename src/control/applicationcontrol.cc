@@ -34,8 +34,9 @@ void ApplicationControl::create_default_connections()
     QObject::connect(d_main_window.spells_widget(), &SpellsWidget::selection_changed, this, &ApplicationControl::on_spell_selection);
     QObject::connect(d_main_window.menu_bar()->host(), &QAction::triggered, this, &ApplicationControl::start_hosting);
     QObject::connect(d_main_window.menu_bar()->connect(), &QAction::triggered, this, &ApplicationControl::connect_to_host);
+    QObject::connect(d_main_window.menu_bar()->update_display(), &QAction::triggered, this, &ApplicationControl::display_update_clicked);    
     QObject::connect(d_main_window.chat_widget(), &ChatWidget::message_entered, this, &ApplicationControl::chat_entered);
-    
+
     QObject::connect(&d_player_control, &PlayerControl::pixmap_required, this, &ApplicationControl::on_pixmap_required);
     QObject::connect(&d_player_control, &PlayerControl::player_connected, this, &ApplicationControl::on_player_connected);
     QObject::connect(&d_player_control, &PlayerControl::player_disconnected, this, &ApplicationControl::on_player_disconnected);
@@ -139,8 +140,10 @@ void ApplicationControl::set_connectionbase_signals()
     QObject::connect(d_connection, &ConnectionBase::player_leaves, &d_player_control, &PlayerControl::on_player_leaves);
     QObject::connect(d_connection, &ConnectionBase::pixmap_received, &d_pixmap_cache, &PixmapCache::put_pixmap);
     QObject::connect(d_connection, &ConnectionBase::pixmap_received, d_main_window.players_widget(), &PlayersWidget::pixmap_received);
+    QObject::connect(d_connection, &ConnectionBase::pixmap_received, d_main_window.display_widget(), &DisplayWidget::pixmap_received);
     QObject::connect(d_connection, &ConnectionBase::chat_message, d_main_window.chat_widget(), &ChatWidget::on_user_message);
     QObject::connect(d_connection, &ConnectionBase::richtext_message, d_main_window.chat_widget(), &ChatWidget::on_rich_message);
+    QObject::connect(d_connection, &ConnectionBase::display_update, this, &ApplicationControl::on_display_update);
 }
 
 
@@ -189,6 +192,17 @@ void ApplicationControl::on_spell_selection(QString const &name)
 }
 
 
+void ApplicationControl::on_display_update(QString const &key)
+{
+    if (d_pixmap_cache.has_pixmap(key))
+        d_main_window.display_widget()->set_pixmap(d_pixmap_cache.get_pixmap(key));
+    else
+    {
+        d_main_window.display_widget()->set_pixmap(key);
+        on_pixmap_required(key);
+    }
+}
+
 ////////////////////
 //      Chat      //
 ////////////////////
@@ -219,6 +233,33 @@ void ApplicationControl::chat_entered(QString const &chat)
     if (d_connection->is_server())
         d_connection->handle_message(doc);
     d_connection->send(doc);
+}
+
+
+////////////////////
+//      Menus     //
+////////////////////
+
+void ApplicationControl::display_update_clicked()
+{
+    if (!d_connection || !d_connection->is_server())
+    {
+        debug_message("Only server may change display.");
+        return;
+    }
+    
+    QString file = QFileDialog::getOpenFileName(&d_main_window, "Select an image");
+
+    if (file.isEmpty())
+        return;
+
+    TransferableImage image = d_pixmap_cache.load_from_file(file);
+    if (image.name.isEmpty())
+        return;
+
+    QJsonDocument doc = display_update_message(image.name);
+    d_connection->send(doc);
+    d_connection->handle_message(doc);
 }
 
 

@@ -46,6 +46,7 @@ class ConnectionBase : public QObject
         void synchronization(QJsonObject const &object);
         void pixmap_received(QString const &key, QPixmap const &pixmap);
         void pixmap_requested(QString const &id, QString const &key);
+        void display_update(QString const &key);
 
         // player stuff
         void player_joins(QJsonObject const &object);

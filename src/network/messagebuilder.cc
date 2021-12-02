@@ -111,3 +111,12 @@ QJsonDocument richtext_message(QString const &id, QString const &message)
     obj["message"] = message;
     return QJsonDocument{obj};
 }
+
+
+QJsonDocument display_update_message(QString const &key)
+{
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::DISPLAY_UPDATE);
+    obj["key"] = key;
+    return QJsonDocument{obj};
+}

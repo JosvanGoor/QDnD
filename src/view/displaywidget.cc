@@ -21,25 +21,16 @@ DisplayWidget::~DisplayWidget()
 //    Display     //
 ////////////////////
 
-bool DisplayWidget::waiting_for_pixmap(QString const &id)
+void DisplayWidget::set_pixmap(QString const &key)
 {
-    if (d_incoming_pixmap_name.isEmpty())
-        return false;
-    
-    return d_incoming_pixmap_name == id;
-}
-
-
-void DisplayWidget::set_incoming_pixmap(QString const &id)
-{
-    d_incoming_pixmap_name = id;
+    d_pixmap_key = key;
 }
 
 
 void DisplayWidget::set_pixmap(QPixmap const &pixmap)
 {
     d_current_display = pixmap;
-    d_incoming_pixmap_name = "";
+    d_pixmap_key = "";
     update();
 }
 
@@ -62,4 +53,18 @@ void DisplayWidget::paintEvent([[maybe_unused]] QPaintEvent *event)
     QPainter painter{this};
     QRect destination{x_offset, y_offset, im_width, im_height};
     painter.drawPixmap(destination, d_current_display);
+}
+
+
+////////////////////
+//    Display     //
+////////////////////
+
+void DisplayWidget::pixmap_received(QString const &key, QPixmap const &pixmap)
+{
+    if (d_pixmap_key.isEmpty())
+        return;
+
+    if (d_pixmap_key == key)
+        set_pixmap(pixmap);
 }

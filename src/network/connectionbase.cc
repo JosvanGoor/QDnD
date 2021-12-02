@@ -127,7 +127,7 @@ void ConnectionBase::handle_message(QJsonDocument const &doc)
         break;
 
         case MessageType::DISPLAY_UPDATE:
-            // TODO: DISPLAY_UPDATE
+            emit display_update(obj["key"].toString());
         break;
 
         default: break;

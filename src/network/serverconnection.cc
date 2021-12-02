@@ -164,6 +164,7 @@ void ServerConnection::queue_message(QString const &identifier, QByteArray const
                 write_blob(state.socket, state.lowprio_queue.back(), false);
                 state.lowprio_queue.pop_back();
             }
+            return;
         }
     }
 
