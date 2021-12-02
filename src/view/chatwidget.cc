@@ -16,6 +16,10 @@ ChatWidget::ChatWidget(QWidget *parent)
     layout()->addWidget(d_input = new QLineEdit);
     layout()->addWidget(d_send = new QPushButton{"Send"});
 
+    QFont font = d_output->font();
+    font.setPointSize(12);
+    d_output->setFont(font);
+
     d_output->setReadOnly(true);
     setMinimumWidth(300);
 
@@ -85,14 +89,14 @@ void ChatWidget::on_user_message(QString const &name, QString const &message)
 }
 
 
-void ChatWidget::on_roll_message(QString const &user, QString const &expression, QString const &result)
+void ChatWidget::on_rich_message(QString const &user, QString const &message)
 {
     QTextCursor cursor{d_output->document()};
     cursor.movePosition(QTextCursor::End);
 
     cursor.beginEditBlock();
-    cursor.insertText(user + " rolling " + expression + "\n");
-    cursor.insertHtml(result);
+    cursor.insertText(user + ": ");
+    cursor.insertHtml(message);
     cursor.insertText("\n");
     cursor.endEditBlock();
 

@@ -5,6 +5,7 @@
 #include <QObject>
 
 #include "playercontrol.h"
+#include "../expressions/diceparser.h"
 #include "../model/pixmapcache.h"
 #include "../model/spell.h"
 #include "../network/clientconnection.h"
@@ -45,13 +46,16 @@ class ApplicationControl : public QObject
         void start_hosting();
         void connect_to_host();
         void set_connectionbase_signals();
-        // void pixmap_received(QString const &key, QPixmap const &pixmap);
 
+        // general slots
         void on_pixmap_required(QString const &key);
         void on_player_connected(Player const &player);
         void on_player_disconnected(QString const &id);
         void on_spell_selection(QString const &name);
 
+        // chat
+        void chat_entered(QString const &chat);
+        
         // server only slots
         void pixmap_requested(QString const &id, QString const &key);
         void on_trigger_synchronization(QString const &identifier);

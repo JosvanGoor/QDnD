@@ -87,3 +87,27 @@ QJsonDocument pixmap_not_found_message(QString const &key)
     obj["key"] = key;
     return QJsonDocument{obj};
 }
+
+
+////////////////////
+//  Chat / Text   //
+////////////////////
+
+QJsonDocument chat_message(QString const &id, QString const &message)
+{
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::CHAT);
+    obj["id"] = id;
+    obj["message"] = message;
+    return QJsonDocument{obj};
+}
+
+
+QJsonDocument richtext_message(QString const &id, QString const &message)
+{
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::RICH_TEXT);
+    obj["id"] = id;
+    obj["message"] = message;
+    return QJsonDocument{obj};
+}

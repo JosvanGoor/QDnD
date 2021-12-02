@@ -27,7 +27,7 @@ class ChatWidget : public QWidget
 
         void on_info_message(QString const &message);
         void on_user_message(QString const &user, QString const &message);
-        void on_roll_message(QString const &user, QString const &expression, QString const &result);
+        void on_rich_message(QString const &user, QString const &expression);
 
     signals:
         void message_entered(QString const &str);

@@ -28,14 +28,14 @@ class ConnectionBase : public QObject
         virtual void connect(QString const &host, uint16_t port = 4144) = 0;
         virtual void disconnect() = 0;
 
+        // messages
+        void handle_message(QJsonDocument const &doc);
+
     protected:
         // base IO
         void write_blob(QTcpSocket *socket, QByteArray const &data, bool limited);
         void write_json(QTcpSocket *socket, QJsonDocument const &doc, bool limited = true);
         QJsonDocument read(QTcpSocket *socket, int &incoming, QByteArray &buffer);
-
-        // messages
-        void handle_message(QJsonDocument const &doc);
 
     signals:
         // system
@@ -50,8 +50,8 @@ class ConnectionBase : public QObject
         // player stuff
         void player_joins(QJsonObject const &object);
         void player_leaves(QString const &identifier);
-
-
+        void chat_message(QString const &name, QString const &message);
+        void richtext_message(QString const&name, QString const &message);
 };  
 
 #endif

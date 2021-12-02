@@ -81,5 +81,6 @@ QVector<DiceToken> dice_tokenize(QString const &expression)
         }
     }
 
+    tokens.push_back(DiceToken{DiceTokenType::EOL, "\0"});
     return tokens;
 }

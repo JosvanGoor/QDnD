@@ -34,6 +34,7 @@ void ApplicationControl::create_default_connections()
     QObject::connect(d_main_window.spells_widget(), &SpellsWidget::selection_changed, this, &ApplicationControl::on_spell_selection);
     QObject::connect(d_main_window.menu_bar()->host(), &QAction::triggered, this, &ApplicationControl::start_hosting);
     QObject::connect(d_main_window.menu_bar()->connect(), &QAction::triggered, this, &ApplicationControl::connect_to_host);
+    QObject::connect(d_main_window.chat_widget(), &ChatWidget::message_entered, this, &ApplicationControl::chat_entered);
     
     QObject::connect(&d_player_control, &PlayerControl::pixmap_required, this, &ApplicationControl::on_pixmap_required);
     QObject::connect(&d_player_control, &PlayerControl::player_connected, this, &ApplicationControl::on_player_connected);
@@ -138,41 +139,8 @@ void ApplicationControl::set_connectionbase_signals()
     QObject::connect(d_connection, &ConnectionBase::player_leaves, &d_player_control, &PlayerControl::on_player_leaves);
     QObject::connect(d_connection, &ConnectionBase::pixmap_received, &d_pixmap_cache, &PixmapCache::put_pixmap);
     QObject::connect(d_connection, &ConnectionBase::pixmap_received, d_main_window.players_widget(), &PlayersWidget::pixmap_received);
-}
-
-
-////////////////////
-//  Server Slots  //
-////////////////////
-
-void ApplicationControl::pixmap_requested(QString const &id, QString const &key)
-{
-    ServerConnection *server = reinterpret_cast<ServerConnection*>(d_connection);
-
-    if (!d_pixmap_cache.has_pixmap(key))
-    {
-        server->message_to(id, pixmap_not_found_message(key));
-        debug_message("Failed to serve pixmap to " + id + ", " + key);
-        return;
-    }
-
-    TransferableImage transfer = d_pixmap_cache.prepare_for_transfer(key);
-    server->queue_message(id, pixmap_transfer_message(transfer.name, transfer.b64_data).toJson());
-}
-
-
-void ApplicationControl::on_trigger_synchronization(QString const &id)
-{
-    debug_message("Sync request for " + id + " triggered.");
-    
-    QJsonArray players;
-    for (auto &player : d_player_control.players())
-        players.push_back(player.serialize());
-    
-    QJsonObject obj;
-    obj["type"] = as_int(MessageType::SYNCHRONIZE);
-    obj["players"] = players;
-    reinterpret_cast<ServerConnection*>(d_connection)->message_to(id, QJsonDocument{obj});
+    QObject::connect(d_connection, &ConnectionBase::chat_message, d_main_window.chat_widget(), &ChatWidget::on_user_message);
+    QObject::connect(d_connection, &ConnectionBase::richtext_message, d_main_window.chat_widget(), &ChatWidget::on_rich_message);
 }
 
 
@@ -215,4 +183,73 @@ void ApplicationControl::on_spell_selection(QString const &name)
 
     if (auto it = d_spells.find(name); it != d_spells.end())
         d_main_window.spells_widget()->show_description(it.value().format());
+}
+
+
+////////////////////
+//      Chat      //
+////////////////////
+
+void ApplicationControl::chat_entered(QString const &chat)
+{
+    if (!d_connection)
+        return;
+
+    QJsonDocument doc;
+
+    if (chat.startsWith("/roll ") && chat.size() != 6)
+    {
+        DiceExpressionPtr ptr = DiceParser::parse(chat.mid(6));
+        if (ptr == nullptr)
+            doc = chat_message(d_player_control.own_identifier(), chat);
+        else
+        {
+            DiceResult result = ptr->evaluate();
+            QString rich = result.text + " -> " + QString::number(result.result);
+            doc = richtext_message(d_player_control.own_identifier(), rich);    
+        }
+        
+    }
+    else
+        doc = chat_message(d_player_control.own_identifier(), chat);
+
+    if (d_connection->is_server())
+        d_connection->handle_message(doc);
+    d_connection->send(doc);
+}
+
+
+
+////////////////////
+//  Server Slots  //
+////////////////////
+
+void ApplicationControl::pixmap_requested(QString const &id, QString const &key)
+{
+    ServerConnection *server = reinterpret_cast<ServerConnection*>(d_connection);
+
+    if (!d_pixmap_cache.has_pixmap(key))
+    {
+        server->message_to(id, pixmap_not_found_message(key));
+        debug_message("Failed to serve pixmap to " + id + ", " + key);
+        return;
+    }
+
+    TransferableImage transfer = d_pixmap_cache.prepare_for_transfer(key);
+    server->queue_message(id, pixmap_transfer_message(transfer.name, transfer.b64_data).toJson());
+}
+
+
+void ApplicationControl::on_trigger_synchronization(QString const &id)
+{
+    debug_message("Sync request for " + id + " triggered.");
+    
+    QJsonArray players;
+    for (auto &player : d_player_control.players())
+        players.push_back(player.serialize());
+    
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::SYNCHRONIZE);
+    obj["players"] = players;
+    reinterpret_cast<ServerConnection*>(d_connection)->message_to(id, QJsonDocument{obj});
 }

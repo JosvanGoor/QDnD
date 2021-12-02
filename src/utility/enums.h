@@ -38,8 +38,8 @@ enum class MessageType
     PIXMAP_NOT_FOUND,
 
     // simple messages
-    CHAT_MESSAGE,
-    DIEROLL_MESSSAGE,
+    CHAT,
+    RICH_TEXT,
     DISPLAY_UPDATE,
 };
 

@@ -118,12 +118,12 @@ void ConnectionBase::handle_message(QJsonDocument const &doc)
         }
         break;
 
-        case MessageType::CHAT_MESSAGE:
-            // TODO: CHAT_MESSAGE
+        case MessageType::CHAT:
+            emit chat_message(obj["id"].toString(), obj["message"].toString());
         break;
 
-        case MessageType::DIEROLL_MESSSAGE:
-            // TODO: DIEROLL_MESSAGE
+        case MessageType::RICH_TEXT:
+            emit richtext_message(obj["id"].toString(), obj["message"].toString());
         break;
 
         case MessageType::DISPLAY_UPDATE:

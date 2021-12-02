@@ -210,7 +210,7 @@ void ServerConnection::on_new_connection()
 
         // server->client state update will emitted from user manager after
         // the new client has sent handshake
-        d_connections.insert(socket, {0, 0, socket, {}, ""});
+        d_connections.insert(socket, {0, 0, socket, {}, "", {}});
         QObject::connect(socket, &QTcpSocket::errorOccurred, this, &ServerConnection::on_socket_error);
         QObject::connect(socket, &QTcpSocket::readyRead, this, &ServerConnection::on_socket_readyread);
         QObject::connect(socket, &QTcpSocket::disconnected, this, &ServerConnection::on_socket_disconnect);

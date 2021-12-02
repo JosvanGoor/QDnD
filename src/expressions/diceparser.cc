@@ -16,8 +16,16 @@ DiceParser::DiceParser(QString const &expression)
 
 DiceExpressionPtr DiceParser::parse(QString const &expression)
 {
-    DiceParser parser{expression};
-    return parser.addition();
+    try 
+    {
+        DiceParser parser{expression};
+        return parser.addition();
+    }
+    catch (std::exception &ex)
+    {
+        // TODO: show result
+        return nullptr;
+    }
 }
 
 
