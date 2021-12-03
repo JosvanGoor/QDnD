@@ -6,7 +6,9 @@
 #include <QPoint>
 #include <QWidget>
 
+#include "../control/playercontrol.h"
 #include "../model/gridmodel.h"
+#include "../utility/painting.h"
 
 class GridWidget : public QWidget
 {
@@ -19,24 +21,23 @@ class GridWidget : public QWidget
     // mouse
     QPoint d_mouse_old;
 
-    // to render
-    GridModel *d_grid_model;
-
     public:
         explicit GridWidget(QWidget *parent = nullptr);
         ~GridWidget();
 
         // painting
         void paintEvent(QPaintEvent *event);
-        void paint_grid(QPainter &painter);
 
-        // utility
-        QColor foreground_color();
-        QColor background_color();
-
-        // gridmodel
-        GridModel *model() noexcept;
-        void set_gridmodel(GridModel *model);
+    signals:
+        // paints grid, background color & brushes (TODO)
+        // then  paints scenery
+        void paint_ground_layer(QPainter &painter, QSize size, QPoint offset, QPoint mousepos);
+        // paints lines etc drawn by players
+        void paint_player_layer(QPainter &painter, QSize size, QPoint offset, QPoint mousepos);
+        // paints entities (players & monsters)
+        void paint_entity_layer(QPainter &painter, QSize size, QPoint offset, QPoint mousepos);
+        // paints mouse related things (pings & aoe markers)
+        void paint_mouse_layer(QPainter &painter, QSize size, QPoint offset, QPoint mousepos);
 };
 
 #endif

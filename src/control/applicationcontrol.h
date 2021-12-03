@@ -12,6 +12,7 @@
 #include "../network/clientconnection.h"
 #include "../network/connectionbase.h"
 #include "../network/serverconnection.h"
+#include "../utility/painting.h"
 #include "../view/connectdialog.h"
 #include "../view/mainwindow.h"
 
@@ -31,7 +32,6 @@ class ApplicationControl : public QObject
     MainWindow d_main_window;
 
     ConnectionBase *d_connection;
-
 
     public:
         explicit ApplicationControl(QObject *parent = nullptr);
@@ -64,6 +64,9 @@ class ApplicationControl : public QObject
         // server only slots
         void pixmap_requested(QString const &id, QString const &key);
         void on_trigger_synchronization(QString const &identifier);
+
+        // painting stuff
+        void on_paint_ground_layer(QPainter &painter, QSize size, QPoint offset, QPoint mousepos);
 
     signals:
         void debug_message(QString const &key);

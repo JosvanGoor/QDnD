@@ -43,6 +43,7 @@ void ServerConnection::send(QByteArray const &data)
 void ServerConnection::send(QJsonDocument const &doc)
 {
     dispatch(doc.toJson());
+    handle_message(doc);
 }
 
 
@@ -107,7 +108,7 @@ void ServerConnection::pre_handle_message(QJsonDocument const &doc, SocketState 
             dispatch(QJsonDocument{obj}.toJson(), true); // notify other users
 
             state.identifier = obj["id"].toString();
-            player_joins(obj);
+            emit player_joins(obj);
         }
         return;
 
@@ -198,7 +199,7 @@ void ServerConnection::update_status()
 void ServerConnection::on_ping_timer()
 {
     // TODO: ping tracking
-    send(ping_message());
+    dispatch(ping_message().toJson());
 }
 
 
@@ -223,13 +224,11 @@ void ServerConnection::on_new_connection()
 
 void ServerConnection::on_socket_error(QAbstractSocket::SocketError error)
 {
-    //TODO: signal user manager of disconnect
     QObject *id = QObject::sender();
     SocketState &state = d_connections.find(id).value();
 
     QString error_string = QMetaEnum::fromType<QAbstractSocket::SocketError>().valueToKey(error);
     emit debug_message(error_string + " from " + state.socket->peerAddress().toString());
-    //TODO: disconnect
 }
 
 

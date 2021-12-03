@@ -40,6 +40,8 @@ void ApplicationControl::create_default_connections()
     QObject::connect(&d_player_control, &PlayerControl::pixmap_required, this, &ApplicationControl::on_pixmap_required);
     QObject::connect(&d_player_control, &PlayerControl::player_connected, this, &ApplicationControl::on_player_connected);
     QObject::connect(&d_player_control, &PlayerControl::player_disconnected, this, &ApplicationControl::on_player_disconnected);
+
+    QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_ground_layer, this, &ApplicationControl::on_paint_ground_layer);
 }
 
 
@@ -225,13 +227,10 @@ void ApplicationControl::chat_entered(QString const &chat)
             QString rich = result.text + " -> " + QString::number(result.result);
             doc = richtext_message(d_player_control.own_identifier(), rich);    
         }
-        
     }
     else
         doc = chat_message(d_player_control.own_identifier(), chat);
 
-    if (d_connection->is_server())
-        d_connection->handle_message(doc);
     d_connection->send(doc);
 }
 
@@ -259,7 +258,6 @@ void ApplicationControl::display_update_clicked()
 
     QJsonDocument doc = display_update_message(image.name);
     d_connection->send(doc);
-    d_connection->handle_message(doc);
 }
 
 
@@ -296,4 +294,15 @@ void ApplicationControl::on_trigger_synchronization(QString const &id)
     obj["type"] = as_int(MessageType::SYNCHRONIZE);
     obj["players"] = players;
     reinterpret_cast<ServerConnection*>(d_connection)->message_to(id, QJsonDocument{obj});
+}
+
+
+////////////////////
+//    Painting    //
+////////////////////
+
+void ApplicationControl::on_paint_ground_layer(QPainter &painter, QSize size, QPoint offset, QPoint mouse)
+{
+    painter.setPen(QPen{Qt::black});
+    paint_grid(painter, size, offset);
 }

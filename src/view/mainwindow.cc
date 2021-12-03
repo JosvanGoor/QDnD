@@ -57,6 +57,12 @@ DisplayWidget *MainWindow::display_widget() noexcept
 }
 
 
+GridWidget *MainWindow::grid_widget() noexcept
+{
+    return d_grid_tab;
+}
+
+
 MenuBar *MainWindow::menu_bar() noexcept
 {
     return d_menu_bar;

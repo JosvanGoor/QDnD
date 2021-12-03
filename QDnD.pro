@@ -35,6 +35,7 @@ SOURCES +=  src/control/applicationcontrol.cc \
             src/utility/enums.cc \
             src/utility/htmlformatting.cc \
             src/utility/loading.cc \
+            src/utility/painting.cc \
             \
             src/view/chatwidget.cc \
             src/view/connectdialog.cc \
@@ -72,6 +73,7 @@ HEADERS +=  src/control/applicationcontrol.h \
             src/utility/enums.h \
             src/utility/htmlformatting.h \
             src/utility/loading.h \
+            src/utility/painting.h \
             \
             src/view/chatwidget.h \
             src/view/connectdialog.h \
