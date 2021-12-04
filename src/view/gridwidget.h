@@ -35,6 +35,7 @@ class GridWidget : public QWidget
 
         // utility
         void set_mouse_mode(MouseMode mode);
+        void request_render_update();
 
         // mouse events
         void mouseMoveEvent(QMouseEvent *event) override;
@@ -42,6 +43,8 @@ class GridWidget : public QWidget
         void mouseReleaseEvent(QMouseEvent *event) override;
 
     signals:
+        void grid_player_move(QPoint const &point);
+
         // paints grid, background color & brushes (TODO)
         // then  paints scenery
         void paint_ground_layer(QPainter &painter, QSize size, QPoint offset, QPoint mousepos);

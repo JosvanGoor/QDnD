@@ -130,6 +130,10 @@ void ConnectionBase::handle_message(QJsonDocument const &doc)
             emit display_update(obj["key"].toString());
         break;
 
+        case MessageType::PLAYER_MOVED:
+            emit player_moved(obj["id"].toString(), {obj["x"].toInt(), obj["y"].toInt()});
+        break;
+
         default: break;
     }
 }

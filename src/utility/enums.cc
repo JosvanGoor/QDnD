@@ -72,6 +72,8 @@ QString as_string(MessageType type)
         case MessageType::CHAT:                 return "CHAT";
         case MessageType::RICH_TEXT:            return "RICH_TEXT";
         case MessageType::DISPLAY_UPDATE:       return "DISPLAY_UPDATE";
+
+        case MessageType::PLAYER_MOVED:         return "PLAYER_MOVED";
     }
 
     return "MessageType: If you read this Jos fucked up.";

@@ -24,6 +24,8 @@ QJsonDocument player_connected_message(QString const &id, QString const &avatar_
     obj["avatar"] = avatar_key;
     obj["color"] = QString::number(color.rgb(), 16);
     obj["scale"] = as_int(scale);
+    obj["x"] = 0;
+    obj["y"] = 0;
     return QJsonDocument{obj};
 }
 
@@ -118,5 +120,20 @@ QJsonDocument display_update_message(QString const &key)
     QJsonObject obj;
     obj["type"] = as_int(MessageType::DISPLAY_UPDATE);
     obj["key"] = key;
+    return QJsonDocument{obj};
+}
+
+
+////////////////////
+// Entity Control //
+////////////////////
+
+QJsonDocument player_move_message(QString const &id, QPoint const &newpos)
+{
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::PLAYER_MOVED);
+    obj["id"] = id;
+    obj["x"] = newpos.x();
+    obj["y"] = newpos.y();
     return QJsonDocument{obj};
 }

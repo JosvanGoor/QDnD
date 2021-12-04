@@ -51,6 +51,7 @@ class ConnectionBase : public QObject
         // player stuff
         void player_joins(QJsonObject const &object);
         void player_leaves(QString const &identifier);
+        void player_moved(QString const &id, QPoint const &pos);
         void chat_message(QString const &name, QString const &message);
         void richtext_message(QString const&name, QString const &message);
 };  

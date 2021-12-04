@@ -31,6 +31,7 @@ ApplicationControl::~ApplicationControl()
 void ApplicationControl::create_default_connections()
 {
     QObject::connect(this, &ApplicationControl::debug_message, &d_main_window, &MainWindow::debug_message);
+    QObject::connect(this, &ApplicationControl::update_grid, d_main_window.grid_widget(), &GridWidget::request_render_update);
     QObject::connect(d_main_window.spells_widget(), &SpellsWidget::selection_changed, this, &ApplicationControl::on_spell_selection);
     QObject::connect(d_main_window.menu_bar()->host(), &QAction::triggered, this, &ApplicationControl::start_hosting);
     QObject::connect(d_main_window.menu_bar()->connect(), &QAction::triggered, this, &ApplicationControl::connect_to_host);
@@ -41,11 +42,13 @@ void ApplicationControl::create_default_connections()
     QObject::connect(&d_player_control, &PlayerControl::player_connected, this, &ApplicationControl::on_player_connected);
     QObject::connect(&d_player_control, &PlayerControl::player_disconnected, this, &ApplicationControl::on_player_disconnected);
     QObject::connect(&d_player_control, &PlayerControl::debug_message, &d_main_window, &MainWindow::debug_message);
+    QObject::connect(&d_player_control, &PlayerControl::update_grid, d_main_window.grid_widget(), &GridWidget::request_render_update);
 
     QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_ground_layer, this, &ApplicationControl::on_paint_ground_layer);
     QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_player_layer, this, &ApplicationControl::on_paint_player_layer);
     QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_entity_layer, this, &ApplicationControl::on_paint_entity_layer);
     QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_mouse_layer, this, &ApplicationControl::on_paint_mouse_layer);
+    QObject::connect(d_main_window.grid_widget(), &GridWidget::grid_player_move, this, &ApplicationControl::on_grid_player_move);
 }
 
 
@@ -140,16 +143,17 @@ void ApplicationControl::connect_to_host()
 
 void ApplicationControl::set_connectionbase_signals()
 {
+    QObject::connect(d_connection, &ConnectionBase::display_update, this, &ApplicationControl::on_display_update);
     QObject::connect(d_connection, &ConnectionBase::debug_message, &d_main_window, &MainWindow::debug_message);
     QObject::connect(d_connection, &ConnectionBase::connection_status, d_main_window.status_bar(), &StatusBar::update_connection_status);
-    QObject::connect(d_connection, &ConnectionBase::player_joins, &d_player_control, &PlayerControl::on_player_joins);
-    QObject::connect(d_connection, &ConnectionBase::player_leaves, &d_player_control, &PlayerControl::on_player_leaves);
     QObject::connect(d_connection, &ConnectionBase::pixmap_received, &d_pixmap_cache, &PixmapCache::put_pixmap);
-    QObject::connect(d_connection, &ConnectionBase::pixmap_received, d_main_window.players_widget(), &PlayersWidget::pixmap_received);
     QObject::connect(d_connection, &ConnectionBase::pixmap_received, d_main_window.display_widget(), &DisplayWidget::pixmap_received);
     QObject::connect(d_connection, &ConnectionBase::chat_message, d_main_window.chat_widget(), &ChatWidget::on_user_message);
     QObject::connect(d_connection, &ConnectionBase::richtext_message, d_main_window.chat_widget(), &ChatWidget::on_rich_message);
-    QObject::connect(d_connection, &ConnectionBase::display_update, this, &ApplicationControl::on_display_update);
+    QObject::connect(d_connection, &ConnectionBase::pixmap_received, d_main_window.players_widget(), &PlayersWidget::pixmap_received);
+    QObject::connect(d_connection, &ConnectionBase::player_leaves, &d_player_control, &PlayerControl::on_player_leaves);
+    QObject::connect(d_connection, &ConnectionBase::player_joins, &d_player_control, &PlayerControl::on_player_joins);
+    QObject::connect(d_connection, &ConnectionBase::player_moved, &d_player_control, &PlayerControl::on_player_moves);
 }
 
 
@@ -178,7 +182,7 @@ void ApplicationControl::on_player_connected(Player const &player)
         d_main_window.players_widget()->add_user(player.identifier(), player.avatar_key(), player.color());
 
     d_main_window.chat_widget()->on_info_message(player.identifier() + " has joined the game.");
-    d_main_window.grid_widget()->update();
+    emit update_grid();
 }
 
 
@@ -187,7 +191,7 @@ void ApplicationControl::on_player_disconnected(QString const &id)
     debug_message("Player disconnected: " + id);
     d_main_window.players_widget()->remove_user(id);
     d_main_window.chat_widget()->on_info_message(id + " has left.");
-    d_main_window.grid_widget()->update();
+    emit update_grid();
 }
 
 
@@ -211,8 +215,23 @@ void ApplicationControl::on_display_update(QString const &key)
     }
 }
 
+
 ////////////////////
-//      Chat      //
+//      Misc      //
+////////////////////
+
+void ApplicationControl::on_grid_player_move(QPoint const &point)
+{
+    if (!d_connection || d_connection->is_server())
+        return;
+
+    debug_message("new player pos: " + QString::number(point.x()) + ", " + QString::number(point.y()));
+    d_connection->send(player_move_message(d_player_control.own_identifier(), point));
+}
+
+
+////////////////////
+//      Misc      //
 ////////////////////
 
 void ApplicationControl::chat_entered(QString const &chat)
@@ -241,10 +260,6 @@ void ApplicationControl::chat_entered(QString const &chat)
 }
 
 
-////////////////////
-//      Menus     //
-////////////////////
-
 void ApplicationControl::display_update_clicked()
 {
     if (!d_connection || !d_connection->is_server())
@@ -265,7 +280,6 @@ void ApplicationControl::display_update_clicked()
     QJsonDocument doc = display_update_message(image.name);
     d_connection->send(doc);
 }
-
 
 
 ////////////////////
@@ -307,20 +321,20 @@ void ApplicationControl::on_trigger_synchronization(QString const &id)
 //    Painting    //
 ////////////////////
 
-void ApplicationControl::on_paint_ground_layer(QPainter &painter, QSize size, QPoint offset, QPoint mouse)
+void ApplicationControl::on_paint_ground_layer(QPainter &painter, QSize size, QPoint offset, [[maybe_unused]] QPoint mouse)
 {
     painter.setPen(QPen{Qt::black});
     paint_grid(painter, size, offset);
 }
 
 
-void ApplicationControl::on_paint_player_layer(QPainter &painter, QSize size, QPoint offset, QPoint mouse)
+void ApplicationControl::on_paint_player_layer([[maybe_unused]] QPainter &painter, [[maybe_unused]] QSize size, [[maybe_unused]] QPoint offset, [[maybe_unused]] QPoint mouse)
 {
 
 }
 
 
-void ApplicationControl::on_paint_entity_layer(QPainter &painter, QSize size, QPoint offset, QPoint mouse)
+void ApplicationControl::on_paint_entity_layer(QPainter &painter, [[maybe_unused]] QSize size, QPoint offset, [[maybe_unused]] QPoint mouse)
 {
     // paint all players
     QMap<QString, Player> &players = d_player_control.players();
@@ -329,7 +343,7 @@ void ApplicationControl::on_paint_entity_layer(QPainter &painter, QSize size, QP
 }
 
 
-void ApplicationControl::on_paint_mouse_layer(QPainter &painter, QSize size, QPoint offset, QPoint mouse)
+void ApplicationControl::on_paint_mouse_layer([[maybe_unused]] QPainter &painter, [[maybe_unused]] QSize size, [[maybe_unused]] QPoint offset, [[maybe_unused]] QPoint mouse)
 {
 
 }

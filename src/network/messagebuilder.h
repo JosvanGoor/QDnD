@@ -5,6 +5,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QPoint>
 
 #include "../utility/enums.h"
 
@@ -24,5 +25,8 @@ QJsonDocument pixmap_not_found_message(QString const &key);
 QJsonDocument chat_message(QString const &id, QString const &message);
 QJsonDocument richtext_message(QString const &id, QString const &message);
 QJsonDocument display_update_message(QString const &key);
+
+// entity control
+QJsonDocument player_move_message(QString const &id, QPoint const &newpos);
 
 #endif

@@ -55,10 +55,11 @@ class ApplicationControl : public QObject
         void on_spell_selection(QString const &name);
         void on_display_update(QString const &key);
 
-        // chat
-        void chat_entered(QString const &chat);
+        // player control
+        void on_grid_player_move(QPoint const &point);
 
-        // menu's
+        // misc
+        void chat_entered(QString const &chat);
         void display_update_clicked();
         
         // server only slots
@@ -72,6 +73,7 @@ class ApplicationControl : public QObject
         void on_paint_mouse_layer(QPainter &painter, QSize size, QPoint offset, QPoint mousepos);
 
     signals:
+        void update_grid();
         void debug_message(QString const &key);
 
 };

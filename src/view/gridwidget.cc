@@ -51,6 +51,12 @@ void GridWidget::set_mouse_mode(MouseMode mode)
 }
 
 
+void GridWidget::request_render_update()
+{
+    update();
+}
+
+
 ////////////////////
 //  Mouse Events  //
 ////////////////////
@@ -81,6 +87,8 @@ void GridWidget::mousePressEvent(QMouseEvent *event)
         case Qt::RightButton:
             d_right_button = true;
         break;
+
+        default: break;
     }
 }
 
@@ -91,10 +99,27 @@ void GridWidget::mouseReleaseEvent(QMouseEvent *event)
     {
         case Qt::LeftButton:
             d_left_button = false;
+            if (d_mouse_mode == MouseMode::MOVE_CHARACTER)
+            {
+                int x = (event->x() - d_offset.x());
+                int y = (event->y() - d_offset.y());
+
+                if (x < 0)
+                    x -= 64;
+                if (y < 0)
+                    y -= 64;
+                
+                x = (x / d_gridsize) * d_gridsize;
+                y = (y / d_gridsize) * d_gridsize;
+
+                grid_player_move({x, y});
+            }
         break;
         
         case Qt::RightButton:
             d_right_button = false;
         break;
+
+        default: break;
     }
 }

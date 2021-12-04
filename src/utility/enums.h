@@ -41,6 +41,9 @@ enum class MessageType
     CHAT,
     RICH_TEXT,
     DISPLAY_UPDATE,
+
+    // entity control
+    PLAYER_MOVED,
 };
 
 int as_int(MessageType type);

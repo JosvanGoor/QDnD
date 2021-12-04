@@ -34,8 +34,10 @@ class PlayerControl : public QObject
     public slots:
         void on_player_joins(QJsonObject const &doc);
         void on_player_leaves(QString const &name);
+        void on_player_moves(QString const &id, QPoint const &newpos);
 
     signals:
+        void update_grid();
         void debug_message(QString const &message);
         // server only
         void trigger_synchronization(QString const &identifier);

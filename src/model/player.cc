@@ -10,9 +10,11 @@ Player::Player()
 
 Player::Player(QString const &id, QString const &key, QColor const &col, GridScale size)
 :   d_identifier(id),
-    d_avatar_key(key),
     d_color(col),
-    d_scale(size)
+    d_position(0, 0),
+    d_avatar_key(key),
+    d_scale(size),
+    d_lines()
 {
 
 }
@@ -108,6 +110,8 @@ QJsonObject Player::serialize() const noexcept
     obj["avatar"] = d_avatar_key;
     obj["color"] = QString::number(d_color.rgb(), 16);
     obj["scale"] = as_int(d_scale);
+    obj["x"] = d_position.x();
+    obj["y"] = d_position.y();
     return obj;
 }
 
@@ -119,7 +123,7 @@ QJsonArray Player::serialize_lines() const noexcept
     for (auto it = d_lines.begin(); it != d_lines.end(); ++it)
     {
         QJsonArray points;
-        for (size_t idx = 0; idx < it.value().line.size(); ++idx)
+        for (int idx = 0; idx < it.value().line.size(); ++idx)
         {
             QJsonObject point;
             point["x"] = it.value().line[idx].x1();
@@ -144,4 +148,6 @@ QJsonArray Player::serialize_lines() const noexcept
         obj["points"] = points;
         arr.push_back(obj);
     }
+
+    return arr;
 }

@@ -64,9 +64,9 @@ void PlayerControl::on_player_joins(QJsonObject const &doc)
     QString avatar_key = doc["avatar"].toString();
     QColor color = doc["color"].toString().toUInt();
     GridScale scale = static_cast<GridScale>(doc["scale"].toInt());
+    
     d_players[id] = {id, avatar_key, color, scale};
-
-    debug_message("Player joined with scale " + as_string(scale));
+    d_players[id].set_position({doc["x"].toInt(), doc["y"].toInt()});
 
     emit pixmap_required(avatar_key);
     emit player_connected(d_players[id]);
@@ -78,4 +78,11 @@ void PlayerControl::on_player_leaves(QString const &name)
 {
     d_players.remove(name);
     emit player_disconnected(name);
+}
+
+
+void PlayerControl::on_player_moves(QString const &id, QPoint const &newpos)
+{
+    d_players.find(id).value().set_position(newpos);
+    update_grid();
 }
