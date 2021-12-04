@@ -9,5 +9,11 @@
         <file>data/accept.png</file>
         <file>data/deny.png</file>
         <file>data/neutral.png</file>
+
+        <file>data/free_icon.png</file>
+        <file>data/ping.png</file>
+        <file>data/move_icon.png</file>
+        <file>data/straight_icon.png</file>
+        <file>data/walk_icon.png</file>
     </qresource>
 </RCC>

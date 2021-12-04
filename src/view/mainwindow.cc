@@ -22,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
     d_central_widget->addWidget(d_right_tabs = new QTabWidget);
     d_right_tabs->addTab(d_chat_tab = new ChatWidget, "Chat");
     d_right_tabs->addTab(d_players_tab = new PlayersWidget, "Players");
+    d_right_tabs->addTab(d_grid_control_tab = new GridControlWidget{d_grid_tab}, "Grid Control");
 
     d_middle_widget->setOrientation(Qt::Vertical);
     d_middle_widget->setSizes({600, 100});
@@ -54,6 +55,12 @@ ChatWidget *MainWindow::chat_widget() noexcept
 DisplayWidget *MainWindow::display_widget() noexcept
 {
     return d_display_tab;
+}
+
+
+GridControlWidget *MainWindow::grid_control_widget() noexcept
+{
+    return d_grid_control_tab;
 }
 
 

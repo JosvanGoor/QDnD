@@ -1,6 +1,7 @@
 #ifndef VIEW_GRIDWIDGET_H
 #define VIEW_GRIDWIDGET_H
 
+#include <QMouseEvent>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QPoint>
@@ -8,7 +9,8 @@
 
 #include "../control/playercontrol.h"
 #include "../model/gridmodel.h"
-#include "../utility/painting.h"
+#include "../utility/enums.h"
+
 
 class GridWidget : public QWidget
 {
@@ -20,6 +22,9 @@ class GridWidget : public QWidget
 
     // mouse
     QPoint d_mouse_old;
+    MouseMode d_mouse_mode;
+    bool d_left_button;
+    bool d_right_button;
 
     public:
         explicit GridWidget(QWidget *parent = nullptr);
@@ -27,6 +32,14 @@ class GridWidget : public QWidget
 
         // painting
         void paintEvent(QPaintEvent *event);
+
+        // utility
+        void set_mouse_mode(MouseMode mode);
+
+        // mouse events
+        void mouseMoveEvent(QMouseEvent *event) override;
+        void mousePressEvent(QMouseEvent *event) override;
+        void mouseReleaseEvent(QMouseEvent *event) override;
 
     signals:
         // paints grid, background color & brushes (TODO)

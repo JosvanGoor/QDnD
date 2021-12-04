@@ -50,8 +50,11 @@ QString as_string(MessageType type);
 // Mouse Modes
 enum class MouseMode
 {
-    SELECT,
-    DRAW
+    FREE_DRAW,
+    LINE_DRAW,
+    MOVE_CHARACTER,
+    MOVE_GRID,
+    PING,
 };
 
 QString as_string(MouseMode mode);

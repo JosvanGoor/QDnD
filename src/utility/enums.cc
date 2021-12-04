@@ -86,8 +86,11 @@ QString as_string(MouseMode mode)
 {
     switch (mode)
     {
-        case MouseMode::SELECT:     return "SELECT";
-        case MouseMode::DRAW:       return "DRAW";
+        case MouseMode::FREE_DRAW:      return "FREE_DRAW";
+        case MouseMode::LINE_DRAW:      return "LINE_DRAW";
+        case MouseMode::MOVE_CHARACTER: return "MOVE_CHARACTER";
+        case MouseMode::MOVE_GRID:      return "MOVE_GRID";
+        case MouseMode::PING:           return "PING";
     }
     
     return "MouseMode: If you read this Jos fucked up.";

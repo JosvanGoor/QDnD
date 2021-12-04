@@ -36,6 +36,7 @@ class PlayerControl : public QObject
         void on_player_leaves(QString const &name);
 
     signals:
+        void debug_message(QString const &message);
         // server only
         void trigger_synchronization(QString const &identifier);
 

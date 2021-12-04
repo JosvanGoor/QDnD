@@ -5,6 +5,9 @@
 #include <QPoint>
 #include <QSize>
 
+#include "enums.h"
+
 void paint_grid(QPainter &painter, QSize size, QPoint offset);
+void paint_player(QPainter &painter, QPixmap const &pixmap, GridScale size, QPoint pos, QPoint offset);
 
 #endif

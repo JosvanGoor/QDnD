@@ -40,8 +40,12 @@ void ApplicationControl::create_default_connections()
     QObject::connect(&d_player_control, &PlayerControl::pixmap_required, this, &ApplicationControl::on_pixmap_required);
     QObject::connect(&d_player_control, &PlayerControl::player_connected, this, &ApplicationControl::on_player_connected);
     QObject::connect(&d_player_control, &PlayerControl::player_disconnected, this, &ApplicationControl::on_player_disconnected);
+    QObject::connect(&d_player_control, &PlayerControl::debug_message, &d_main_window, &MainWindow::debug_message);
 
     QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_ground_layer, this, &ApplicationControl::on_paint_ground_layer);
+    QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_player_layer, this, &ApplicationControl::on_paint_player_layer);
+    QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_entity_layer, this, &ApplicationControl::on_paint_entity_layer);
+    QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_mouse_layer, this, &ApplicationControl::on_paint_mouse_layer);
 }
 
 
@@ -174,6 +178,7 @@ void ApplicationControl::on_player_connected(Player const &player)
         d_main_window.players_widget()->add_user(player.identifier(), player.avatar_key(), player.color());
 
     d_main_window.chat_widget()->on_info_message(player.identifier() + " has joined the game.");
+    d_main_window.grid_widget()->update();
 }
 
 
@@ -182,6 +187,7 @@ void ApplicationControl::on_player_disconnected(QString const &id)
     debug_message("Player disconnected: " + id);
     d_main_window.players_widget()->remove_user(id);
     d_main_window.chat_widget()->on_info_message(id + " has left.");
+    d_main_window.grid_widget()->update();
 }
 
 
@@ -305,4 +311,25 @@ void ApplicationControl::on_paint_ground_layer(QPainter &painter, QSize size, QP
 {
     painter.setPen(QPen{Qt::black});
     paint_grid(painter, size, offset);
+}
+
+
+void ApplicationControl::on_paint_player_layer(QPainter &painter, QSize size, QPoint offset, QPoint mouse)
+{
+
+}
+
+
+void ApplicationControl::on_paint_entity_layer(QPainter &painter, QSize size, QPoint offset, QPoint mouse)
+{
+    // paint all players
+    QMap<QString, Player> &players = d_player_control.players();
+    for (auto &player : players)
+        paint_player(painter, d_pixmap_cache.get_pixmap(player.avatar_key()), player.size(), player.position(), offset);
+}
+
+
+void ApplicationControl::on_paint_mouse_layer(QPainter &painter, QSize size, QPoint offset, QPoint mouse)
+{
+
 }

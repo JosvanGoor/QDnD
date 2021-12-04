@@ -28,7 +28,7 @@ class Player
     // battlemat layer
     QPoint d_position;
     QString d_avatar_key;
-    GridScale d_size;
+    GridScale d_scale;
 
     // line layer
     QMap<QString, DrawLine> d_lines;

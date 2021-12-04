@@ -13,3 +13,12 @@ void paint_grid(QPainter &painter, QSize size, QPoint offset)
     for (int row = y_off; row < size.height(); row += gridsize)
         painter.drawLine(0, row, size.width(), row);
 }
+
+
+void paint_player(QPainter &painter, QPixmap const &pixmap, GridScale size, QPoint pos, QPoint offset)
+{
+    int dims = 64 * scale(size);
+    painter.translate(offset);
+    painter.drawPixmap({pos.x(), pos.y(), dims, dims}, pixmap);
+    painter.resetTransform();
+}

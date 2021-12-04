@@ -66,6 +66,8 @@ void PlayerControl::on_player_joins(QJsonObject const &doc)
     GridScale scale = static_cast<GridScale>(doc["scale"].toInt());
     d_players[id] = {id, avatar_key, color, scale};
 
+    debug_message("Player joined with scale " + as_string(scale));
+
     emit pixmap_required(avatar_key);
     emit player_connected(d_players[id]);
     emit trigger_synchronization(id);

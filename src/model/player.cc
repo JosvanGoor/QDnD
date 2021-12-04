@@ -12,7 +12,7 @@ Player::Player(QString const &id, QString const &key, QColor const &col, GridSca
 :   d_identifier(id),
     d_avatar_key(key),
     d_color(col),
-    d_size(size)
+    d_scale(size)
 {
 
 }
@@ -54,7 +54,7 @@ QColor const &Player::color() const
 
 GridScale Player::size() const
 {
-    return d_size;
+    return d_scale;
 }
 
 
@@ -107,7 +107,7 @@ QJsonObject Player::serialize() const noexcept
     obj["id"] = d_identifier;
     obj["avatar"] = d_avatar_key;
     obj["color"] = QString::number(d_color.rgb(), 16);
-    obj["size"] = as_int(d_size);
+    obj["scale"] = as_int(d_scale);
     return obj;
 }
 
