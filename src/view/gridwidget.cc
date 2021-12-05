@@ -10,6 +10,7 @@ GridWidget::GridWidget(QWidget *parent)
     d_offset = {};
     d_draw_color = Qt::black;
     d_line_start = {};
+    d_worldmouse_old = {};
     d_mouse_old = {};
     d_mouse_mode = MouseMode::MOVE_CHARACTER;
     d_left_button = false;
@@ -41,16 +42,20 @@ void GridWidget::paintEvent([[maybe_unused]] QPaintEvent *event)
     emit paint_mouse_layer(painter, size(), d_offset, d_mouse_old);
 
     // Paint currently happening things
-    if (d_mouse_mode == MouseMode::LINE_DRAW && d_left_button)
+    if (d_left_button)
     {
-        QPen pen;
-        pen.setColor(d_draw_color);
-        pen.setWidth(8);
+        switch (d_mouse_mode)
+        {
+            case MouseMode::LINE_DRAW:
+                paint_line(painter, {{d_line_start, d_line_end}}, d_draw_color, d_offset);
+            break;
 
-        painter.translate(d_offset);
-        painter.setPen(pen);
-        painter.drawLine(d_line_start, d_line_end);
-        painter.resetTransform();
+            case MouseMode::FREE_DRAW:
+                paint_line(painter, d_line_segments, d_draw_color, d_offset);
+            break;
+
+            default: break;
+        }
     }
 }
 
@@ -83,6 +88,7 @@ QPoint GridWidget::snap_to_grid(QPoint const &point, bool round)
     
     int x = point.x() + rounder;
     int y = point.y() + rounder;
+    // below 0 shit gets fucky wucky, which we fix like this
     if (x < 0) x -= 64;
     if (y < 0) y -= 64;
     x = (x / 64) * 64;
@@ -97,6 +103,13 @@ QPoint GridWidget::world_pos(QPoint const &point)
     return QPoint{point.x() - d_offset.x(), point.y() - d_offset.y()};
 }
 
+
+void GridWidget::reset_offset()
+{
+    d_offset = {};
+    update();
+}
+
 ////////////////////
 //  Mouse Events  //
 ////////////////////
@@ -106,18 +119,36 @@ void GridWidget::mouseMoveEvent(QMouseEvent *event)
     bool shift = (event->modifiers() & Qt::ShiftModifier) != 0;
     int dx = event->x() - d_mouse_old.x();
     int dy = event->y() - d_mouse_old.y();
-    d_mouse_old = event->pos();
-
-    if (d_right_button || (d_left_button && d_mouse_mode == MouseMode::MOVE_GRID))
+    
+    if (d_right_button)
     {
         d_offset.setX(d_offset.x() + dx);
         d_offset.setY(d_offset.y() + dy);
     }
 
-    if (d_mouse_mode == MouseMode::LINE_DRAW)
+    if (d_left_button)
     {
-        d_line_end = shift ? snap_to_grid(world_pos(event->pos())) : world_pos(event->pos());
+        switch (d_mouse_mode)
+        {
+            case MouseMode::MOVE_GRID:
+                d_offset.setX(d_offset.x() + dx);
+                d_offset.setY(d_offset.y() + dy);
+            break;
+
+            case MouseMode::LINE_DRAW:
+                d_line_end = shift ? snap_to_grid(world_pos(event->pos())) : world_pos(event->pos());
+            break;
+
+            case MouseMode::FREE_DRAW:
+                d_line_segments.push_back({d_worldmouse_old, world_pos(event->pos())});
+            break;
+
+            default: break;
+        }
     }
+
+    d_worldmouse_old = world_pos(event->pos());
+    d_mouse_old = event->pos();
 
     update();
 }
@@ -131,8 +162,15 @@ void GridWidget::mousePressEvent(QMouseEvent *event)
     {
         case Qt::LeftButton:
             d_left_button = true;
-            if (d_mouse_mode == MouseMode::LINE_DRAW)
-                d_line_start = shift ? snap_to_grid(world_pos(event->pos())) : world_pos(event->pos());
+            
+            switch (d_mouse_mode)
+            {
+                case MouseMode::LINE_DRAW:
+                    d_line_start = shift ? snap_to_grid(world_pos(event->pos())) : world_pos(event->pos());
+                break;
+
+                default: break;
+            }
         break;
         
         case Qt::RightButton:
@@ -152,14 +190,25 @@ void GridWidget::mouseReleaseEvent(QMouseEvent *event)
     {
         case Qt::LeftButton:
             d_left_button = false;
-            if (d_mouse_mode == MouseMode::MOVE_CHARACTER)
-                grid_player_move(snap_to_grid(world_pos(event->pos()), false));
-            else if (d_mouse_mode == MouseMode::LINE_DRAW)
+            switch (d_mouse_mode)
             {
-                QVector<QLine> lines;
-                QPoint end = shift ? snap_to_grid(world_pos(event->pos())) : world_pos(event->pos());
-                lines.push_back({d_line_start, end});
-                emit grid_line_drawn(lines, d_draw_color);
+                case MouseMode::MOVE_CHARACTER:
+                    emit grid_player_move(snap_to_grid(world_pos(event->pos()), false));
+                break;
+
+                case MouseMode::LINE_DRAW:
+                {
+                    QPoint end = shift ? snap_to_grid(world_pos(event->pos())) : world_pos(event->pos());
+                    emit grid_line_drawn({{d_line_start, end}}, d_draw_color);
+                }
+                break;
+
+                case MouseMode::FREE_DRAW:
+                    emit grid_line_drawn(d_line_segments, d_draw_color);
+                    d_line_segments.clear();
+                break;
+
+                default: break;
             }
         break;
         

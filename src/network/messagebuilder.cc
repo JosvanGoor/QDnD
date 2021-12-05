@@ -206,3 +206,26 @@ QJsonDocument line_drawn_message(QString const &id, QString const &name, QVector
     obj["points"] = line_arr;
     return QJsonDocument{obj};
 }
+
+
+QJsonDocument lines_removal_message(QString const &id, QVector<QString> const &names)
+{
+    QJsonArray arr;
+    for (auto &line_id : names)
+        arr.push_back(line_id);
+
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::LINES_DELETED);
+    obj["id"] = id;
+    obj["lines"] = arr;
+    return QJsonDocument{obj};
+}
+
+
+QJsonDocument lines_cleared_message(QString const &id)
+{
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::LINES_CLEARED);
+    obj["id"] = id;
+    return QJsonDocument{obj};
+}

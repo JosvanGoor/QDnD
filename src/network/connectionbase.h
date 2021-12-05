@@ -58,6 +58,8 @@ class ConnectionBase : public QObject
         // grid stuff
         void line_sync(QJsonObject const &obj);
         void line_received(QJsonObject const &obj);
+        void lines_removed(QJsonObject const &obj);
+        void lines_cleared(QString const &id);
 };  
 
 #endif

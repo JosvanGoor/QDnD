@@ -35,3 +35,34 @@ void paint_line(QPainter &painter, QVector<QLine> const &lines, QColor color, QP
     painter.drawLines(lines);
     painter.resetTransform();
 }
+
+
+void paint_rect_around_line(QPainter &painter, QVector<QLine> const &lines, QColor color, QPoint offset)
+{
+    int max_x = -1'000'000;
+    int min_x = 1'000'000;
+    int max_y = -1'000'000;
+    int min_y = 1'000'000;
+
+    for (auto &line : lines)
+    {
+        max_x = qMax(qMax(max_x, line.x1()), line.x2());
+        max_y = qMax(qMax(max_y, line.y1()), line.y2());
+        min_x = qMin(qMin(min_x, line.x1()), line.x2());
+        min_y = qMin(qMin(min_y, line.y1()), line.y2());
+    }
+
+    max_x += 4;
+    max_y += 4;
+    min_x -= 4;
+    min_y -= 4;
+
+    painter.translate(offset);
+    QPen pen;
+    pen.setColor(color);
+    pen.setWidth(2);
+    painter.setPen(pen);
+
+    painter.drawRect(min_x, min_y, max_x - min_x, max_y - min_y);
+    painter.resetTransform();
+}

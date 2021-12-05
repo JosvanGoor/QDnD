@@ -142,6 +142,14 @@ void ConnectionBase::handle_message(QJsonDocument const &doc)
             emit line_received(obj);
         break;
 
+        case MessageType::LINES_DELETED:
+            emit lines_removed(obj);
+        break;
+
+        case MessageType::LINES_CLEARED:
+            emit lines_cleared(obj["id"].toString());
+        break;
+
         default: break;
     }
 }

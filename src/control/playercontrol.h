@@ -42,6 +42,8 @@ class PlayerControl : public QObject
         void on_player_moves(QString const &id, QPoint const &newpos);
 
         void on_line_received(QJsonObject const &doc);
+        void on_lines_removed(QJsonObject const &obj);
+        void on_lines_cleared(QString const &id);
 
     signals:
         void update_grid();

@@ -30,6 +30,7 @@ class ApplicationControl : public QObject
     QMap<QString, Spell> d_spells;
     PlayerControl d_player_control;
     MainWindow d_main_window;
+    QSet<QString> d_line_selection;
 
     ConnectionBase *d_connection;
 
@@ -61,6 +62,9 @@ class ApplicationControl : public QObject
         // grid control
         void on_grid_line_drawn(QVector<QLine> const &lines, QColor const &color);
         void on_grid_player_move(QPoint const &point);
+        void on_grid_delete_lines(QVector<QString> const &lines);
+        void on_grid_line_selection(QSet<QString> const &lines);
+        void on_grid_delete_all_lines();
 
         // misc
         void chat_entered(QString const &chat);

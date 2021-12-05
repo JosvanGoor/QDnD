@@ -32,5 +32,7 @@ QJsonDocument display_update_message(QString const &key);
 // grid control
 QJsonDocument player_move_message(QString const &id, QPoint const &newpos);
 QJsonDocument line_drawn_message(QString const &id, QString const &name, QVector<QLine> const &lines, QColor const &color);
+QJsonDocument lines_removal_message(QString const &id, QVector<QString> const &lines);
+QJsonDocument lines_cleared_message(QString const &id);
 
 #endif

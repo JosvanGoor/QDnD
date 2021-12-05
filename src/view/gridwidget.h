@@ -10,6 +10,7 @@
 #include "../control/playercontrol.h"
 #include "../model/gridmodel.h"
 #include "../utility/enums.h"
+#include "../utility/painting.h"
 
 
 class GridWidget : public QWidget
@@ -23,9 +24,11 @@ class GridWidget : public QWidget
     // linedraw
     QPoint d_line_start;
     QPoint d_line_end;
+    QVector<QLine> d_line_segments;
 
     // mouse
     QPoint d_mouse_old;
+    QPoint d_worldmouse_old;
     MouseMode d_mouse_mode;
     bool d_left_button;
     bool d_right_button;
@@ -43,6 +46,7 @@ class GridWidget : public QWidget
         void request_render_update();
         QPoint snap_to_grid(QPoint const &point, bool round = true);
         QPoint world_pos(QPoint const &point);
+        void reset_offset();
 
         // mouse events
         void mouseMoveEvent(QMouseEvent *event) override;

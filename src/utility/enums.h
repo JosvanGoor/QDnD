@@ -47,7 +47,9 @@ enum class MessageType
     PLAYER_MOVED,
 
     // drawing
-    LINE_DRAWN
+    LINE_DRAWN,
+    LINES_DELETED,
+    LINES_CLEARED
 };
 
 int as_int(MessageType type);

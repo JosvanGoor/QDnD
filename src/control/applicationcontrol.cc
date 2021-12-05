@@ -44,6 +44,9 @@ void ApplicationControl::create_default_connections()
     QObject::connect(&d_player_control, &PlayerControl::debug_message, &d_main_window, &MainWindow::debug_message);
     QObject::connect(&d_player_control, &PlayerControl::update_grid, d_main_window.grid_widget(), &GridWidget::request_render_update);
 
+    QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::lines_cleared, this, &ApplicationControl::on_grid_delete_all_lines);
+    QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::lines_removed, this, &ApplicationControl::on_grid_delete_lines);
+    QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::line_selection_changed, this, &ApplicationControl::on_grid_line_selection);
     QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_ground_layer, this, &ApplicationControl::on_paint_ground_layer);
     QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_player_layer, this, &ApplicationControl::on_paint_player_layer);
     QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_entity_layer, this, &ApplicationControl::on_paint_entity_layer);
@@ -105,9 +108,6 @@ bool ApplicationControl::verify_close_connection()
     QObject::disconnect(&d_player_control, &PlayerControl::trigger_synchronization, this, &ApplicationControl::on_trigger_synchronization);
     QObject::disconnect(d_connection, &ConnectionBase::pixmap_requested, this, &ApplicationControl::pixmap_requested);
     d_connection = nullptr;
-
-
-
     return true;
 }
 
@@ -170,6 +170,8 @@ void ApplicationControl::set_connectionbase_signals()
     QObject::connect(d_connection, &ConnectionBase::player_moved, &d_player_control, &PlayerControl::on_player_moves);
     QObject::connect(d_connection, &ConnectionBase::line_received, &d_player_control, &PlayerControl::on_line_received);
     QObject::connect(d_connection, &ConnectionBase::line_sync, this, &ApplicationControl::on_line_sync);
+    QObject::connect(d_connection, &ConnectionBase::lines_removed, &d_player_control, &PlayerControl::on_lines_removed);
+    QObject::connect(d_connection, &ConnectionBase::lines_cleared, &d_player_control, &PlayerControl::on_lines_cleared);
 }
 
 
@@ -269,6 +271,7 @@ void ApplicationControl::on_grid_line_drawn(QVector<QLine> const &lines, QColor 
     QString id = d_player_control.own_identifier();
     QString name = d_player_control.unique_name();
     d_connection->send(line_drawn_message(id, name, lines, color));
+    d_main_window.grid_control_widget()->register_line(name);
 }
 
 
@@ -277,6 +280,36 @@ void ApplicationControl::on_grid_player_move(QPoint const &point)
     if (!d_connection)
         return;
     d_connection->send(player_move_message(d_player_control.own_identifier(), point));
+}
+
+
+void ApplicationControl::on_grid_delete_lines(QVector<QString> const &lines)
+{
+    if (!d_connection)
+        return;
+    d_connection->send(lines_removal_message(d_player_control.own_identifier(), lines));
+}
+
+
+void ApplicationControl::on_grid_line_selection(QSet<QString> const &lines)
+{
+    d_line_selection = lines;
+    update_grid();
+}
+
+
+void ApplicationControl::on_grid_delete_all_lines()
+{
+    if (!d_connection)
+        return;
+
+    QMessageBox confirm{&d_main_window};
+    confirm.setText("Are you sure you want to clear all your lines?");
+    confirm.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    if (confirm.exec() == QMessageBox::No)
+        return;
+
+    d_connection->send(lines_cleared_message(d_player_control.own_identifier()));
 }
 
 
@@ -366,7 +399,10 @@ void ApplicationControl::on_trigger_synchronization(QString const &id)
     reinterpret_cast<ServerConnection*>(d_connection)->message_to(id, QJsonDocument{obj});
 
     for (auto &player : d_player_control.players())
-        reinterpret_cast<ServerConnection*>(d_connection)->queue_message(id, synchronize_lines_message(id, player.lines()).toJson());
+    {
+        if (!player.lines().isEmpty())
+            reinterpret_cast<ServerConnection*>(d_connection)->queue_message(id, synchronize_lines_message(id, player.lines()).toJson());
+    }
 }
 
 
@@ -388,8 +424,20 @@ void ApplicationControl::on_paint_player_layer(QPainter &painter, [[maybe_unused
     for (auto &player : players)
     {
         QMap<QString, DrawLine> const &lines = player.lines();
-        for (auto &line : lines)
-            paint_line(painter, line.line, line.color, offset);
+        if (player.identifier() == d_player_control.own_identifier())
+        {
+            for (auto it = player.lines().begin(); it != player.lines().end(); ++it)
+            {
+                paint_line(painter,it.value().line, it.value().color, offset);
+                if (auto it2 = d_line_selection.find(it.key()); it2 != d_line_selection.end())
+                    paint_rect_around_line(painter, it.value().line, QColor{255, 0, 255}, offset);
+            }
+        }
+        else
+        {
+            for (auto &line : lines)
+                paint_line(painter, line.line, line.color, offset);
+        }
     }
 }
 

@@ -134,3 +134,21 @@ void PlayerControl::on_line_received(QJsonObject const &doc)
     artist.add_line(name, {color, lines});
     update_grid();
 }
+
+
+void PlayerControl::on_lines_removed(QJsonObject const &obj)
+{
+    Player &owner = d_players.find(obj["id"].toString()).value();
+    QJsonArray names = obj["lines"].toArray();
+
+    for (auto val : names)
+        owner.remove_line(val.toString());
+    update_grid();
+}
+
+
+void PlayerControl::on_lines_cleared(QString const &id)
+{
+    d_players.find(id).value().clear_lines();
+    update_grid();
+}

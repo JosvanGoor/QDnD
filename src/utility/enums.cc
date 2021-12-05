@@ -77,6 +77,8 @@ QString as_string(MessageType type)
         case MessageType::PLAYER_MOVED:         return "PLAYER_MOVED";
 
         case MessageType::LINE_DRAWN:           return "LINE_DRAWN";
+        case MessageType::LINES_DELETED:        return "LINES_DELETED";
+        case MessageType::LINES_CLEARED:        return "LINES_CLEARED";
     }
 
     return "MessageType: If you read this Jos fucked up.";
