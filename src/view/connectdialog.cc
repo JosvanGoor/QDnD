@@ -105,7 +105,7 @@ void ConnectDialog::on_select_avatar()
     
     QPixmap new_avatar;
     new_avatar.loadFromData(arr);
-    d_drop_widget->setPixmap(new_avatar);
+    d_drop_widget->setPixmap(new_avatar.scaled(d_drop_widget->size()));
 }
 
 

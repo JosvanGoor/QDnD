@@ -84,6 +84,7 @@ void ApplicationControl::reset()
 {
     d_player_control.clear();
     d_pixmap_cache.clear();
+    d_main_window.unload_entity_widget();
 }
 
 
@@ -124,8 +125,9 @@ void ApplicationControl::start_hosting()
 
     QObject::connect(&d_player_control, &PlayerControl::trigger_synchronization, this, &ApplicationControl::on_trigger_synchronization);
     QObject::connect(d_connection, &ConnectionBase::pixmap_requested, this, &ApplicationControl::pixmap_requested);
+    
+    d_main_window.load_entity_widget();
     set_connectionbase_signals();
-
     d_connection->connect("", 4144);
 }
 

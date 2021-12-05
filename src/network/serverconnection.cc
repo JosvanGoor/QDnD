@@ -10,6 +10,7 @@ ServerConnection::ServerConnection(QObject *parent)
     d_server = new QTcpServer;
 
     QObject::connect(d_server, &QTcpServer::newConnection, this, &ServerConnection::on_new_connection);
+    QObject::connect(&d_ping_timer, &QTimer::timeout, this, &ServerConnection::on_ping_timer);
 }
 
 

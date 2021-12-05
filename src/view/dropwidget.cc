@@ -12,12 +12,11 @@ DropWidget::DropWidget(QWidget *parent)
     if (d_deny.isNull())
         d_deny = QPixmap{":data/deny.png"}.scaled(256, 256);
 
-    set_display(QPixmap{":data/neutral.png"});
 
     setAlignment(Qt::AlignCenter);
     setAcceptDrops(true);
-    setMinimumSize(256, 256);
-    setMaximumSize(256, 256);
+    set_preferred_size({256, 256});
+    set_display(QPixmap{":data/neutral.png"});
 }
 
 
@@ -33,8 +32,8 @@ DropWidget::~DropWidget()
 
 void DropWidget::set_display(QPixmap const &pixmap)
 {
-    d_display = pixmap.scaled(256, 256);
-    setPixmap(pixmap.scaled(256, 256));
+    d_display = pixmap.scaled(d_size);
+    setPixmap(pixmap.scaled(d_size));
 }
 
 
@@ -75,7 +74,7 @@ void DropWidget::dragLeaveEvent([[maybe_unused]] QDragLeaveEvent *event)
 void DropWidget::dropEvent([[maybe_unused]] QDropEvent *event)
 {
     QString filename = d_file_to_accept.toLocalFile();
-    QPixmap pixmap = QPixmap{filename}.scaled(256, 256);
+    QPixmap pixmap = QPixmap{filename}.scaled(d_size);
 
     if (pixmap.isNull())
     {
@@ -85,4 +84,13 @@ void DropWidget::dropEvent([[maybe_unused]] QDropEvent *event)
 
     setPixmap(pixmap);
     emit pixmap_dropped(filename);
+}
+
+
+void DropWidget::set_preferred_size(QSize const &size)
+{
+    d_size = size;
+    setMinimumSize(size);
+    setMaximumSize(size);
+    set_display(d_display);
 }

@@ -16,6 +16,7 @@ class DropWidget : public QLabel
     QPixmap d_deny;
     QPixmap d_display;
     QUrl d_file_to_accept;
+    QSize d_size;
 
     public:
         explicit DropWidget(QWidget *parent = nullptr);
@@ -27,6 +28,8 @@ class DropWidget : public QLabel
         // void dragMoveEvent(QDragMoveEvent *event) override;
         void dragLeaveEvent(QDragLeaveEvent *event) override;
         void dropEvent(QDropEvent *event) override;
+
+        void set_preferred_size(QSize const &size);
 
     signals:
         void pixmap_dropped(QString const &filename);

@@ -42,6 +42,7 @@ SOURCES +=  src/control/applicationcontrol.cc \
             src/view/connectdialog.cc \
             src/view/displaywidget.cc \
             src/view/dropwidget.cc \
+            src/view/entitywidget.cc \
             src/view/gridcontrolwidget.cc \
             src/view/gridwidget.cc \
             src/view/mainwindow.cc \
@@ -82,6 +83,7 @@ HEADERS +=  src/control/applicationcontrol.h \
             src/view/connectdialog.h \
             src/view/displaywidget.h \
             src/view/dropwidget.h \
+            src/view/entitywidget.h \
             src/view/gridcontrolwidget.h \
             src/view/gridwidget.h \
             src/view/mainwindow.h \

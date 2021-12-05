@@ -7,6 +7,7 @@
 MainWindow::MainWindow(QWidget *parent)
 :   QMainWindow(parent)
 {
+    d_entity_tab = nullptr;
     setCentralWidget(d_central_widget = new QSplitter);
 
     d_central_widget->addWidget(d_middle_widget = new QSplitter);
@@ -89,6 +90,23 @@ SpellsWidget *MainWindow::spells_widget() noexcept
 StatusBar *MainWindow::status_bar() noexcept
 {
     return d_status_bar;
+}
+
+
+////////////////////
+//    Utility     //
+////////////////////
+
+void MainWindow::load_entity_widget()
+{
+    d_right_tabs->addTab(d_entity_tab = new EntityWidget, "Entity Control");
+}
+
+
+void MainWindow::unload_entity_widget()
+{
+    delete d_entity_tab;
+    d_entity_tab = nullptr;
 }
 
 
