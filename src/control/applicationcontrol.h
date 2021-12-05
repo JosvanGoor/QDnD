@@ -41,6 +41,8 @@ class ApplicationControl : public QObject
         void create_default_connections();
         void load_spells(QString const &filename);
 
+        void reset();
+
     public slots:
         // networking
         bool verify_close_connection();
@@ -54,6 +56,7 @@ class ApplicationControl : public QObject
         void on_player_disconnected(QString const &id);
         void on_spell_selection(QString const &name);
         void on_display_update(QString const &key);
+        void on_line_sync(QJsonObject const &obj);
 
         // grid control
         void on_grid_line_drawn(QVector<QLine> const &lines, QColor const &color);

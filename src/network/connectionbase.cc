@@ -97,6 +97,10 @@ void ConnectionBase::handle_message(QJsonDocument const &doc)
         }
         break;
 
+        case MessageType::SYNCHRONIZE_LINES:
+            emit line_sync(obj);
+        break;
+
         case MessageType::PLAYER_CONNECTED:
             emit player_joins(obj);
         break;

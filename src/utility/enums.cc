@@ -59,6 +59,7 @@ QString as_string(MessageType type)
     {
         case MessageType::ERROR:                return "ERROR";
         case MessageType::SYNCHRONIZE:          return "SYNCHRONIZE";
+        case MessageType::SYNCHRONIZE_LINES:    return "SYNCHRONIZE_LINES";
         case MessageType::HANDSHAKE:            return "HANDSHAKE";
         case MessageType::PLAYER_CONNECTED:     return "PLAYER_CONNECTED";
         case MessageType::PLAYER_DISCONNECTED:  return "PLAYER_DISCONNECTED";

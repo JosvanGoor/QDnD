@@ -22,6 +22,12 @@ PixmapCache::~PixmapCache()
 //     Public     //
 ////////////////////
 
+void PixmapCache::clear()
+{
+    d_pixmaps.clear();
+}
+
+
 bool PixmapCache::has_pixmap(QString const &name) const noexcept
 {
     auto it = d_pixmaps.find(name);

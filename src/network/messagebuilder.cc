@@ -16,6 +16,45 @@ QJsonDocument handshake_message(QString const &id, QByteArray const &b64_avatar,
 }
 
 
+QJsonDocument synchronize_lines_message(QString const &id, QMap<QString, DrawLine> const &lines)
+{
+    QJsonArray line_objects;
+
+    for (auto it = lines.begin(); it != lines.end(); ++it)
+    {
+        QJsonArray line;
+        for (auto &pt : it.value().line)
+        {
+            QJsonObject obj;
+            obj["x"] = pt.x1();
+            obj["y"] = pt.y1();
+            line.push_back(obj);
+        }
+
+        if (!it.value().line.isEmpty())
+        {
+            QJsonObject obj;
+            obj["x"] = it.value().line.back().x2();
+            obj["y"] = it.value().line.back().y2();
+            line.push_back(obj);
+        }
+
+        QJsonObject obj;
+        obj["name"] = it.key();
+        obj["color"] = static_cast<int>(it.value().color.rgba());
+        obj["points"] = line;
+        line_objects.push_back(obj);
+    }
+
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::SYNCHRONIZE_LINES);
+    obj["id"] = id;
+    obj["lines"] = line_objects;
+    return QJsonDocument{obj};
+}
+
+
+
 QJsonDocument player_connected_message(QString const &id, QString const &avatar_key, QColor const &color, GridScale scale)
 {
     QJsonObject obj;

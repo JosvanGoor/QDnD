@@ -27,9 +27,11 @@ class PlayerControl : public QObject
         // utility
         QMap<QString, Player> &players();
         Player &player(QString const &identifier);
+        void clear();
 
         // self
         void create_dungeon_master(QString const &avatar_key);
+        Player &own_player();
         QString unique_name();
         QString const &own_identifier() const noexcept;
         void set_own_identifier(QString const &id) noexcept;

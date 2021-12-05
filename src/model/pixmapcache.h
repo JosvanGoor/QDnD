@@ -37,6 +37,8 @@ class PixmapCache : public QObject
         PixmapCache();
         ~PixmapCache();
 
+        void clear();
+
         bool has_pixmap(QString const &name) const noexcept; // either in cache or memory
         void put_pixmap(QString const &name, QPixmap const &pixmap);
         bool load_pixmap(QString const &name, QByteArray const &b64_data) noexcept;

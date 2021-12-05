@@ -7,7 +7,7 @@
 PlayerControl::PlayerControl(QObject *parent)
 :   QObject(parent)
 {
-
+    d_unique_number = 0;
 }
 
 
@@ -38,6 +38,13 @@ Player &PlayerControl::player(QString const &identifier)
 }
 
 
+void PlayerControl::clear()
+{
+    d_own_identifier = "";
+    d_players.clear();
+    player_disconnected("Dungeon Master");
+}
+
 ////////////////////
 //      Self      //
 ////////////////////
@@ -48,6 +55,12 @@ void PlayerControl::create_dungeon_master(QString const &avatar_key)
     d_players[player.identifier()] = player;
     d_own_identifier = player.identifier();
     emit player_connected(player);
+}
+
+
+Player &PlayerControl::own_player()
+{
+    return d_players.find(d_own_identifier).value();
 }
 
 
@@ -108,7 +121,6 @@ void PlayerControl::on_line_received(QJsonObject const &doc)
     Player &artist = d_players.find(doc["id"].toString()).value();
     QJsonArray points = doc["points"].toArray();
 
-    
     QVector<QLine> lines;
     for (int idx = 0; idx < (points.size() - 1); ++idx)
     {

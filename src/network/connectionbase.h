@@ -56,6 +56,7 @@ class ConnectionBase : public QObject
         void richtext_message(QString const&name, QString const &message);
 
         // grid stuff
+        void line_sync(QJsonObject const &obj);
         void line_received(QJsonObject const &obj);
 };  
 

@@ -8,10 +8,12 @@
 #include <QLine>
 #include <QPoint>
 
+#include "../model/player.h"
 #include "../utility/enums.h"
 
 // system
 QJsonDocument handshake_message(QString const &id, QByteArray const &b64_avatar, QColor const &color, GridScale scale);
+QJsonDocument synchronize_lines_message(QString const &id, QMap<QString, DrawLine> const &lines);
 QJsonDocument player_connected_message(QString const &id, QString const &avatar_key, QColor const &color, GridScale scale);
 QJsonDocument player_disconnected_message(QString const &id);
 QJsonDocument ping_message() noexcept;

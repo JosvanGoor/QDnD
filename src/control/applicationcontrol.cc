@@ -77,6 +77,13 @@ void ApplicationControl::load_spells(QString const &filename)
 }
 
 
+void ApplicationControl::reset()
+{
+    d_player_control.clear();
+    d_pixmap_cache.clear();
+}
+
+
 ////////////////////
 //   Networking   //
 ////////////////////
@@ -92,9 +99,15 @@ bool ApplicationControl::verify_close_connection()
     if (confirm.exec() == QMessageBox::No)
         return false;
 
+    reset();
     d_connection->disconnect();
     d_connection->deleteLater();
+    QObject::disconnect(&d_player_control, &PlayerControl::trigger_synchronization, this, &ApplicationControl::on_trigger_synchronization);
+    QObject::disconnect(d_connection, &ConnectionBase::pixmap_requested, this, &ApplicationControl::pixmap_requested);
     d_connection = nullptr;
+
+
+
     return true;
 }
 
@@ -156,6 +169,7 @@ void ApplicationControl::set_connectionbase_signals()
     QObject::connect(d_connection, &ConnectionBase::player_joins, &d_player_control, &PlayerControl::on_player_joins);
     QObject::connect(d_connection, &ConnectionBase::player_moved, &d_player_control, &PlayerControl::on_player_moves);
     QObject::connect(d_connection, &ConnectionBase::line_received, &d_player_control, &PlayerControl::on_line_received);
+    QObject::connect(d_connection, &ConnectionBase::line_sync, this, &ApplicationControl::on_line_sync);
 }
 
 
@@ -215,6 +229,31 @@ void ApplicationControl::on_display_update(QString const &key)
         d_main_window.display_widget()->set_pixmap(key);
         on_pixmap_required(key);
     }
+}
+
+
+void ApplicationControl::on_line_sync(QJsonObject const &obj)
+{
+    Player &player = d_player_control.player(obj["id"].toString());
+
+    QJsonArray line_objects = obj["lines"].toArray();
+    for (auto object : line_objects)
+    {
+        QString name = object.toObject()["name"].toString();
+        QColor color = static_cast<unsigned int>(object.toObject()["color"].toInt());
+        QJsonArray line = object.toObject()["points"].toArray();
+        QVector<QLine> lines;
+        for (int idx = 0; idx < (line.size() - 1); ++idx)
+        {
+            QPoint p1 = {line[idx].toObject()["x"].toInt(), line[idx].toObject()["y"].toInt()};
+            QPoint p2 = {line[idx + 1].toObject()["x"].toInt(), line[idx + 1].toObject()["y"].toInt()};
+            lines.push_back({p1, p2});
+        }
+
+        player.add_line(name, {color, lines});
+    }
+
+    update_grid();
 }
 
 
@@ -327,6 +366,9 @@ void ApplicationControl::on_trigger_synchronization(QString const &id)
     obj["type"] = as_int(MessageType::SYNCHRONIZE);
     obj["players"] = players;
     reinterpret_cast<ServerConnection*>(d_connection)->message_to(id, QJsonDocument{obj});
+
+    for (auto &player : d_player_control.players())
+        reinterpret_cast<ServerConnection*>(d_connection)->queue_message(id, synchronize_lines_message(id, player.lines()).toJson());
 }
 
 

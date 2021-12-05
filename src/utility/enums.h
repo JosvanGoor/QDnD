@@ -27,6 +27,7 @@ enum class MessageType
     // system messages
     HANDSHAKE,
     SYNCHRONIZE,
+    SYNCHRONIZE_LINES,
     PLAYER_CONNECTED,
     PLAYER_DISCONNECTED,
     PING,
