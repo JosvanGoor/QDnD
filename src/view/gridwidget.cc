@@ -77,9 +77,18 @@ void GridWidget::request_render_update()
 }
 
 
-QPoint GridWidget::snap_to_grid(QPoint const &point)
+QPoint GridWidget::snap_to_grid(QPoint const &point, bool round)
 {
-    return QPoint{((point.x() + 32) / 64) * 64, ((point.y() + 32) / 64) * 64};
+    int rounder = round ? 32 : 0;
+    
+    int x = point.x() + rounder;
+    int y = point.y() + rounder;
+    if (x < 0) x -= 64;
+    if (y < 0) y -= 64;
+    x = (x / 64) * 64;
+    y = (y / 64) * 64;
+
+    return QPoint{x, y};
 }
 
 
@@ -144,15 +153,7 @@ void GridWidget::mouseReleaseEvent(QMouseEvent *event)
         case Qt::LeftButton:
             d_left_button = false;
             if (d_mouse_mode == MouseMode::MOVE_CHARACTER)
-            {
-                int x = (event->x() - d_offset.x());
-                int y = (event->y() - d_offset.y());
-                if (x < 0) x -= 64;
-                if (y < 0) y -= 64;
-                x = (x / 64) * 64;
-                y = (y / 64) * 64;
-                grid_player_move({x, y});
-            }
+                grid_player_move(snap_to_grid(world_pos(event->pos()), false));
             else if (d_mouse_mode == MouseMode::LINE_DRAW)
             {
                 QVector<QLine> lines;

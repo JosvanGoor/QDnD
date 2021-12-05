@@ -276,8 +276,6 @@ void ApplicationControl::on_grid_player_move(QPoint const &point)
 {
     if (!d_connection)
         return;
-
-    debug_message("new player pos: " + QString::number(point.x()) + ", " + QString::number(point.y()));
     d_connection->send(player_move_message(d_player_control.own_identifier(), point));
 }
 

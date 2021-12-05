@@ -41,7 +41,7 @@ class GridWidget : public QWidget
         void set_draw_color(QColor color);
         void set_mouse_mode(MouseMode mode);
         void request_render_update();
-        QPoint snap_to_grid(QPoint const &point);
+        QPoint snap_to_grid(QPoint const &point, bool round = true);
         QPoint world_pos(QPoint const &point);
 
         // mouse events
