@@ -44,6 +44,9 @@ enum class MessageType
 
     // entity control
     PLAYER_MOVED,
+
+    // drawing
+    LINE_DRAWN
 };
 
 int as_int(MessageType type);

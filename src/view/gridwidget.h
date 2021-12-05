@@ -16,9 +16,13 @@ class GridWidget : public QWidget
 {
     Q_OBJECT
 
-    // grid drawing stuff
-    int d_gridsize;
+    // drawing stuff
     QPoint d_offset;
+    QColor d_draw_color;
+
+    // linedraw
+    QPoint d_line_start;
+    QPoint d_line_end;
 
     // mouse
     QPoint d_mouse_old;
@@ -34,8 +38,11 @@ class GridWidget : public QWidget
         void paintEvent(QPaintEvent *event);
 
         // utility
+        void set_draw_color(QColor color);
         void set_mouse_mode(MouseMode mode);
         void request_render_update();
+        QPoint snap_to_grid(QPoint const &point);
+        QPoint world_pos(QPoint const &point);
 
         // mouse events
         void mouseMoveEvent(QMouseEvent *event) override;
@@ -44,6 +51,7 @@ class GridWidget : public QWidget
 
     signals:
         void grid_player_move(QPoint const &point);
+        void grid_line_drawn(QVector<QLine> const &line, QColor const &color);
 
         // paints grid, background color & brushes (TODO)
         // then  paints scenery

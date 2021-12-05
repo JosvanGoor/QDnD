@@ -10,7 +10,7 @@ QJsonDocument handshake_message(QString const &id, QByteArray const &b64_avatar,
     obj["type"] = as_int(MessageType::HANDSHAKE);
     obj["id"] = id;
     obj["avatar"] = QString{b64_avatar};
-    obj["color"] = QString::number(color.rgb(), 16);
+    obj["color"] = static_cast<int>(color.rgba());
     obj["scale"] = as_int(scale);
     return QJsonDocument{obj};
 }
@@ -22,7 +22,7 @@ QJsonDocument player_connected_message(QString const &id, QString const &avatar_
     obj["type"] = as_int(MessageType::PLAYER_CONNECTED);
     obj["id"] = id;
     obj["avatar"] = avatar_key;
-    obj["color"] = QString::number(color.rgb(), 16);
+    obj["color"] = static_cast<int>(color.rgba());
     obj["scale"] = as_int(scale);
     obj["x"] = 0;
     obj["y"] = 0;
@@ -125,7 +125,7 @@ QJsonDocument display_update_message(QString const &key)
 
 
 ////////////////////
-// Entity Control //
+//  Grid Control  //
 ////////////////////
 
 QJsonDocument player_move_message(QString const &id, QPoint const &newpos)
@@ -135,5 +135,35 @@ QJsonDocument player_move_message(QString const &id, QPoint const &newpos)
     obj["id"] = id;
     obj["x"] = newpos.x();
     obj["y"] = newpos.y();
+    return QJsonDocument{obj};
+}
+
+
+QJsonDocument line_drawn_message(QString const &id, QString const &name, QVector<QLine> const &lines, QColor const &color)
+{
+    QJsonArray line_arr;
+    
+    for (auto &bit : lines)
+    {
+        QJsonObject obj;
+        obj["x"] = bit.x1();
+        obj["y"] = bit.y1();
+        line_arr.push_back(obj);
+    }
+
+    if (!lines.isEmpty())
+    {
+        QJsonObject obj;
+        obj["x"] = lines.back().x2();
+        obj["y"] = lines.back().y2();
+        line_arr.push_back(obj);
+    }
+
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::LINE_DRAWN);
+    obj["id"] = id;
+    obj["name"] = name;
+    obj["color"] = static_cast<int>(color.rgba());
+    obj["points"] = line_arr;
     return QJsonDocument{obj};
 }

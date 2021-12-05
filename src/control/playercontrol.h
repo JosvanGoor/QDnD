@@ -16,6 +16,7 @@ class PlayerControl : public QObject
 {
     Q_OBJECT
 
+    uint64_t d_unique_number;
     QString d_own_identifier;
     QMap<QString, Player> d_players;
 
@@ -28,6 +29,8 @@ class PlayerControl : public QObject
         Player &player(QString const &identifier);
 
         // self
+        void create_dungeon_master(QString const &avatar_key);
+        QString unique_name();
         QString const &own_identifier() const noexcept;
         void set_own_identifier(QString const &id) noexcept;
 
@@ -35,6 +38,8 @@ class PlayerControl : public QObject
         void on_player_joins(QJsonObject const &doc);
         void on_player_leaves(QString const &name);
         void on_player_moves(QString const &id, QPoint const &newpos);
+
+        void on_line_received(QJsonObject const &doc);
 
     signals:
         void update_grid();

@@ -49,6 +49,7 @@ void ApplicationControl::create_default_connections()
     QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_entity_layer, this, &ApplicationControl::on_paint_entity_layer);
     QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_mouse_layer, this, &ApplicationControl::on_paint_mouse_layer);
     QObject::connect(d_main_window.grid_widget(), &GridWidget::grid_player_move, this, &ApplicationControl::on_grid_player_move);
+    QObject::connect(d_main_window.grid_widget(), &GridWidget::grid_line_drawn, this, &ApplicationControl::on_grid_line_drawn);
 }
 
 
@@ -105,9 +106,9 @@ void ApplicationControl::start_hosting()
     
     d_connection = new ServerConnection;
 
-    // TODO: connect rest
-    // TODO: set id to "Dungeon Master".
-    d_player_control.set_own_identifier("Dungeon Master");
+    TransferableImage dm_ava = d_pixmap_cache.load_from_file(":/data/dmpic.png");
+    d_player_control.create_dungeon_master(dm_ava.name);
+
     QObject::connect(&d_player_control, &PlayerControl::trigger_synchronization, this, &ApplicationControl::on_trigger_synchronization);
     QObject::connect(d_connection, &ConnectionBase::pixmap_requested, this, &ApplicationControl::pixmap_requested);
     set_connectionbase_signals();
@@ -154,6 +155,7 @@ void ApplicationControl::set_connectionbase_signals()
     QObject::connect(d_connection, &ConnectionBase::player_leaves, &d_player_control, &PlayerControl::on_player_leaves);
     QObject::connect(d_connection, &ConnectionBase::player_joins, &d_player_control, &PlayerControl::on_player_joins);
     QObject::connect(d_connection, &ConnectionBase::player_moved, &d_player_control, &PlayerControl::on_player_moves);
+    QObject::connect(d_connection, &ConnectionBase::line_received, &d_player_control, &PlayerControl::on_line_received);
 }
 
 
@@ -217,12 +219,23 @@ void ApplicationControl::on_display_update(QString const &key)
 
 
 ////////////////////
-//      Misc      //
+//      Grid      //
 ////////////////////
+
+void ApplicationControl::on_grid_line_drawn(QVector<QLine> const &lines, QColor const &color)
+{
+    if (!d_connection)
+        return;
+
+    QString id = d_player_control.own_identifier();
+    QString name = d_player_control.unique_name();
+    d_connection->send(line_drawn_message(id, name, lines, color));
+}
+
 
 void ApplicationControl::on_grid_player_move(QPoint const &point)
 {
-    if (!d_connection || d_connection->is_server())
+    if (!d_connection)
         return;
 
     debug_message("new player pos: " + QString::number(point.x()) + ", " + QString::number(point.y()));
@@ -328,9 +341,16 @@ void ApplicationControl::on_paint_ground_layer(QPainter &painter, QSize size, QP
 }
 
 
-void ApplicationControl::on_paint_player_layer([[maybe_unused]] QPainter &painter, [[maybe_unused]] QSize size, [[maybe_unused]] QPoint offset, [[maybe_unused]] QPoint mouse)
+void ApplicationControl::on_paint_player_layer(QPainter &painter, [[maybe_unused]] QSize size, QPoint offset, [[maybe_unused]] QPoint mouse)
 {
+    QMap<QString, Player> &players = d_player_control.players();
 
+    for (auto &player : players)
+    {
+        QMap<QString, DrawLine> const &lines = player.lines();
+        for (auto &line : lines)
+            paint_line(painter, line.line, line.color, offset);
+    }
 }
 
 

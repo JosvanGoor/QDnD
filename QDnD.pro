@@ -38,6 +38,7 @@ SOURCES +=  src/control/applicationcontrol.cc \
             src/utility/painting.cc \
             \
             src/view/chatwidget.cc \
+            src/view/colordisplay.cc \
             src/view/connectdialog.cc \
             src/view/displaywidget.cc \
             src/view/dropwidget.cc \
@@ -77,6 +78,7 @@ HEADERS +=  src/control/applicationcontrol.h \
             src/utility/painting.h \
             \
             src/view/chatwidget.h \
+            src/view/colordisplay.h \
             src/view/connectdialog.h \
             src/view/displaywidget.h \
             src/view/dropwidget.h \

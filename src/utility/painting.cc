@@ -22,3 +22,16 @@ void paint_player(QPainter &painter, QPixmap const &pixmap, GridScale size, QPoi
     painter.drawPixmap({pos.x(), pos.y(), dims, dims}, pixmap);
     painter.resetTransform();
 }
+
+
+void paint_line(QPainter &painter, QVector<QLine> const &lines, QColor color, QPoint offset)
+{
+    painter.translate(offset);
+    QPen pen;
+    pen.setColor(color);
+    pen.setWidth(8);
+    painter.setPen(pen);
+
+    painter.drawLines(lines);
+    painter.resetTransform();
+}

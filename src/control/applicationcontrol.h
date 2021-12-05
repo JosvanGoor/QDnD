@@ -55,7 +55,8 @@ class ApplicationControl : public QObject
         void on_spell_selection(QString const &name);
         void on_display_update(QString const &key);
 
-        // player control
+        // grid control
+        void on_grid_line_drawn(QVector<QLine> const &lines, QColor const &color);
         void on_grid_player_move(QPoint const &point);
 
         // misc

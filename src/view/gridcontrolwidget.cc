@@ -38,7 +38,17 @@ GridControlWidget::GridControlWidget(GridWidget *grid_widget, QWidget *parent)
     QObject::connect(d_straight_button, &QPushButton::pressed, this, &GridControlWidget::on_button_pressed);
     QObject::connect(d_free_button, &QPushButton::pressed, this, &GridControlWidget::on_button_pressed);
 
+    d_color_widget = new QGroupBox{"Color"};
+    d_color_widget->setLayout(new QHBoxLayout);
+    d_color_widget->layout()->addWidget(d_color_display = new ColorDisplay{Qt::black});
+    d_color_widget->layout()->addWidget(d_color_pick = new QPushButton{"Pick Color"});
+    d_color_display->setMinimumSize(28, 28);
+    d_color_display->setMaximumSize(28, 28);
+
+    QObject::connect(d_color_pick, &QPushButton::pressed, this, &GridControlWidget::on_color_selection);
+
     layout()->addWidget(d_button_widget);
+    layout()->addWidget(d_color_widget);
 }
 
 
@@ -51,6 +61,17 @@ GridControlWidget::~GridControlWidget()
 ////////////////////
 //     Slots      //
 ////////////////////
+
+void GridControlWidget::on_color_selection()
+{
+    QColor selection = QColorDialog::getColor(d_color_display->color(), this);
+    if (selection.isValid())
+    {
+        d_color_display->set_color(selection);
+        d_grid_widget->set_draw_color(selection);
+    }
+}
+
 
 void GridControlWidget::on_button_pressed()
 {

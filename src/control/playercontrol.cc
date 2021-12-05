@@ -39,8 +39,23 @@ Player &PlayerControl::player(QString const &identifier)
 
 
 ////////////////////
-//     Slots      //
+//      Self      //
 ////////////////////
+
+void PlayerControl::create_dungeon_master(QString const &avatar_key)
+{
+    Player player{"Dungeon Master", avatar_key, Qt::black};
+    d_players[player.identifier()] = player;
+    d_own_identifier = player.identifier();
+    emit player_connected(player);
+}
+
+
+QString PlayerControl::unique_name()
+{
+    return d_own_identifier + " " + QString::number(d_unique_number++);
+}
+
 
 QString const &PlayerControl::own_identifier() const noexcept
 {
@@ -84,5 +99,26 @@ void PlayerControl::on_player_leaves(QString const &name)
 void PlayerControl::on_player_moves(QString const &id, QPoint const &newpos)
 {
     d_players.find(id).value().set_position(newpos);
+    update_grid();
+}
+
+
+void PlayerControl::on_line_received(QJsonObject const &doc)
+{
+    Player &artist = d_players.find(doc["id"].toString()).value();
+    QJsonArray points = doc["points"].toArray();
+
+    
+    QVector<QLine> lines;
+    for (int idx = 0; idx < (points.size() - 1); ++idx)
+    {
+        QPoint p1 = {points[idx].toObject()["x"].toInt(), points[idx].toObject()["y"].toInt()};
+        QPoint p2 = {points[idx + 1].toObject()["x"].toInt(), points[idx + 1].toObject()["y"].toInt()};
+        lines.push_back({p1, p2});
+    }
+
+    QString name = doc["name"].toString();
+    QColor color = static_cast<unsigned int>(doc["color"].toInt());
+    artist.add_line(name, {color, lines});
     update_grid();
 }

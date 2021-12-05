@@ -9,5 +9,6 @@
 
 void paint_grid(QPainter &painter, QSize size, QPoint offset);
 void paint_player(QPainter &painter, QPixmap const &pixmap, GridScale size, QPoint pos, QPoint offset);
+void paint_line(QPainter &painter, QVector<QLine> const &lines, QColor color, QPoint offset);
 
 #endif

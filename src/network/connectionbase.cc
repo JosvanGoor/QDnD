@@ -134,6 +134,10 @@ void ConnectionBase::handle_message(QJsonDocument const &doc)
             emit player_moved(obj["id"].toString(), {obj["x"].toInt(), obj["y"].toInt()});
         break;
 
+        case MessageType::LINE_DRAWN:
+            emit line_received(obj);
+        break;
+
         default: break;
     }
 }
