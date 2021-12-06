@@ -101,6 +101,10 @@ void ConnectionBase::handle_message(QJsonDocument const &doc)
             emit line_sync(obj);
         break;
 
+        case MessageType::SYNCHRONIZE_ENTITIES:
+            emit synchronize_entities(obj);
+        break;
+
         case MessageType::PLAYER_CONNECTED:
             emit player_joins(obj);
         break;
@@ -148,6 +152,22 @@ void ConnectionBase::handle_message(QJsonDocument const &doc)
 
         case MessageType::LINES_CLEARED:
             emit lines_cleared(obj["id"].toString());
+        break;
+
+        case MessageType::ENTITY_ADDED:
+            emit entity_added(obj);
+        break;
+
+        case MessageType::ENTITIES_REMOVED:
+            emit entities_removed(obj);
+        break;
+
+        case MessageType::ENTITIES_CLEARED:
+            emit entities_cleared();
+        break;
+
+        case MessageType::ENTITIES_MOVED:
+            emit entities_moved(obj);
         break;
 
         default: break;

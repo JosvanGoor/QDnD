@@ -122,11 +122,15 @@ void ApplicationControl::start_hosting()
 
     TransferableImage dm_ava = d_pixmap_cache.load_from_file(":/data/dmpic.png");
     d_player_control.create_dungeon_master(dm_ava.name);
+    d_main_window.load_entity_widget();
 
     QObject::connect(&d_player_control, &PlayerControl::trigger_synchronization, this, &ApplicationControl::on_trigger_synchronization);
     QObject::connect(d_connection, &ConnectionBase::pixmap_requested, this, &ApplicationControl::pixmap_requested);
-    
-    d_main_window.load_entity_widget();
+    QObject::connect(d_main_window.entity_widget(), &EntityWidget::delete_all_entities, this, &ApplicationControl::on_host_entities_cleared);
+    QObject::connect(d_main_window.entity_widget(), &EntityWidget::delete_entities, this, &ApplicationControl::on_host_entities_removed);
+    QObject::connect(d_main_window.entity_widget(), &EntityWidget::add_entity, this, &ApplicationControl::on_host_entity_added);
+    QObject::connect(d_main_window.entity_widget(), &EntityWidget::entity_selection, this, &ApplicationControl::on_host_entities_selection);
+
     set_connectionbase_signals();
     d_connection->connect("", 4144);
 }
@@ -159,21 +163,30 @@ void ApplicationControl::connect_to_host()
 
 void ApplicationControl::set_connectionbase_signals()
 {
-    QObject::connect(d_connection, &ConnectionBase::display_update, this, &ApplicationControl::on_display_update);
+    QObject::connect(d_connection, &ConnectionBase::pixmap_received, &d_pixmap_cache, &PixmapCache::put_pixmap);
+    
     QObject::connect(d_connection, &ConnectionBase::debug_message, &d_main_window, &MainWindow::debug_message);
     QObject::connect(d_connection, &ConnectionBase::connection_status, d_main_window.status_bar(), &StatusBar::update_connection_status);
-    QObject::connect(d_connection, &ConnectionBase::pixmap_received, &d_pixmap_cache, &PixmapCache::put_pixmap);
     QObject::connect(d_connection, &ConnectionBase::pixmap_received, d_main_window.display_widget(), &DisplayWidget::pixmap_received);
     QObject::connect(d_connection, &ConnectionBase::chat_message, d_main_window.chat_widget(), &ChatWidget::on_user_message);
     QObject::connect(d_connection, &ConnectionBase::richtext_message, d_main_window.chat_widget(), &ChatWidget::on_rich_message);
     QObject::connect(d_connection, &ConnectionBase::pixmap_received, d_main_window.players_widget(), &PlayersWidget::pixmap_received);
+    
     QObject::connect(d_connection, &ConnectionBase::player_leaves, &d_player_control, &PlayerControl::on_player_leaves);
     QObject::connect(d_connection, &ConnectionBase::player_joins, &d_player_control, &PlayerControl::on_player_joins);
     QObject::connect(d_connection, &ConnectionBase::player_moved, &d_player_control, &PlayerControl::on_player_moves);
     QObject::connect(d_connection, &ConnectionBase::line_received, &d_player_control, &PlayerControl::on_line_received);
-    QObject::connect(d_connection, &ConnectionBase::line_sync, this, &ApplicationControl::on_line_sync);
     QObject::connect(d_connection, &ConnectionBase::lines_removed, &d_player_control, &PlayerControl::on_lines_removed);
     QObject::connect(d_connection, &ConnectionBase::lines_cleared, &d_player_control, &PlayerControl::on_lines_cleared);
+    
+    QObject::connect(d_connection, &ConnectionBase::display_update, this, &ApplicationControl::on_display_update);
+    QObject::connect(d_connection, &ConnectionBase::line_sync, this, &ApplicationControl::on_line_sync);
+    QObject::connect(d_connection, &ConnectionBase::entity_added, this, &ApplicationControl::on_entity_added);
+    QObject::connect(d_connection, &ConnectionBase::entities_removed, this, &ApplicationControl::on_entities_removed);
+    QObject::connect(d_connection, &ConnectionBase::entities_cleared, this, &ApplicationControl::on_entities_cleared);
+    QObject::connect(d_connection, &ConnectionBase::entities_moved, this, &ApplicationControl::on_entities_moved);
+    QObject::connect(d_connection, &ConnectionBase::pixmap_received, this, &ApplicationControl::on_pixmap_received);
+    QObject::connect(d_connection, &ConnectionBase::synchronize_entities, this, &ApplicationControl::on_synchronize_entities);
 }
 
 
@@ -260,6 +273,11 @@ void ApplicationControl::on_line_sync(QJsonObject const &obj)
     update_grid();
 }
 
+void ApplicationControl::on_pixmap_received([[maybe_unused]] QString const &key, [[maybe_unused]] QPixmap const &pixmap)
+{
+    update_grid();
+}
+
 
 ////////////////////
 //      Grid      //
@@ -281,7 +299,11 @@ void ApplicationControl::on_grid_player_move(QPoint const &point)
 {
     if (!d_connection)
         return;
-    d_connection->send(player_move_message(d_player_control.own_identifier(), point));
+
+    if (!d_connection->is_server())
+        d_connection->send(player_move_message(d_player_control.own_identifier(), point));
+    else if (!d_entity_selection.isEmpty())
+        d_connection->send(entities_moved_message(d_entity_selection, point));
 }
 
 
@@ -314,6 +336,105 @@ void ApplicationControl::on_grid_delete_all_lines()
     d_connection->send(lines_cleared_message(d_player_control.own_identifier()));
 }
 
+
+////////////////////
+//  Host Entity   //
+////////////////////
+
+void ApplicationControl::on_host_entity_added(QString const &name, QString const &filename)
+{
+    TransferableImage avatar = d_pixmap_cache.load_from_file(filename);
+    // QPoint initial_location{-1'000'000, -1'000'000}; // far away / out of sight
+    QPoint initial_location{64, 64}; // far away / out of sight
+    d_connection->send(entity_added_message(name, avatar.name, initial_location));
+}
+
+
+void ApplicationControl::on_host_entities_removed(QVector<QString> const &entities)
+{
+    d_connection->send(entities_removed_message(entities));
+}
+
+
+void ApplicationControl::on_host_entities_cleared()
+{
+    d_connection->send(entities_cleared_message());
+}
+
+
+void ApplicationControl::on_host_entities_selection(QSet<QString> const &names)
+{
+    d_entity_selection = names;
+    update_grid();
+}
+
+
+////////////////////
+// Client Entity  //
+////////////////////
+
+void ApplicationControl::on_entity_added(QJsonObject const &obj)
+{
+    QString name = obj["name"].toString();
+    QString avatar_key = obj["avatar"].toString();
+    QPoint pos{obj["x"].toInt(), obj["y"].toInt()};
+
+    d_entities[name] = Entity{avatar_key, pos, GridScale::MEDIUM};
+    on_pixmap_required(avatar_key);
+    update_grid();
+}
+
+
+void ApplicationControl::on_entities_removed(QJsonObject const &obj)
+{
+    QJsonArray entities = obj["entities"].toArray();
+
+    for (auto entity : entities)
+    {
+        if (auto it = d_entities.find(entity.toString()); it != d_entities.end())
+            d_entities.erase(it);
+    }
+    update_grid();
+}
+
+
+void ApplicationControl::on_entities_cleared()
+{
+    d_entities.clear();
+    update_grid();
+}
+
+
+void ApplicationControl::on_entities_moved(QJsonObject const &obj)
+{
+    QPoint pos{obj["x"].toInt(), obj["y"].toInt()};
+    QJsonArray entities = obj["entities"].toArray();
+
+    for (auto entity : entities)
+    {
+        if (auto it = d_entities.find(entity.toString()); it != d_entities.end())
+            it.value().position = pos;
+    }
+    update_grid();
+}
+
+
+void ApplicationControl::on_synchronize_entities(QJsonObject const &obj)
+{
+    QJsonArray entities = obj["entities"].toArray();
+
+    for (auto entity : entities)
+    {
+        QJsonObject obj = entity.toObject();
+        QString name = obj["name"].toString();
+        QString avatar_key = obj["avatar"].toString();
+        GridScale scale = static_cast<GridScale>(obj["scale"].toInt());
+        QPoint pos{obj["x"].toInt(), obj["y"].toInt()};
+        d_entities[name] = Entity{avatar_key, pos, scale};
+        on_pixmap_required(avatar_key);
+    }
+    update_grid();
+}
 
 ////////////////////
 //      Misc      //
@@ -405,6 +526,8 @@ void ApplicationControl::on_trigger_synchronization(QString const &id)
         if (!player.lines().isEmpty())
             reinterpret_cast<ServerConnection*>(d_connection)->queue_message(id, synchronize_lines_message(id, player.lines()).toJson());
     }
+
+    reinterpret_cast<ServerConnection*>(d_connection)->queue_message(id, synchronize_entities_message(d_entities).toJson());
 }
 
 
@@ -446,10 +569,22 @@ void ApplicationControl::on_paint_player_layer(QPainter &painter, [[maybe_unused
 
 void ApplicationControl::on_paint_entity_layer(QPainter &painter, [[maybe_unused]] QSize size, QPoint offset, [[maybe_unused]] QPoint mouse)
 {
+    // paint all entities
+    for (auto it = d_entities.begin(); it != d_entities.end(); ++it)
+    {
+        paint_player(painter, d_pixmap_cache.get_pixmap(it.value().avatar_key), it.value().scale, it.value().position, offset);
+        if (auto it2 = d_entity_selection.find(it.key()); it2 != d_entity_selection.end())
+            paint_rect_around_pixmap(painter, it.value().position, it.value().scale, QColor{0, 255, 0}, offset);
+    }
+    
     // paint all players
     QMap<QString, Player> &players = d_player_control.players();
     for (auto &player : players)
+    {
+        if (player.identifier() == "Dungeon Master")
+            continue;
         paint_player(painter, d_pixmap_cache.get_pixmap(player.avatar_key()), player.size(), player.position(), offset);
+    }
 }
 
 

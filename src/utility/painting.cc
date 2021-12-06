@@ -66,3 +66,18 @@ void paint_rect_around_line(QPainter &painter, QVector<QLine> const &lines, QCol
     painter.drawRect(min_x, min_y, max_x - min_x, max_y - min_y);
     painter.resetTransform();
 }
+
+
+void paint_rect_around_pixmap(QPainter &painter, QPoint const &pos, GridScale size, QColor color, QPoint offset)
+{
+    int dims = 64 * scale(size);
+
+    QPen pen;
+    pen.setColor(color);
+    pen.setWidth(2);
+
+    painter.setPen(pen);
+    painter.translate(offset);
+    painter.drawRect(pos.x(), pos.y(), dims, dims);
+    painter.resetTransform();
+}

@@ -59,6 +59,12 @@ DisplayWidget *MainWindow::display_widget() noexcept
 }
 
 
+EntityWidget *MainWindow::entity_widget() noexcept
+{
+    return d_entity_tab;
+}
+
+
 GridControlWidget *MainWindow::grid_control_widget() noexcept
 {
     return d_grid_control_tab;

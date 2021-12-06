@@ -16,6 +16,14 @@
 #include "../view/connectdialog.h"
 #include "../view/mainwindow.h"
 
+// will be replaced with a more complex version soon(tm)
+struct Entity
+{
+    QString avatar_key;
+    QPoint position;
+    GridScale scale;
+};
+
 /*
     Central control class
 
@@ -27,10 +35,14 @@ class ApplicationControl : public QObject
     Q_OBJECT
 
     PixmapCache d_pixmap_cache;
-    QMap<QString, Spell> d_spells;
     PlayerControl d_player_control;
     MainWindow d_main_window;
+
     QSet<QString> d_line_selection;
+    QSet<QString> d_entity_selection;
+
+    QMap<QString, Spell> d_spells;
+    QMap<QString, Entity> d_entities;
 
     ConnectionBase *d_connection;
 
@@ -58,6 +70,7 @@ class ApplicationControl : public QObject
         void on_spell_selection(QString const &name);
         void on_display_update(QString const &key);
         void on_line_sync(QJsonObject const &obj);
+        void on_pixmap_received(QString const &key, QPixmap const &pixmap);
 
         // grid control
         void on_grid_line_drawn(QVector<QLine> const &lines, QColor const &color);
@@ -65,6 +78,19 @@ class ApplicationControl : public QObject
         void on_grid_delete_lines(QVector<QString> const &lines);
         void on_grid_line_selection(QSet<QString> const &lines);
         void on_grid_delete_all_lines();
+
+        // host entity control
+        void on_host_entity_added(QString const &name, QString const &filename);
+        void on_host_entities_removed(QVector<QString> const &entities);
+        void on_host_entities_cleared();
+        void on_host_entities_selection(QSet<QString> const &names);
+
+        // client entity control
+        void on_entity_added(QJsonObject const &obj);
+        void on_entities_removed(QJsonObject const &obj);
+        void on_entities_cleared();
+        void on_entities_moved(QJsonObject const &obj);
+        void on_synchronize_entities(QJsonObject const &obj);
 
         // misc
         void chat_entered(QString const &chat);

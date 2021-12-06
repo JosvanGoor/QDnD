@@ -28,6 +28,7 @@ enum class MessageType
     HANDSHAKE,
     SYNCHRONIZE,
     SYNCHRONIZE_LINES,
+    SYNCHRONIZE_ENTITIES,
     PLAYER_CONNECTED,
     PLAYER_DISCONNECTED,
     PING,
@@ -45,6 +46,10 @@ enum class MessageType
 
     // entity control
     PLAYER_MOVED,
+    ENTITY_ADDED,
+    ENTITIES_MOVED,
+    ENTITIES_REMOVED,
+    ENTITIES_CLEARED,
 
     // drawing
     LINE_DRAWN,

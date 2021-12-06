@@ -1,5 +1,7 @@
 #include "messagebuilder.h"
 
+#include "../control/applicationcontrol.h" // because forward decl.
+
 ////////////////////
 //     System     //
 ////////////////////
@@ -53,6 +55,26 @@ QJsonDocument synchronize_lines_message(QString const &id, QMap<QString, DrawLin
     return QJsonDocument{obj};
 }
 
+
+QJsonDocument synchronize_entities_message(QMap<QString, Entity> const &entities)
+{
+    QJsonArray arr;
+    for (auto it = entities.begin(); it != entities.end(); ++it)
+    {
+        QJsonObject obj;
+        obj["name"] = it.key();
+        obj["avatar"] = it.value().avatar_key;
+        obj["x"] = it.value().position.x();
+        obj["y"] = it.value().position.y();
+        obj["scale"] = as_int(it.value().scale);
+        arr.push_back(obj);
+    }
+
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::SYNCHRONIZE_ENTITIES);
+    obj["entities"] = arr;
+    return QJsonDocument{obj};
+}
 
 
 QJsonDocument player_connected_message(QString const &id, QString const &avatar_key, QColor const &color, GridScale scale)
@@ -164,7 +186,7 @@ QJsonDocument display_update_message(QString const &key)
 
 
 ////////////////////
-//  Grid Control  //
+//    Entities    //
 ////////////////////
 
 QJsonDocument player_move_message(QString const &id, QPoint const &newpos)
@@ -177,6 +199,57 @@ QJsonDocument player_move_message(QString const &id, QPoint const &newpos)
     return QJsonDocument{obj};
 }
 
+QJsonDocument entity_added_message(QString const &name, QString const &avatar_key, QPoint const &position)
+{
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::ENTITY_ADDED);
+    obj["name"] = name;
+    obj["avatar"] = avatar_key;
+    obj["x"] = position.x();
+    obj["y"] = position.y();
+    return QJsonDocument{obj};
+}
+
+
+QJsonDocument entities_moved_message(QSet<QString> const &names, QPoint const &newpos)
+{
+    QJsonArray arr;
+    for (auto &name : names)
+        arr.push_back(name);
+
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::ENTITIES_MOVED);
+    obj["entities"] = arr;
+    obj["x"] = newpos.x();
+    obj["y"] = newpos.y();
+    return QJsonDocument{obj};
+}
+
+
+QJsonDocument entities_removed_message(QVector<QString> const &names)
+{
+    QJsonArray arr;
+    for (auto &name : names)
+        arr.push_back(name);
+
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::ENTITIES_REMOVED);
+    obj["entities"] = arr;
+    return QJsonDocument{obj};
+}
+
+
+QJsonDocument entities_cleared_message()
+{
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::ENTITIES_CLEARED);
+    return QJsonDocument{obj};
+}
+
+
+////////////////////
+//  Line Control  //
+////////////////////
 
 QJsonDocument line_drawn_message(QString const &id, QString const &name, QVector<QLine> const &lines, QColor const &color)
 {

@@ -55,6 +55,13 @@ class ConnectionBase : public QObject
         void chat_message(QString const &name, QString const &message);
         void richtext_message(QString const&name, QString const &message);
 
+        // entity stuff
+        void entity_added(QJsonObject const &obj);
+        void entities_removed(QJsonObject const &obj);
+        void entities_cleared();
+        void entities_moved(QJsonObject const &obj);
+        void synchronize_entities(QJsonObject const &obj);
+
         // grid stuff
         void line_sync(QJsonObject const &obj);
         void line_received(QJsonObject const &obj);
