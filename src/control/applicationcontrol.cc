@@ -344,8 +344,7 @@ void ApplicationControl::on_grid_delete_all_lines()
 void ApplicationControl::on_host_entity_added(QString const &name, QString const &filename)
 {
     TransferableImage avatar = d_pixmap_cache.load_from_file(filename);
-    // QPoint initial_location{-1'000'000, -1'000'000}; // far away / out of sight
-    QPoint initial_location{64, 64}; // far away / out of sight
+    QPoint initial_location{-1'000'000, -1'000'000}; // far away / out of sight
     d_connection->send(entity_added_message(name, avatar.name, initial_location));
 }
 
