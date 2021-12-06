@@ -121,7 +121,6 @@ void ConnectionBase::handle_message(QJsonDocument const &doc)
         {
             QPixmap avatar = pixmap_from_b64(obj["data"].toString().toLocal8Bit());
             QString key = obj["key"].toString();
-            emit debug_message("pixmap received: " + key);
             emit pixmap_received(key, avatar);
         }
         break;

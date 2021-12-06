@@ -84,6 +84,7 @@ void ApplicationControl::reset()
 {
     d_player_control.clear();
     d_pixmap_cache.clear();
+    d_entities.clear();
     d_main_window.unload_entity_widget();
 }
 
@@ -197,12 +198,7 @@ void ApplicationControl::set_connectionbase_signals()
 void ApplicationControl::on_pixmap_required(QString const &key)
 {
     if (!d_pixmap_cache.has_pixmap(key))
-    {
         d_connection->send(pixmap_request_message({key}));
-        debug_message("Requested pixmap " + key);
-    }
-    else
-        debug_message("Pixmap " + key + " not requested, found in cache.");
 }
 
 
@@ -526,7 +522,8 @@ void ApplicationControl::on_trigger_synchronization(QString const &id)
             reinterpret_cast<ServerConnection*>(d_connection)->queue_message(id, synchronize_lines_message(id, player.lines()).toJson());
     }
 
-    reinterpret_cast<ServerConnection*>(d_connection)->queue_message(id, synchronize_entities_message(d_entities).toJson());
+    if (!d_entities.isEmpty())
+        reinterpret_cast<ServerConnection*>(d_connection)->queue_message(id, synchronize_entities_message(d_entities).toJson());
 }
 
 
