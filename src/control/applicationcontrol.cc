@@ -519,7 +519,7 @@ void ApplicationControl::on_trigger_synchronization(QString const &id)
     for (auto &player : d_player_control.players())
     {
         if (!player.lines().isEmpty())
-            reinterpret_cast<ServerConnection*>(d_connection)->queue_message(id, synchronize_lines_message(id, player.lines()).toJson());
+            reinterpret_cast<ServerConnection*>(d_connection)->queue_message(id, synchronize_lines_message(player.identifier(), player.lines()).toJson());
     }
 
     if (!d_entities.isEmpty())
