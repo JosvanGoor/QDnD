@@ -17,13 +17,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     d_middle_tabs->addTab(d_display_tab = new DisplayWidget, "Display");
     d_middle_tabs->addTab(d_spells_tab = new SpellsWidget, "Spells");
-    d_middle_tabs->addTab(d_grid_tab = new GridWidget, "Grid");
+    // d_middle_tabs->addTab(d_grid_tab = new GridWidget, "Grid");
     d_middle_tabs->setCurrentIndex(2); // TODO: remove
     
     d_central_widget->addWidget(d_right_tabs = new QTabWidget);
     d_right_tabs->addTab(d_chat_tab = new ChatWidget, "Chat");
     d_right_tabs->addTab(d_players_tab = new PlayersWidget, "Players");
-    d_right_tabs->addTab(d_grid_control_tab = new GridControlWidget{d_grid_tab}, "Grid Control");
+    // d_right_tabs->addTab(d_grid_control_tab = new GridControlWidget{d_grid_tab}, "Grid Control");
 
     d_middle_widget->setOrientation(Qt::Vertical);
     d_middle_widget->setSizes({600, 100});
@@ -65,16 +65,16 @@ EntityWidget *MainWindow::entity_widget() noexcept
 }
 
 
-GridControlWidget *MainWindow::grid_control_widget() noexcept
-{
-    return d_grid_control_tab;
-}
+// GridControlWidget *MainWindow::grid_control_widget() noexcept
+// {
+//     return d_grid_control_tab;
+// }
 
 
-GridWidget *MainWindow::grid_widget() noexcept
-{
-    return d_grid_tab;
-}
+// GridWidget *MainWindow::grid_widget() noexcept
+// {
+//     return d_grid_tab;
+// }
 
 
 MenuBar *MainWindow::menu_bar() noexcept

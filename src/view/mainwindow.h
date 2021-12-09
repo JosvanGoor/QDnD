@@ -12,8 +12,8 @@
 #include "chatwidget.h"
 #include "displaywidget.h"
 #include "entitywidget.h"
-#include "gridcontrolwidget.h"
-#include "gridwidget.h"
+// #include "gridcontrolwidget.h"
+// #include "gridwidget.h"
 #include "menubar.h"
 #include "playerswidget.h"
 #include "spellswidget.h"
@@ -28,12 +28,12 @@ class MainWindow : public QMainWindow
             QTabWidget *d_middle_tabs;
                 DisplayWidget *d_display_tab;
                 SpellsWidget *d_spells_tab;
-                GridWidget *d_grid_tab;
+                // GridWidget *d_grid_tab;
             QTextEdit *d_debug_output;
         QTabWidget *d_right_tabs;
             ChatWidget *d_chat_tab;
             PlayersWidget *d_players_tab;
-            GridControlWidget *d_grid_control_tab;
+            // GridControlWidget *d_grid_control_tab;
             EntityWidget *d_entity_tab;
 
     MenuBar *d_menu_bar;
@@ -47,8 +47,8 @@ class MainWindow : public QMainWindow
         ChatWidget *chat_widget() noexcept;
         DisplayWidget *display_widget() noexcept;
         EntityWidget *entity_widget() noexcept;
-        GridControlWidget *grid_control_widget() noexcept;
-        GridWidget *grid_widget() noexcept;
+        // GridControlWidget *grid_control_widget() noexcept;
+        // GridWidget *grid_widget() noexcept;
         MenuBar *menu_bar() noexcept;
         PlayersWidget *players_widget() noexcept;
         SpellsWidget *spells_widget() noexcept;

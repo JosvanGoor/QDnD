@@ -31,31 +31,31 @@ ApplicationControl::~ApplicationControl()
 void ApplicationControl::create_default_connections()
 {
     QObject::connect(this, &ApplicationControl::debug_message, &d_main_window, &MainWindow::debug_message);
-    QObject::connect(this, &ApplicationControl::update_grid, d_main_window.grid_widget(), &GridWidget::request_render_update);
+    // QObject::connect(this, &ApplicationControl::update_grid, d_main_window.grid_widget(), &GridWidget::request_render_update);
     QObject::connect(d_main_window.spells_widget(), &SpellsWidget::selection_changed, this, &ApplicationControl::on_spell_selection);
     QObject::connect(d_main_window.menu_bar()->host(), &QAction::triggered, this, &ApplicationControl::start_hosting);
     QObject::connect(d_main_window.menu_bar()->connect(), &QAction::triggered, this, &ApplicationControl::connect_to_host);
     QObject::connect(d_main_window.menu_bar()->update_display(), &QAction::triggered, this, &ApplicationControl::display_update_clicked);    
     QObject::connect(d_main_window.chat_widget(), &ChatWidget::message_entered, this, &ApplicationControl::chat_entered);
 
-    QObject::connect(&d_entity_manager, &EntityManager::update_grid, d_main_window.grid_widget(), &GridWidget::request_render_update);
+    // QObject::connect(&d_entity_manager, &EntityManager::update_grid, d_main_window.grid_widget(), &GridWidget::request_render_update);
     QObject::connect(&d_entity_manager, &EntityManager::pixmap_required, this, &ApplicationControl::on_pixmap_required);
 
     QObject::connect(&d_player_control, &PlayerControl::pixmap_required, this, &ApplicationControl::on_pixmap_required);
     QObject::connect(&d_player_control, &PlayerControl::player_connected, this, &ApplicationControl::on_player_connected);
     QObject::connect(&d_player_control, &PlayerControl::player_disconnected, this, &ApplicationControl::on_player_disconnected);
     QObject::connect(&d_player_control, &PlayerControl::debug_message, &d_main_window, &MainWindow::debug_message);
-    QObject::connect(&d_player_control, &PlayerControl::update_grid, d_main_window.grid_widget(), &GridWidget::request_render_update);
+    // QObject::connect(&d_player_control, &PlayerControl::update_grid, d_main_window.grid_widget(), &GridWidget::request_render_update);
 
-    QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::lines_cleared, this, &ApplicationControl::on_grid_delete_all_lines);
-    QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::lines_removed, this, &ApplicationControl::on_grid_delete_lines);
-    QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::line_selection_changed, this, &ApplicationControl::on_grid_line_selection);
-    QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_ground_layer, this, &ApplicationControl::on_paint_ground_layer);
-    QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_player_layer, this, &ApplicationControl::on_paint_player_layer);
-    QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_entity_layer, this, &ApplicationControl::on_paint_entity_layer);
-    QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_mouse_layer, this, &ApplicationControl::on_paint_mouse_layer);
-    QObject::connect(d_main_window.grid_widget(), &GridWidget::grid_player_move, this, &ApplicationControl::on_grid_player_move);
-    QObject::connect(d_main_window.grid_widget(), &GridWidget::grid_line_drawn, this, &ApplicationControl::on_grid_line_drawn);
+//     QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::lines_cleared, this, &ApplicationControl::on_grid_delete_all_lines);
+//     QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::lines_removed, this, &ApplicationControl::on_grid_delete_lines);
+//     QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::line_selection_changed, this, &ApplicationControl::on_grid_line_selection);
+//     QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_ground_layer, this, &ApplicationControl::on_paint_ground_layer);
+//     QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_player_layer, this, &ApplicationControl::on_paint_player_layer);
+//     QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_entity_layer, this, &ApplicationControl::on_paint_entity_layer);
+//     QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_mouse_layer, this, &ApplicationControl::on_paint_mouse_layer);
+//     QObject::connect(d_main_window.grid_widget(), &GridWidget::grid_player_move, this, &ApplicationControl::on_grid_player_move);
+//     QObject::connect(d_main_window.grid_widget(), &GridWidget::grid_line_drawn, this, &ApplicationControl::on_grid_line_drawn);
 }
 
 
@@ -148,7 +148,7 @@ void ApplicationControl::connect_to_host()
     ConnectDialog dialog{&d_main_window};
     if (dialog.exec() == QDialog::Rejected)
     {
-        debug_message("ConnectDialog: Inputs rejected.");
+        emit debug_message("ConnectDialog: Inputs rejected.");
         return;
     }
 
@@ -160,7 +160,7 @@ void ApplicationControl::connect_to_host()
     // TODO: add extra settings to connection dialog
     d_player_control.set_own_identifier(dialog.character_name());
     TransferableImage avatar = d_pixmap_cache.load_from_file(dialog.avatar_file());
-    debug_message("My avatar hash: " + avatar.name);
+    emit debug_message("My avatar hash: " + avatar.name);
     d_connection->send(handshake_message(dialog.character_name(), avatar.b64_data, Qt::black, GridScale::MEDIUM));
 }
 
@@ -291,7 +291,7 @@ void ApplicationControl::on_grid_line_drawn(QVector<QLine> const &lines, QColor 
     QString id = d_player_control.own_identifier();
     QString name = d_player_control.unique_name();
     d_connection->send(line_drawn_message(id, name, lines, color));
-    d_main_window.grid_control_widget()->register_line(name);
+    // d_main_window.grid_control_widget()->register_line(name);
 }
 
 
