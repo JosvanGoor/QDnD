@@ -14,6 +14,7 @@ QMAKE_CXXFLAGS = -Wall -pedantic
 
 
 SOURCES +=  src/control/applicationcontrol.cc \
+            src/control/entitymanager.cc \
             src/control/playercontrol.cc \
             \
             src/expressions/diceexpression.cc \
@@ -21,6 +22,7 @@ SOURCES +=  src/control/applicationcontrol.cc \
             src/expressions/dicetokenizer.cc \
             src/expressions/parserstate.cc \
             \
+            src/model/entity.cc \
             src/model/griditemgroup.cc \
             src/model/gridmodel.cc \
             src/model/pixmapcache.cc \
@@ -55,6 +57,7 @@ SOURCES +=  src/control/applicationcontrol.cc \
 
 
 HEADERS +=  src/control/applicationcontrol.h \
+            src/control/entitymanager.h \
             src/control/playercontrol.h \
             \
             src/expressions/diceexpression.h \
@@ -62,6 +65,7 @@ HEADERS +=  src/control/applicationcontrol.h \
             src/expressions/dicetokenizer.h \
             src/expressions/parserstate.h \
             \
+            src/model/entity.h \
             src/model/griditemgroup.h \
             src/model/gridmodel.h \
             src/model/pixmapcache.h \

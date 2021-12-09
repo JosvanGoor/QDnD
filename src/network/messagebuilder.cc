@@ -63,10 +63,10 @@ QJsonDocument synchronize_entities_message(QMap<QString, Entity> const &entities
     {
         QJsonObject obj;
         obj["name"] = it.key();
-        obj["avatar"] = it.value().avatar_key;
-        obj["x"] = it.value().position.x();
-        obj["y"] = it.value().position.y();
-        obj["scale"] = as_int(it.value().scale);
+        obj["avatar"] = it.value().avatar();
+        obj["x"] = it.value().position().x();
+        obj["y"] = it.value().position().y();
+        obj["scale"] = as_int(it.value().scale());
         arr.push_back(obj);
     }
 
