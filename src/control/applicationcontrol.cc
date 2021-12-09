@@ -47,15 +47,18 @@ void ApplicationControl::create_default_connections()
     QObject::connect(&d_player_control, &PlayerControl::debug_message, &d_main_window, &MainWindow::debug_message);
     // QObject::connect(&d_player_control, &PlayerControl::update_grid, d_main_window.grid_widget(), &GridWidget::request_render_update);
 
-//     QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::lines_cleared, this, &ApplicationControl::on_grid_delete_all_lines);
-//     QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::lines_removed, this, &ApplicationControl::on_grid_delete_lines);
-//     QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::line_selection_changed, this, &ApplicationControl::on_grid_line_selection);
+    QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::lines_cleared, this, &ApplicationControl::on_grid_delete_all_lines);
+    QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::lines_removed, this, &ApplicationControl::on_grid_delete_lines);
+    QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::line_selection_changed, this, &ApplicationControl::on_grid_line_selection);
 //     QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_ground_layer, this, &ApplicationControl::on_paint_ground_layer);
 //     QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_player_layer, this, &ApplicationControl::on_paint_player_layer);
 //     QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_entity_layer, this, &ApplicationControl::on_paint_entity_layer);
 //     QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_mouse_layer, this, &ApplicationControl::on_paint_mouse_layer);
 //     QObject::connect(d_main_window.grid_widget(), &GridWidget::grid_player_move, this, &ApplicationControl::on_grid_player_move);
 //     QObject::connect(d_main_window.grid_widget(), &GridWidget::grid_line_drawn, this, &ApplicationControl::on_grid_line_drawn);
+    QObject::connect(d_main_window.grid_widget(), &GridWidget::debug_message, &d_main_window, &MainWindow::debug_message);
+    QObject::connect(&d_main_window.grid_widget()->mouse_controller(), &MouseController::debug_message, &d_main_window, &MainWindow::debug_message);
+
 }
 
 
@@ -461,68 +464,4 @@ void ApplicationControl::on_trigger_synchronization(QString const &id)
 
     if (!d_entity_manager.entities().isEmpty())
         reinterpret_cast<ServerConnection*>(d_connection)->queue_message(id, synchronize_entities_message(d_entity_manager.entities()).toJson());
-}
-
-
-////////////////////
-//    Painting    //
-////////////////////
-
-void ApplicationControl::on_paint_ground_layer(QPainter &painter, QSize size, QPoint offset, [[maybe_unused]] QPoint mouse)
-{
-    painter.setPen(QPen{Qt::black});
-    paint_grid(painter, size, offset);
-}
-
-
-void ApplicationControl::on_paint_player_layer(QPainter &painter, [[maybe_unused]] QSize size, QPoint offset, [[maybe_unused]] QPoint mouse)
-{
-    QMap<QString, Player> &players = d_player_control.players();
-
-    for (auto &player : players)
-    {
-        QMap<QString, DrawLine> const &lines = player.lines();
-        if (player.identifier() == d_player_control.own_identifier())
-        {
-            for (auto it = player.lines().begin(); it != player.lines().end(); ++it)
-            {
-                paint_line(painter,it.value().line, it.value().color, offset);
-                if (auto it2 = d_line_selection.find(it.key()); it2 != d_line_selection.end())
-                    paint_rect_around_line(painter, it.value().line, QColor{255, 0, 255}, offset);
-            }
-        }
-        else
-        {
-            for (auto &line : lines)
-                paint_line(painter, line.line, line.color, offset);
-        }
-    }
-}
-
-
-void ApplicationControl::on_paint_entity_layer(QPainter &painter, [[maybe_unused]] QSize size, QPoint offset, [[maybe_unused]] QPoint mouse)
-{
-    // paint all entities
-    QMap<QString, Entity> entities = d_entity_manager.entities();
-    for (auto it = entities.begin(); it != entities.end(); ++it)
-    {
-        paint_player(painter, d_pixmap_cache.get_pixmap(it.value().avatar()), it.value().scale(), it.value().position(), offset);
-        if (auto it2 = d_entity_selection.find(it.key()); it2 != d_entity_selection.end())
-            paint_rect_around_pixmap(painter, it.value().position(), it.value().scale(), QColor{0, 255, 0}, offset);
-    }
-    
-    // paint all players
-    QMap<QString, Player> &players = d_player_control.players();
-    for (auto &player : players)
-    {
-        if (player.identifier() == "Dungeon Master")
-            continue;
-        paint_player(painter, d_pixmap_cache.get_pixmap(player.avatar_key()), player.size(), player.position(), offset);
-    }
-}
-
-
-void ApplicationControl::on_paint_mouse_layer([[maybe_unused]] QPainter &painter, [[maybe_unused]] QSize size, [[maybe_unused]] QPoint offset, [[maybe_unused]] QPoint mouse)
-{
-
 }

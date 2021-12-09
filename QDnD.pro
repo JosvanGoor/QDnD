@@ -15,6 +15,7 @@ QMAKE_CXXFLAGS = -Wall -pedantic
 
 SOURCES +=  src/control/applicationcontrol.cc \
             src/control/entitymanager.cc \
+            src/control/mousecontroller.cc \
             src/control/playercontrol.cc \
             \
             src/expressions/diceexpression.cc \
@@ -45,6 +46,8 @@ SOURCES +=  src/control/applicationcontrol.cc \
             src/view/displaywidget.cc \
             src/view/dropwidget.cc \
             src/view/entitywidget.cc \
+            src/view/gridcontrolwidget.cc \
+            src/view/gridwidget.cc \
             src/view/mainwindow.cc \
             src/view/menubar.cc \
             src/view/playerswidget.cc \
@@ -56,6 +59,7 @@ SOURCES +=  src/control/applicationcontrol.cc \
 
 HEADERS +=  src/control/applicationcontrol.h \
             src/control/entitymanager.h \
+            src/control/mousecontroller.h \
             src/control/playercontrol.h \
             \
             src/expressions/diceexpression.h \
@@ -86,6 +90,8 @@ HEADERS +=  src/control/applicationcontrol.h \
             src/view/displaywidget.h \
             src/view/dropwidget.h \
             src/view/entitywidget.h \
+            src/view/gridcontrolwidget.h \
+            src/view/gridwidget.h \
             src/view/mainwindow.h \
             src/view/menubar.h \
             src/view/playerswidget.h \

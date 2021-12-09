@@ -87,13 +87,7 @@ class ApplicationControl : public QObject
         // server only slots
         void pixmap_requested(QString const &id, QString const &key);
         void on_trigger_synchronization(QString const &identifier);
-
-        // painting stuff
-        void on_paint_ground_layer(QPainter &painter, QSize size, QPoint offset, QPoint mousepos);
-        void on_paint_player_layer(QPainter &painter, QSize size, QPoint offset, QPoint mousepos);
-        void on_paint_entity_layer(QPainter &painter, QSize size, QPoint offset, QPoint mousepos);
-        void on_paint_mouse_layer(QPainter &painter, QSize size, QPoint offset, QPoint mousepos);
-
+        
     signals:
         void update_grid();
         void debug_message(QString const &key);
