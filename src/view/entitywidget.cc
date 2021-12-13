@@ -90,6 +90,9 @@ void EntityWidget::on_clear_entities()
 
 void EntityWidget::on_add_entity()
 {
+    if (d_pixmap_filename.isEmpty())
+        return;
+
     QString name = d_entity_name->text() + " " + QString::number(d_unique_number++);
     d_entity_list->addItem(name);
     emit add_entity(name, d_pixmap_filename);
