@@ -38,6 +38,9 @@ void ApplicationControl::create_default_connections()
     QObject::connect(d_main_window.menu_bar()->update_display(), &QAction::triggered, this, &ApplicationControl::display_update_clicked);    
     QObject::connect(d_main_window.chat_widget(), &ChatWidget::message_entered, this, &ApplicationControl::chat_entered);
 
+    QObject::connect(&d_entity_manager, &EntityManager::update_grid, d_main_window.grid_widget(), &GridWidget::request_render_update);
+    QObject::connect(&d_entity_manager, &EntityManager::pixmap_required, this, &ApplicationControl::on_pixmap_required);
+
     QObject::connect(&d_player_control, &PlayerControl::pixmap_required, this, &ApplicationControl::on_pixmap_required);
     QObject::connect(&d_player_control, &PlayerControl::player_connected, this, &ApplicationControl::on_player_connected);
     QObject::connect(&d_player_control, &PlayerControl::player_disconnected, this, &ApplicationControl::on_player_disconnected);
@@ -84,7 +87,7 @@ void ApplicationControl::reset()
 {
     d_player_control.clear();
     d_pixmap_cache.clear();
-    d_entities.clear();
+    d_entity_manager.clear();
     d_main_window.unload_entity_widget();
 }
 
@@ -180,14 +183,15 @@ void ApplicationControl::set_connectionbase_signals()
     QObject::connect(d_connection, &ConnectionBase::lines_removed, &d_player_control, &PlayerControl::on_lines_removed);
     QObject::connect(d_connection, &ConnectionBase::lines_cleared, &d_player_control, &PlayerControl::on_lines_cleared);
     
-    QObject::connect(d_connection, &ConnectionBase::display_update, this, &ApplicationControl::on_display_update);
     QObject::connect(d_connection, &ConnectionBase::line_sync, this, &ApplicationControl::on_line_sync);
-    QObject::connect(d_connection, &ConnectionBase::entity_added, this, &ApplicationControl::on_entity_added);
-    QObject::connect(d_connection, &ConnectionBase::entities_removed, this, &ApplicationControl::on_entities_removed);
-    QObject::connect(d_connection, &ConnectionBase::entities_cleared, this, &ApplicationControl::on_entities_cleared);
-    QObject::connect(d_connection, &ConnectionBase::entities_moved, this, &ApplicationControl::on_entities_moved);
+    QObject::connect(d_connection, &ConnectionBase::display_update, this, &ApplicationControl::on_display_update);
     QObject::connect(d_connection, &ConnectionBase::pixmap_received, this, &ApplicationControl::on_pixmap_received);
-    QObject::connect(d_connection, &ConnectionBase::synchronize_entities, this, &ApplicationControl::on_synchronize_entities);
+    
+    QObject::connect(d_connection, &ConnectionBase::entity_added, &d_entity_manager, &EntityManager::on_entity_added);
+    QObject::connect(d_connection, &ConnectionBase::entities_removed, &d_entity_manager, &EntityManager::on_entities_removed);
+    QObject::connect(d_connection, &ConnectionBase::entities_cleared, &d_entity_manager, &EntityManager::on_entities_cleared);
+    QObject::connect(d_connection, &ConnectionBase::entities_moved, &d_entity_manager, &EntityManager::on_entities_moved);
+    QObject::connect(d_connection, &ConnectionBase::synchronize_entities, &d_entity_manager, &EntityManager::on_entities_synchronized);
 }
 
 
@@ -365,73 +369,6 @@ void ApplicationControl::on_host_entities_selection(QSet<QString> const &names)
 
 
 ////////////////////
-// Client Entity  //
-////////////////////
-
-void ApplicationControl::on_entity_added(QJsonObject const &obj)
-{
-    QString name = obj["name"].toString();
-    QString avatar_key = obj["avatar"].toString();
-    QPoint pos{obj["x"].toInt(), obj["y"].toInt()};
-
-    d_entities[name] = Entity{avatar_key, pos, GridScale::MEDIUM};
-    on_pixmap_required(avatar_key);
-    update_grid();
-}
-
-
-void ApplicationControl::on_entities_removed(QJsonObject const &obj)
-{
-    QJsonArray entities = obj["entities"].toArray();
-
-    for (auto entity : entities)
-    {
-        if (auto it = d_entities.find(entity.toString()); it != d_entities.end())
-            d_entities.erase(it);
-    }
-    update_grid();
-}
-
-
-void ApplicationControl::on_entities_cleared()
-{
-    d_entities.clear();
-    update_grid();
-}
-
-
-void ApplicationControl::on_entities_moved(QJsonObject const &obj)
-{
-    QPoint pos{obj["x"].toInt(), obj["y"].toInt()};
-    QJsonArray entities = obj["entities"].toArray();
-
-    for (auto entity : entities)
-    {
-        if (auto it = d_entities.find(entity.toString()); it != d_entities.end())
-            it.value().position = pos;
-    }
-    update_grid();
-}
-
-
-void ApplicationControl::on_synchronize_entities(QJsonObject const &obj)
-{
-    QJsonArray entities = obj["entities"].toArray();
-
-    for (auto entity : entities)
-    {
-        QJsonObject obj = entity.toObject();
-        QString name = obj["name"].toString();
-        QString avatar_key = obj["avatar"].toString();
-        GridScale scale = static_cast<GridScale>(obj["scale"].toInt());
-        QPoint pos{obj["x"].toInt(), obj["y"].toInt()};
-        d_entities[name] = Entity{avatar_key, pos, scale};
-        on_pixmap_required(avatar_key);
-    }
-    update_grid();
-}
-
-////////////////////
 //      Misc      //
 ////////////////////
 
@@ -522,8 +459,8 @@ void ApplicationControl::on_trigger_synchronization(QString const &id)
             reinterpret_cast<ServerConnection*>(d_connection)->queue_message(id, synchronize_lines_message(player.identifier(), player.lines()).toJson());
     }
 
-    if (!d_entities.isEmpty())
-        reinterpret_cast<ServerConnection*>(d_connection)->queue_message(id, synchronize_entities_message(d_entities).toJson());
+    if (!d_entity_manager.entities().isEmpty())
+        reinterpret_cast<ServerConnection*>(d_connection)->queue_message(id, synchronize_entities_message(d_entity_manager.entities()).toJson());
 }
 
 
@@ -566,11 +503,12 @@ void ApplicationControl::on_paint_player_layer(QPainter &painter, [[maybe_unused
 void ApplicationControl::on_paint_entity_layer(QPainter &painter, [[maybe_unused]] QSize size, QPoint offset, [[maybe_unused]] QPoint mouse)
 {
     // paint all entities
-    for (auto it = d_entities.begin(); it != d_entities.end(); ++it)
+    QMap<QString, Entity> entities = d_entity_manager.entities();
+    for (auto it = entities.begin(); it != entities.end(); ++it)
     {
-        paint_player(painter, d_pixmap_cache.get_pixmap(it.value().avatar_key), it.value().scale, it.value().position, offset);
+        paint_player(painter, d_pixmap_cache.get_pixmap(it.value().avatar()), it.value().scale(), it.value().position(), offset);
         if (auto it2 = d_entity_selection.find(it.key()); it2 != d_entity_selection.end())
-            paint_rect_around_pixmap(painter, it.value().position, it.value().scale, QColor{0, 255, 0}, offset);
+            paint_rect_around_pixmap(painter, it.value().position(), it.value().scale(), QColor{0, 255, 0}, offset);
     }
     
     // paint all players

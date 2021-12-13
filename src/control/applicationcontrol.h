@@ -5,8 +5,10 @@
 #include <QMessageBox>
 #include <QObject>
 
+#include "entitymanager.h"
 #include "playercontrol.h"
 #include "../expressions/diceparser.h"
+#include "../model/entity.h"
 #include "../model/pixmapcache.h"
 #include "../model/spell.h"
 #include "../network/clientconnection.h"
@@ -15,14 +17,6 @@
 #include "../utility/painting.h"
 #include "../view/connectdialog.h"
 #include "../view/mainwindow.h"
-
-// will be replaced with a more complex version soon(tm)
-struct Entity
-{
-    QString avatar_key;
-    QPoint position;
-    GridScale scale;
-};
 
 /*
     Central control class
@@ -35,6 +29,7 @@ class ApplicationControl : public QObject
     Q_OBJECT
 
     PixmapCache d_pixmap_cache;
+    EntityManager d_entity_manager;
     PlayerControl d_player_control;
     MainWindow d_main_window;
 
@@ -84,13 +79,6 @@ class ApplicationControl : public QObject
         void on_host_entities_removed(QVector<QString> const &entities);
         void on_host_entities_cleared();
         void on_host_entities_selection(QSet<QString> const &names);
-
-        // client entity control
-        void on_entity_added(QJsonObject const &obj);
-        void on_entities_removed(QJsonObject const &obj);
-        void on_entities_cleared();
-        void on_entities_moved(QJsonObject const &obj);
-        void on_synchronize_entities(QJsonObject const &obj);
 
         // misc
         void chat_entered(QString const &chat);
