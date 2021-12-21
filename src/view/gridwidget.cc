@@ -7,6 +7,7 @@
 GridWidget::GridWidget(QWidget *parent)
 :   QWidget(parent)
 {
+    d_zoom = 1.0f;
     d_offset = {};
     d_draw_color = Qt::black;
     d_line_start = {};
@@ -33,13 +34,14 @@ GridWidget::~GridWidget()
 void GridWidget::paintEvent([[maybe_unused]] QPaintEvent *event)
 {
     QPainter painter{this};
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setWindow(0, 0, int(width() * (d_zoom)), int(height() * (d_zoom)));
+    painter.fillRect(0, 0, (width() * d_zoom) + 1,  int(height() * d_zoom) + 1, QBrush{Qt::white});
 
-    painter.fillRect(0, 0, width(), height(), QBrush{Qt::white});
-    
-    emit paint_ground_layer(painter, size(), d_offset, d_mouse_old);
-    emit paint_player_layer(painter, size(), d_offset, d_mouse_old);
-    emit paint_entity_layer(painter, size(), d_offset, d_mouse_old);
-    emit paint_mouse_layer(painter, size(), d_offset, d_mouse_old);
+    emit paint_ground_layer(painter, size() * d_zoom, d_offset, d_mouse_old);
+    emit paint_player_layer(painter, size() * d_zoom, d_offset, d_mouse_old);
+    emit paint_entity_layer(painter, size() * d_zoom, d_offset, d_mouse_old);
+    emit paint_mouse_layer(painter, size() * d_zoom, d_offset, d_mouse_old);
 
     // Paint currently happening things
     if (d_left_button)
@@ -100,7 +102,7 @@ QPoint GridWidget::snap_to_grid(QPoint const &point, bool round)
 
 QPoint GridWidget::world_pos(QPoint const &point)
 {
-    return QPoint{point.x() - d_offset.x(), point.y() - d_offset.y()};
+    return QPoint{int((point.x() + 0.5) * d_zoom) - d_offset.x(), int((point.y() + 0.5) * d_zoom) - d_offset.y()};
 }
 
 
@@ -218,4 +220,14 @@ void GridWidget::mouseReleaseEvent(QMouseEvent *event)
 
         default: break;
     }
+}
+
+
+void GridWidget::wheelEvent(QWheelEvent *event)
+{
+    int steps = event->angleDelta().y() / (8 * 15);
+
+    d_zoom -= steps * 0.1;
+    d_zoom = qMax(0.5f, qMin(2.0f, d_zoom));
+    update();
 }

@@ -18,6 +18,7 @@ class GridWidget : public QWidget
     Q_OBJECT
 
     // drawing stuff
+    float d_zoom;
     QPoint d_offset;
     QColor d_draw_color;
 
@@ -52,8 +53,10 @@ class GridWidget : public QWidget
         void mouseMoveEvent(QMouseEvent *event) override;
         void mousePressEvent(QMouseEvent *event) override;
         void mouseReleaseEvent(QMouseEvent *event) override;
+        void wheelEvent(QWheelEvent *event) override;
 
     signals:
+        void debug_message(QString const &message);
         void grid_player_move(QPoint const &point);
         void grid_line_drawn(QVector<QLine> const &line, QColor const &color);
 

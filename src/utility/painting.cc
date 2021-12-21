@@ -20,7 +20,7 @@ void paint_player(QPainter &painter, QPixmap const &pixmap, GridScale size, QPoi
     int dims = 64 * scale(size) - 8;
     painter.translate(offset);
     painter.drawPixmap({pos.x() + 4, pos.y() + 4, dims, dims}, pixmap);
-    painter.resetTransform();
+    painter.translate(-offset);
 }
 
 
@@ -33,7 +33,7 @@ void paint_line(QPainter &painter, QVector<QLine> const &lines, QColor color, QP
     painter.setPen(pen);
 
     painter.drawLines(lines);
-    painter.resetTransform();
+    painter.translate(-offset);
 }
 
 
@@ -64,7 +64,7 @@ void paint_rect_around_line(QPainter &painter, QVector<QLine> const &lines, QCol
     painter.setPen(pen);
 
     painter.drawRect(min_x, min_y, max_x - min_x, max_y - min_y);
-    painter.resetTransform();
+    painter.translate(-offset);
 }
 
 
@@ -79,5 +79,5 @@ void paint_rect_around_pixmap(QPainter &painter, QPoint const &pos, GridScale si
     painter.setPen(pen);
     painter.translate(offset);
     painter.drawRect(pos.x(), pos.y(), dims, dims);
-    painter.resetTransform();
+    painter.translate(-offset);
 }
