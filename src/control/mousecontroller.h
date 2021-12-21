@@ -18,6 +18,8 @@ class MouseController : public QObject
     Q_OBJECT
     
     // dimensions
+    float d_zoom;
+    QSize d_widget_size;
     QSize d_grid_size;
     QPoint d_grid_offset;
 
@@ -36,7 +38,7 @@ class MouseController : public QObject
 
         // utility
         void reset_offset();
-        void grid_resized(int width, int height);
+        void grid_resized(QSize const &size);
         QPoint world_position(QPoint const &point);
         QPoint snap_to_grid(QPoint const &point, bool round = true);
 
@@ -44,15 +46,22 @@ class MouseController : public QObject
         QSize const &grid_size();
         QPoint const &grid_offset();
 
+        // setters
+        void set_entity_mode(bool entity_mode);
+        void set_mouse_mode(MouseMode mouse_mode);
+
         // events
         void mouse_press_event(QMouseEvent *event);
         void mouse_release_event(QMouseEvent *event);
         void mouse_move_event(QMouseEvent *event);
         void mouse_wheel_event(QWheelEvent *event);
 
+        // graphics
+        void regenerate_ortho();
+
     signals:
         void debug_message(QString const &message);
-        void ortho_changed(int x, int y, int width, int height);
+        void ortho_changed(int left, int right, int bottom, int top);
 };
 
 #endif

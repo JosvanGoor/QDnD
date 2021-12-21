@@ -32,7 +32,6 @@ class EntityManager : public QObject
         void on_entities_synchronized(QJsonObject const &obj);
 
     signals:
-        void update_grid();
         void pixmap_required(QString const &key);
 };
 

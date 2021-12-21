@@ -14,15 +14,15 @@ Player::Player(QString const &id, QString const &key, QColor const &col, GridSca
     d_position(0, 0),
     d_avatar_key(key),
     d_scale(size),
-    d_lines()
-{
-
-}
+    d_lines(),
+    d_lines_mesh(nullptr)
+{ }
 
 
 Player::~Player()
 {
-
+    if (d_lines_mesh)
+        delete d_lines_mesh;
 }
 
 
@@ -76,6 +76,12 @@ void Player::set_position(QPoint const &pos)
 }
 
 
+void Player::set_line_mesh(StaticMesh<2, 3, 0> *mesh)
+{
+    d_lines_mesh = mesh;
+}
+
+
 ////////////////////
 //     Lines      //
 ////////////////////
@@ -99,6 +105,37 @@ void Player::clear_lines()
 }
 
 
+void Player::render_lines()
+{
+    d_lines_mesh->render(GL_LINES);
+}
+
+
+void Player::regenerate_line_mesh()
+{
+    QVector<float> mesh;
+
+    for (auto &line : d_lines)
+    {
+        if (line.points.isEmpty())
+            continue;
+        float r = line.color.redF();
+        float g = line.color.greenF();
+        float b = line.color.blueF();
+        for (int idx = 0; idx < (line.points.size() - 1); ++idx)
+        {
+            mesh +=
+            {
+                float(line.points[idx].x()), float(line.points[idx].y()),           r, g, b,
+                float(line.points[idx + 1].x()), float(line.points[idx + 1].y()),   r, g, b,
+            };
+        }
+    }
+
+    d_lines_mesh->update(mesh);
+}
+
+
 ////////////////////
 //   Serialize    //
 ////////////////////
@@ -113,41 +150,4 @@ QJsonObject Player::serialize() const noexcept
     obj["x"] = d_position.x();
     obj["y"] = d_position.y();
     return obj;
-}
-
-
-QJsonArray Player::serialize_lines() const noexcept
-{
-    QJsonArray arr;
-
-    for (auto it = d_lines.begin(); it != d_lines.end(); ++it)
-    {
-        QJsonArray points;
-        for (int idx = 0; idx < it.value().line.size(); ++idx)
-        {
-            QJsonObject point;
-            point["x"] = it.value().line[idx].x1();
-            point["y"] = it.value().line[idx].y1();
-            points.push_back(points);
-        }
-
-        // we take only start points of individual lines, since they match the
-        // previous bit's end point. But of course then we need to take
-        // the end for the last one or we are 1 short!
-        if (!it.value().line.isEmpty())
-        {
-            QJsonObject point;
-            point["x"] = it.value().line.back().x2();
-            point["y"] = it.value().line.back().y2();
-            points.push_back(points);
-        }
-
-        QJsonObject obj;
-        obj["name"] = it.key();
-        obj["color"] = QString::number(it.value().color.rgb(), 16);
-        obj["points"] = points;
-        arr.push_back(obj);
-    }
-
-    return arr;
 }

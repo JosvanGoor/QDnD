@@ -25,19 +25,11 @@ QJsonDocument synchronize_lines_message(QString const &id, QMap<QString, DrawLin
     for (auto it = lines.begin(); it != lines.end(); ++it)
     {
         QJsonArray line;
-        for (auto &pt : it.value().line)
+        for (auto &pt : it.value().points)
         {
             QJsonObject obj;
-            obj["x"] = pt.x1();
-            obj["y"] = pt.y1();
-            line.push_back(obj);
-        }
-
-        if (!it.value().line.isEmpty())
-        {
-            QJsonObject obj;
-            obj["x"] = it.value().line.back().x2();
-            obj["y"] = it.value().line.back().y2();
+            obj["x"] = pt.x();
+            obj["y"] = pt.y();
             line.push_back(obj);
         }
 

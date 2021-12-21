@@ -46,7 +46,6 @@ class PlayerControl : public QObject
         void on_lines_cleared(QString const &id);
 
     signals:
-        void update_grid();
         void debug_message(QString const &message);
         // server only
         void trigger_synchronization(QString const &identifier);

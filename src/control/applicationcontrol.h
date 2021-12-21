@@ -87,9 +87,11 @@ class ApplicationControl : public QObject
         // server only slots
         void pixmap_requested(QString const &id, QString const &key);
         void on_trigger_synchronization(QString const &identifier);
+
+        // rendering
+        void on_render_player_lines();
         
     signals:
-        void update_grid();
         void debug_message(QString const &key);
 
 };

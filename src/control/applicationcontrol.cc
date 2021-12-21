@@ -31,34 +31,26 @@ ApplicationControl::~ApplicationControl()
 void ApplicationControl::create_default_connections()
 {
     QObject::connect(this, &ApplicationControl::debug_message, &d_main_window, &MainWindow::debug_message);
-    // QObject::connect(this, &ApplicationControl::update_grid, d_main_window.grid_widget(), &GridWidget::request_render_update);
     QObject::connect(d_main_window.spells_widget(), &SpellsWidget::selection_changed, this, &ApplicationControl::on_spell_selection);
     QObject::connect(d_main_window.menu_bar()->host(), &QAction::triggered, this, &ApplicationControl::start_hosting);
     QObject::connect(d_main_window.menu_bar()->connect(), &QAction::triggered, this, &ApplicationControl::connect_to_host);
     QObject::connect(d_main_window.menu_bar()->update_display(), &QAction::triggered, this, &ApplicationControl::display_update_clicked);    
     QObject::connect(d_main_window.chat_widget(), &ChatWidget::message_entered, this, &ApplicationControl::chat_entered);
 
-    // QObject::connect(&d_entity_manager, &EntityManager::update_grid, d_main_window.grid_widget(), &GridWidget::request_render_update);
     QObject::connect(&d_entity_manager, &EntityManager::pixmap_required, this, &ApplicationControl::on_pixmap_required);
 
     QObject::connect(&d_player_control, &PlayerControl::pixmap_required, this, &ApplicationControl::on_pixmap_required);
     QObject::connect(&d_player_control, &PlayerControl::player_connected, this, &ApplicationControl::on_player_connected);
     QObject::connect(&d_player_control, &PlayerControl::player_disconnected, this, &ApplicationControl::on_player_disconnected);
     QObject::connect(&d_player_control, &PlayerControl::debug_message, &d_main_window, &MainWindow::debug_message);
-    // QObject::connect(&d_player_control, &PlayerControl::update_grid, d_main_window.grid_widget(), &GridWidget::request_render_update);
 
     QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::lines_cleared, this, &ApplicationControl::on_grid_delete_all_lines);
     QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::lines_removed, this, &ApplicationControl::on_grid_delete_lines);
     QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::line_selection_changed, this, &ApplicationControl::on_grid_line_selection);
-//     QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_ground_layer, this, &ApplicationControl::on_paint_ground_layer);
-//     QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_player_layer, this, &ApplicationControl::on_paint_player_layer);
-//     QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_entity_layer, this, &ApplicationControl::on_paint_entity_layer);
-//     QObject::connect(d_main_window.grid_widget(), &GridWidget::paint_mouse_layer, this, &ApplicationControl::on_paint_mouse_layer);
-//     QObject::connect(d_main_window.grid_widget(), &GridWidget::grid_player_move, this, &ApplicationControl::on_grid_player_move);
-//     QObject::connect(d_main_window.grid_widget(), &GridWidget::grid_line_drawn, this, &ApplicationControl::on_grid_line_drawn);
     QObject::connect(d_main_window.grid_widget(), &GridWidget::debug_message, &d_main_window, &MainWindow::debug_message);
     QObject::connect(&d_main_window.grid_widget()->mouse_controller(), &MouseController::debug_message, &d_main_window, &MainWindow::debug_message);
 
+    QObject::connect(d_main_window.grid_widget(), &GridWidget::render_player_lines, this, &ApplicationControl::on_render_player_lines);
 }
 
 
@@ -218,7 +210,6 @@ void ApplicationControl::on_player_connected(Player const &player)
         d_main_window.players_widget()->add_user(player.identifier(), player.avatar_key(), player.color());
 
     d_main_window.chat_widget()->on_info_message(player.identifier() + " has joined the game.");
-    emit update_grid();
 }
 
 
@@ -227,7 +218,6 @@ void ApplicationControl::on_player_disconnected(QString const &id)
     debug_message("Player disconnected: " + id);
     d_main_window.players_widget()->remove_user(id);
     d_main_window.chat_widget()->on_info_message(id + " has left.");
-    emit update_grid();
 }
 
 
@@ -262,23 +252,20 @@ void ApplicationControl::on_line_sync(QJsonObject const &obj)
         QString name = object.toObject()["name"].toString();
         QColor color = static_cast<unsigned int>(object.toObject()["color"].toInt());
         QJsonArray line = object.toObject()["points"].toArray();
-        QVector<QLine> lines;
+        QVector<QPoint> lines;
         for (int idx = 0; idx < (line.size() - 1); ++idx)
         {
             QPoint p1 = {line[idx].toObject()["x"].toInt(), line[idx].toObject()["y"].toInt()};
-            QPoint p2 = {line[idx + 1].toObject()["x"].toInt(), line[idx + 1].toObject()["y"].toInt()};
-            lines.push_back({p1, p2});
+            lines.push_back(p1);
         }
 
         player.add_line(name, {color, lines});
     }
-
-    update_grid();
 }
 
 void ApplicationControl::on_pixmap_received([[maybe_unused]] QString const &key, [[maybe_unused]] QPixmap const &pixmap)
 {
-    update_grid();
+    // ??
 }
 
 
@@ -294,7 +281,7 @@ void ApplicationControl::on_grid_line_drawn(QVector<QLine> const &lines, QColor 
     QString id = d_player_control.own_identifier();
     QString name = d_player_control.unique_name();
     d_connection->send(line_drawn_message(id, name, lines, color));
-    // d_main_window.grid_control_widget()->register_line(name);
+    d_main_window.grid_control_widget()->register_line(name);
 }
 
 
@@ -321,7 +308,6 @@ void ApplicationControl::on_grid_delete_lines(QVector<QString> const &lines)
 void ApplicationControl::on_grid_line_selection(QSet<QString> const &lines)
 {
     d_line_selection = lines;
-    update_grid();
 }
 
 
@@ -367,7 +353,6 @@ void ApplicationControl::on_host_entities_cleared()
 void ApplicationControl::on_host_entities_selection(QSet<QString> const &names)
 {
     d_entity_selection = names;
-    update_grid();
 }
 
 
@@ -464,4 +449,15 @@ void ApplicationControl::on_trigger_synchronization(QString const &id)
 
     if (!d_entity_manager.entities().isEmpty())
         reinterpret_cast<ServerConnection*>(d_connection)->queue_message(id, synchronize_entities_message(d_entity_manager.entities()).toJson());
+}
+
+
+////////////////////
+//    Rendering   //
+////////////////////
+
+void ApplicationControl::on_render_player_lines()
+{
+    for (auto &player : d_player_control.players())
+        player.render_lines();
 }

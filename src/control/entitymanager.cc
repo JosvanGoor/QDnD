@@ -20,7 +20,6 @@ EntityManager::~EntityManager()
 void EntityManager::clear()
 {
     d_entities.clear();
-    emit update_grid();
 }
 
 
@@ -42,7 +41,6 @@ void EntityManager::on_entity_added(QJsonObject const &obj)
 
     d_entities[name] = Entity{avatar, pos};
     emit pixmap_required(avatar);
-    update_grid();
 }
 
 
@@ -55,15 +53,12 @@ void EntityManager::on_entities_removed(QJsonObject const &obj)
         if (auto it = d_entities.find(entity.toString()); it != d_entities.end())
             d_entities.erase(it);
     }
-
-    emit update_grid();
 }
 
 
 void EntityManager::on_entities_cleared()
 {
     d_entities.clear();
-    emit update_grid();
 }
 
 
@@ -77,8 +72,6 @@ void EntityManager::on_entities_moved(QJsonObject const &obj)
         if (auto it = d_entities.find(entity.toString()); it != d_entities.end())
             it.value().set_postion(pos);
     }
-
-    update_grid();
 }
 
 
@@ -98,6 +91,4 @@ void EntityManager::on_entities_synchronized(QJsonObject const &obj)
         (d_entities[name] = Entity{avatar, pos}).set_scale(scale);
         emit pixmap_required(avatar);
     }
-
-    update_grid();
 }
