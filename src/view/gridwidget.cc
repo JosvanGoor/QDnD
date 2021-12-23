@@ -124,8 +124,8 @@ void GridWidget::mouseMoveEvent(QMouseEvent *event)
     
     if (d_right_button)
     {
-        d_offset.setX(d_offset.x() + dx);
-        d_offset.setY(d_offset.y() + dy);
+        d_offset.setX(d_offset.x() + (dx * d_zoom));
+        d_offset.setY(d_offset.y() + (dy * d_zoom));
     }
 
     if (d_left_button)
