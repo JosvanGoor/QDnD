@@ -75,10 +75,9 @@ class ApplicationControl : public QObject
         void on_grid_delete_all_lines();
 
         // host entity control
-        void on_host_entity_added(QString const &name, QString const &filename);
-        void on_host_entities_removed(QVector<QString> const &entities);
-        void on_host_entities_cleared();
-        void on_host_entities_selection(QSet<QString> const &names);
+        void on_entity_added(QString const &name, QString const &filename, GridScale scale);
+        void on_entities_removed(QVector<QString> const &entities);
+        void on_entities_selection(QSet<QString> const &names);
 
         // misc
         void chat_entered(QString const &chat);

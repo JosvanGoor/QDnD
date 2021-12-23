@@ -47,6 +47,10 @@ void ApplicationControl::create_default_connections()
     QObject::connect(&d_player_control, &PlayerControl::debug_message, &d_main_window, &MainWindow::debug_message);
     QObject::connect(&d_player_control, &PlayerControl::update_grid, d_main_window.grid_widget(), &GridWidget::request_render_update);
 
+    QObject::connect(d_main_window.entity_widget(), &EntityWidget::add_entity, this, &ApplicationControl::on_entity_added);
+    QObject::connect(d_main_window.entity_widget(), &EntityWidget::delete_entities, this, &ApplicationControl::on_entities_removed);
+    QObject::connect(d_main_window.entity_widget(), &EntityWidget::entity_selection, this, &ApplicationControl::on_entities_selection);
+
     QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::lines_cleared, this, &ApplicationControl::on_grid_delete_all_lines);
     QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::lines_removed, this, &ApplicationControl::on_grid_delete_lines);
     QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::line_selection_changed, this, &ApplicationControl::on_grid_line_selection);
@@ -89,7 +93,7 @@ void ApplicationControl::reset()
     d_player_control.clear();
     d_pixmap_cache.clear();
     d_entity_manager.clear();
-    d_main_window.unload_entity_widget();
+    d_main_window.entity_widget()->set_name_prefix("");
 }
 
 
@@ -113,6 +117,8 @@ bool ApplicationControl::verify_close_connection()
     d_connection->deleteLater();
     QObject::disconnect(&d_player_control, &PlayerControl::trigger_synchronization, this, &ApplicationControl::on_trigger_synchronization);
     QObject::disconnect(d_connection, &ConnectionBase::pixmap_requested, this, &ApplicationControl::pixmap_requested);
+    QObject::disconnect(d_main_window.entity_widget(), &EntityWidget::add_entity, this, &ApplicationControl::on_entity_added);
+    
     d_connection = nullptr;
     return true;
 }
@@ -127,14 +133,10 @@ void ApplicationControl::start_hosting()
 
     TransferableImage dm_ava = d_pixmap_cache.load_from_file(":/data/dmpic.png");
     d_player_control.create_dungeon_master(dm_ava.name);
-    d_main_window.load_entity_widget();
+    // d_main_window.load_entity_widget();
 
     QObject::connect(&d_player_control, &PlayerControl::trigger_synchronization, this, &ApplicationControl::on_trigger_synchronization);
     QObject::connect(d_connection, &ConnectionBase::pixmap_requested, this, &ApplicationControl::pixmap_requested);
-    QObject::connect(d_main_window.entity_widget(), &EntityWidget::delete_all_entities, this, &ApplicationControl::on_host_entities_cleared);
-    QObject::connect(d_main_window.entity_widget(), &EntityWidget::delete_entities, this, &ApplicationControl::on_host_entities_removed);
-    QObject::connect(d_main_window.entity_widget(), &EntityWidget::add_entity, this, &ApplicationControl::on_host_entity_added);
-    QObject::connect(d_main_window.entity_widget(), &EntityWidget::entity_selection, this, &ApplicationControl::on_host_entities_selection);
 
     set_connectionbase_signals();
     d_connection->connect("", 4144);
@@ -157,9 +159,8 @@ void ApplicationControl::connect_to_host()
     set_connectionbase_signals();
 
     d_connection->connect(dialog.hostname(), dialog.port());
-    
-    // TODO: add extra settings to connection dialog
     d_player_control.set_own_identifier(dialog.character_name());
+    d_main_window.entity_widget()->set_name_prefix(d_player_control.own_identifier());
     TransferableImage avatar = d_pixmap_cache.load_from_file(dialog.avatar_file());
     debug_message("My avatar hash: " + avatar.name);
     d_connection->send(handshake_message(dialog.character_name(), avatar.b64_data, Qt::black, GridScale::MEDIUM));
@@ -301,10 +302,10 @@ void ApplicationControl::on_grid_player_move(QPoint const &point)
     if (!d_connection)
         return;
 
-    if (!d_connection->is_server())
-        d_connection->send(player_move_message(d_player_control.own_identifier(), point));
-    else if (!d_entity_selection.isEmpty())
+    if (!d_entity_selection.isEmpty())
         d_connection->send(entities_moved_message(d_entity_selection, point));
+    else if (!d_connection->is_server())
+        d_connection->send(player_move_message(d_player_control.own_identifier(), point));
 }
 
 
@@ -339,30 +340,30 @@ void ApplicationControl::on_grid_delete_all_lines()
 
 
 ////////////////////
-//  Host Entity   //
+//     Entity     //
 ////////////////////
 
-void ApplicationControl::on_host_entity_added(QString const &name, QString const &filename)
+void ApplicationControl::on_entity_added(QString const &name, QString const &filename, GridScale scale)
 {
+    if (!d_connection)
+        return;
+
     TransferableImage avatar = d_pixmap_cache.load_from_file(filename);
-    QPoint initial_location{-1'000'000, -1'000'000}; // far away / out of sight
-    d_connection->send(entity_added_message(name, avatar.name, initial_location));
+
+    if (d_connection->is_server())
+        d_connection->send(entity_added_message(name, avatar.name, {-1'000'000, -1'000'000}, scale));
+    else
+        d_connection->send(player_entity_added_message(name, avatar.b64_data, {0, 0}, scale));
 }
 
 
-void ApplicationControl::on_host_entities_removed(QVector<QString> const &entities)
+void ApplicationControl::on_entities_removed(QVector<QString> const &entities)
 {
     d_connection->send(entities_removed_message(entities));
 }
 
 
-void ApplicationControl::on_host_entities_cleared()
-{
-    d_connection->send(entities_cleared_message());
-}
-
-
-void ApplicationControl::on_host_entities_selection(QSet<QString> const &names)
+void ApplicationControl::on_entities_selection(QSet<QString> const &names)
 {
     d_entity_selection = names;
     update_grid();

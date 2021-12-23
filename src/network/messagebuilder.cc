@@ -199,7 +199,21 @@ QJsonDocument player_move_message(QString const &id, QPoint const &newpos)
     return QJsonDocument{obj};
 }
 
-QJsonDocument entity_added_message(QString const &name, QString const &avatar_key, QPoint const &position)
+
+QJsonDocument player_entity_added_message(QString const &id, QByteArray const &b64_img, QPoint const &position, GridScale size)
+{
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::PLAYER_ENTITY_ADDED);
+    obj["name"] = id;
+    obj["avatar"] = QString{b64_img};
+    obj["x"] = position.x();
+    obj["y"] = position.y();
+    obj["scale"] = as_int(size);
+    return QJsonDocument{obj};
+}
+
+
+QJsonDocument entity_added_message(QString const &name, QString const &avatar_key, QPoint const &position, GridScale scale)
 {
     QJsonObject obj;
     obj["type"] = as_int(MessageType::ENTITY_ADDED);
@@ -207,6 +221,7 @@ QJsonDocument entity_added_message(QString const &name, QString const &avatar_ke
     obj["avatar"] = avatar_key;
     obj["x"] = position.x();
     obj["y"] = position.y();
+    obj["scale"] = as_int(scale);
     return QJsonDocument{obj};
 }
 

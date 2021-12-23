@@ -33,6 +33,8 @@ MainWindow::MainWindow(QWidget *parent)
     setMenuBar(d_menu_bar = new MenuBar);
     setStatusBar(d_status_bar = new StatusBar);
 
+    load_entity_widget();
+
     resize(1600, 900);
 }
 

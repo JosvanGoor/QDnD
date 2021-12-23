@@ -13,7 +13,7 @@ EntityWidget::EntityWidget(QWidget *parent)
     d_entity_widget->setLayout(new QVBoxLayout);
     d_entity_widget->layout()->addWidget(d_entity_list = new QListWidget);
     d_entity_widget->layout()->addWidget(d_delete_entities = new QPushButton{"Delete Selected"});
-    d_entity_widget->layout()->addWidget(d_clear_entities = new QPushButton{"Clear Entities"});
+    // d_entity_widget->layout()->addWidget(d_clear_entities = new QPushButton{"Clear Entities"});
 
     d_adder_buttons = new QWidget;
     d_adder_buttons->setLayout(new QHBoxLayout);
@@ -28,10 +28,13 @@ EntityWidget::EntityWidget(QWidget *parent)
     aligning_widget->layout()->addWidget(d_pixmap_drop = new DropWidget);
     
     QWidget *form_widget = new QWidget;
-    form_widget->setLayout(new QHBoxLayout);
-    form_widget->layout()->addWidget(new QLabel{"Entity Name:"});
-    form_widget->layout()->addWidget(d_entity_name = new QLineEdit);
-    
+    QFormLayout *form_layout = new QFormLayout;
+    form_widget->setLayout(form_layout);
+    form_layout->addRow("Name", d_entity_name = new QLineEdit);
+    form_layout->addRow("Size", d_entity_size = new QComboBox);
+    d_entity_size->addItems({"Tiny", "Small", "Medium", "Large", "Huge", "Gargantuan"});
+    d_entity_size->setCurrentIndex(2);
+
     d_adder_widget->layout()->addWidget(aligning_widget);
     d_adder_widget->layout()->addWidget(form_widget);
     d_adder_widget->layout()->addWidget(d_adder_buttons);
@@ -45,7 +48,7 @@ EntityWidget::EntityWidget(QWidget *parent)
     layout()->addWidget(d_adder_widget);
 
     QObject::connect(d_delete_entities, &QPushButton::pressed, this, &EntityWidget::on_delete_entities);
-    QObject::connect(d_clear_entities, &QPushButton::pressed, this, &EntityWidget::on_clear_entities);
+    // QObject::connect(d_clear_entities, &QPushButton::pressed, this, &EntityWidget::on_clear_entities);
     QObject::connect(d_add_entity, &QPushButton::pressed, this, &EntityWidget::on_add_entity);
     QObject::connect(d_select_file, &QPushButton::pressed, this, &EntityWidget::on_select_file);
     QObject::connect(d_pixmap_drop, &DropWidget::pixmap_dropped, this, &EntityWidget::on_file_dropped);
@@ -56,6 +59,12 @@ EntityWidget::EntityWidget(QWidget *parent)
 EntityWidget::~EntityWidget()
 {
 
+}
+
+
+void EntityWidget::set_name_prefix(QString const &str)
+{
+    d_name_prefix = str;
 }
 
 
@@ -81,21 +90,16 @@ void EntityWidget::on_delete_entities()
 }
 
 
-void EntityWidget::on_clear_entities()
-{
-    d_entity_list->clear();
-    emit delete_all_entities();
-}
-
-
 void EntityWidget::on_add_entity()
 {
     if (d_pixmap_filename.isEmpty())
         return;
 
-    QString name = d_entity_name->text() + " " + QString::number(d_unique_number++);
+    QString name = d_name_prefix + d_entity_name->text() + " " + QString::number(d_unique_number++);
     d_entity_list->addItem(name);
-    emit add_entity(name, d_pixmap_filename);
+    GridScale scale = static_cast<GridScale>(d_entity_size->currentIndex());
+
+    emit add_entity(name, d_pixmap_filename, scale);
 }
 
 

@@ -46,6 +46,7 @@ enum class MessageType
 
     // entity control
     PLAYER_MOVED,
+    PLAYER_ENTITY_ADDED,
     ENTITY_ADDED,
     ENTITIES_MOVED,
     ENTITIES_REMOVED,

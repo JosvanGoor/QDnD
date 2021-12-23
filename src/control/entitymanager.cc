@@ -39,8 +39,10 @@ void EntityManager::on_entity_added(QJsonObject const &obj)
     QString name = obj["name"].toString();
     QString avatar = obj["avatar"].toString();
     QPoint pos{obj["x"].toInt(), obj["y"].toInt()};
+    GridScale scale = static_cast<GridScale>(obj["scale"].toInt());
 
     d_entities[name] = Entity{avatar, pos};
+    d_entities[name].set_scale(scale);
     emit pixmap_required(avatar);
     update_grid();
 }

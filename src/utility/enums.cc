@@ -9,7 +9,7 @@ float scale(GridScale scale)
     switch (scale)
     {
         case GridScale::TINY: return 0.25f;
-        case GridScale::SMALL: return 1.0f;
+        case GridScale::SMALL: return 0.5f;
         case GridScale::MEDIUM: return 1.0f;
         case GridScale::LARGE: return 2.0f;
         case GridScale::HUGE: return 3.0f;
@@ -76,6 +76,7 @@ QString as_string(MessageType type)
         case MessageType::DISPLAY_UPDATE:       return "DISPLAY_UPDATE";
 
         case MessageType::PLAYER_MOVED:         return "PLAYER_MOVED";
+        case MessageType::PLAYER_ENTITY_ADDED:  return "PLAYER_ENTITY_ADDED";
         case MessageType::ENTITY_ADDED:         return "ENTITY_ADDED";
         case MessageType::ENTITIES_MOVED:       return "ENTITIES_MOVED";
         case MessageType::ENTITIES_REMOVED:     return "ENTITIES_REMOVED";

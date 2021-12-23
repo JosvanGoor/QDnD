@@ -35,7 +35,8 @@ QJsonDocument display_update_message(QString const &key);
 
 // entity control
 QJsonDocument player_move_message(QString const &id, QPoint const &newpos);
-QJsonDocument entity_added_message(QString const &id, QString const &avatar_key, QPoint const &position);
+QJsonDocument player_entity_added_message(QString const &id, QByteArray const &b64_img, QPoint const &position, GridScale size);
+QJsonDocument entity_added_message(QString const &id, QString const &avatar_key, QPoint const &position, GridScale size);
 QJsonDocument entities_moved_message(QSet<QString> const &names, QPoint const &newpos);
 QJsonDocument entities_removed_message(QVector<QString> const &names);
 QJsonDocument entities_cleared_message();

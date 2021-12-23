@@ -125,6 +125,18 @@ void ServerConnection::pre_handle_message(QJsonDocument const &doc, SocketState 
         }
         return;
 
+        case MessageType::PLAYER_ENTITY_ADDED:
+        {
+            QString avatar_key = b64_pixmap_hash(obj["avatar"].toString().toLocal8Bit());
+            QPixmap avatar_pixmap = pixmap_from_b64(obj["avatar"].toString().toLocal8Bit());
+            emit pixmap_received(avatar_key, avatar_pixmap);
+            obj["avatar"] = avatar_key;
+            obj["type"] = as_int(MessageType::ENTITY_ADDED);
+            dispatch(QJsonDocument{obj}.toJson());
+            emit entity_added(obj);
+        }
+        return;
+
         default: break;
     }
 
