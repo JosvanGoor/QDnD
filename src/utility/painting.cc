@@ -17,9 +17,15 @@ void paint_grid(QPainter &painter, QSize size, QPoint offset)
 
 void paint_player(QPainter &painter, QPixmap const &pixmap, GridScale size, QPoint pos, QPoint offset)
 {
-    int dims = 64 * scale(size) - 8;
+    int dims = 64 * scale(size);
+    int local_offset = 4;
+    if (dims < 64)
+        local_offset = (64 - dims) / 2;
+    else
+        dims -= 8;
+
     painter.translate(offset);
-    painter.drawPixmap({pos.x() + 4, pos.y() + 4, dims, dims}, pixmap);
+    painter.drawPixmap({pos.x() + local_offset, pos.y() + local_offset, dims, dims}, pixmap);
     painter.translate(-offset);
 }
 
