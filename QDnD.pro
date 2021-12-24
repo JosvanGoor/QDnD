@@ -36,6 +36,7 @@ SOURCES +=  src/control/applicationcontrol.cc \
             \
             src/utility/enums.cc \
             src/utility/htmlformatting.cc \
+            src/utility/jsonconversion.cc \
             src/utility/loading.cc \
             src/utility/painting.cc \
             \
@@ -79,6 +80,7 @@ HEADERS +=  src/control/applicationcontrol.h \
             \
             src/utility/enums.h \
             src/utility/htmlformatting.h \
+            src/utility/jsonconversion.h \
             src/utility/loading.h \
             src/utility/painting.h \
             \

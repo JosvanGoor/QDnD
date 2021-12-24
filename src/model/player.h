@@ -56,7 +56,6 @@ class Player
 
         // serialize
         QJsonObject serialize() const noexcept;
-        QJsonArray serialize_lines() const noexcept;
 };
 
 #endif

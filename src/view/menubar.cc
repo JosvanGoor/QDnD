@@ -8,7 +8,12 @@ MenuBar::MenuBar(QWidget *parent)
 :   QMenuBar(parent)
 {
     addMenu(d_file = new QMenu{"File"});
+    d_file->addAction(d_load_lines = new QAction{"Load Lines"});
+    d_file->addAction(d_save_own_lines = new QAction{"Save Own Lines"});
+    d_file->addAction(d_save_all_lines = new QAction{"Save All Lines"});
+    d_file->addSeparator();
     d_file->addAction(d_update_display = new QAction{"Update Display"});
+    d_file->addSeparator();
     d_file->addAction(d_quit = new QAction{"Quit"});
 
     addMenu(d_connection = new QMenu{"Connection"});
@@ -16,36 +21,12 @@ MenuBar::MenuBar(QWidget *parent)
     d_connection->addAction(d_connect = new QAction{"Connect"});
     d_connection->addSeparator();
     d_connection->addAction(d_disconnect = new QAction{"Disconnect"});
-
-    d_display = nullptr;
-    // d_update_display = nullptr;
 }
 
 
 MenuBar::~MenuBar()
 {
 
-}
-
-
-////////////////////
-//    Getters     //
-////////////////////
-
-void MenuBar::add_server_menus()
-{
-    if (d_display)
-        return;
-
-    addMenu(d_display = new QMenu{"Display"});
-    d_display->addAction(d_update_display = new QAction{"Update Display"});
-}
-
-
-void MenuBar::remove_server_menus()
-{
-    delete d_display;
-    d_display = nullptr;
 }
 
 
@@ -76,7 +57,26 @@ QAction *MenuBar::disconnect()
     return d_disconnect;
 }
 
+
 QAction *MenuBar::update_display()
 {
     return d_update_display;
+}
+
+
+QAction *MenuBar::load_lines()
+{
+    return d_load_lines;
+}
+
+
+QAction *MenuBar::save_own_lines()
+{
+    return d_save_own_lines;
+}
+
+
+QAction *MenuBar::save_all_lines()
+{
+    return d_save_all_lines;
 }

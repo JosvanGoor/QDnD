@@ -116,38 +116,38 @@ QJsonObject Player::serialize() const noexcept
 }
 
 
-QJsonArray Player::serialize_lines() const noexcept
-{
-    QJsonArray arr;
+// QJsonArray Player::serialize_lines() const noexcept
+// {
+//     QJsonArray arr;
 
-    for (auto it = d_lines.begin(); it != d_lines.end(); ++it)
-    {
-        QJsonArray points;
-        for (int idx = 0; idx < it.value().line.size(); ++idx)
-        {
-            QJsonObject point;
-            point["x"] = it.value().line[idx].x1();
-            point["y"] = it.value().line[idx].y1();
-            points.push_back(points);
-        }
+//     for (auto it = d_lines.begin(); it != d_lines.end(); ++it)
+//     {
+//         QJsonArray points;
+//         for (int idx = 0; idx < it.value().line.size(); ++idx)
+//         {
+//             QJsonObject point;
+//             point["x"] = it.value().line[idx].x1();
+//             point["y"] = it.value().line[idx].y1();
+//             points.push_back(points);
+//         }
 
-        // we take only start points of individual lines, since they match the
-        // previous bit's end point. But of course then we need to take
-        // the end for the last one or we are 1 short!
-        if (!it.value().line.isEmpty())
-        {
-            QJsonObject point;
-            point["x"] = it.value().line.back().x2();
-            point["y"] = it.value().line.back().y2();
-            points.push_back(points);
-        }
+//         // we take only start points of individual lines, since they match the
+//         // previous bit's end point. But of course then we need to take
+//         // the end for the last one or we are 1 short!
+//         if (!it.value().line.isEmpty())
+//         {
+//             QJsonObject point;
+//             point["x"] = it.value().line.back().x2();
+//             point["y"] = it.value().line.back().y2();
+//             points.push_back(points);
+//         }
 
-        QJsonObject obj;
-        obj["name"] = it.key();
-        obj["color"] = QString::number(it.value().color.rgb(), 16);
-        obj["points"] = points;
-        arr.push_back(obj);
-    }
+//         QJsonObject obj;
+//         obj["name"] = it.key();
+//         obj["color"] = QString::number(it.value().color.rgb(), 16);
+//         obj["points"] = points;
+//         arr.push_back(obj);
+//     }
 
-    return arr;
-}
+//     return arr;
+// }

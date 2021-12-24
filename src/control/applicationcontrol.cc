@@ -35,7 +35,10 @@ void ApplicationControl::create_default_connections()
     QObject::connect(d_main_window.spells_widget(), &SpellsWidget::selection_changed, this, &ApplicationControl::on_spell_selection);
     QObject::connect(d_main_window.menu_bar()->host(), &QAction::triggered, this, &ApplicationControl::start_hosting);
     QObject::connect(d_main_window.menu_bar()->connect(), &QAction::triggered, this, &ApplicationControl::connect_to_host);
-    QObject::connect(d_main_window.menu_bar()->update_display(), &QAction::triggered, this, &ApplicationControl::display_update_clicked);    
+    QObject::connect(d_main_window.menu_bar()->update_display(), &QAction::triggered, this, &ApplicationControl::display_update_clicked);
+    QObject::connect(d_main_window.menu_bar()->load_lines(), &QAction::triggered, this, &ApplicationControl::load_lines);
+    QObject::connect(d_main_window.menu_bar()->save_own_lines(), &QAction::triggered, this, &ApplicationControl::save_own_lines);
+    QObject::connect(d_main_window.menu_bar()->save_all_lines(), &QAction::triggered, this, &ApplicationControl::save_all_lines);
     QObject::connect(d_main_window.chat_widget(), &ChatWidget::message_entered, this, &ApplicationControl::chat_entered);
 
     QObject::connect(&d_entity_manager, &EntityManager::update_grid, d_main_window.grid_widget(), &GridWidget::request_render_update);
@@ -492,6 +495,95 @@ void ApplicationControl::on_trigger_synchronization(QString const &id)
         reinterpret_cast<ServerConnection*>(d_connection)->queue_message(id, synchronize_entities_message(d_entity_manager.entities()).toJson());
 }
 
+
+////////////////////
+//  Save & Load   //
+////////////////////
+
+void ApplicationControl::save_own_lines()
+{
+    QString filename = QFileDialog::getSaveFileName(&d_main_window, "Select a Save Location");
+    if (filename.isEmpty())
+    {
+        debug_message("Nothing Saved.");
+        return;
+    }
+
+    Player &player = d_player_control.own_player();
+    QJsonArray lines;
+    for (auto it = player.lines().begin(); it != player.lines().end(); ++it)
+        lines.append(drawline_to_json(it.key(), it.value()));
+
+    QJsonObject obj;
+    obj["type"] = "LineStorage_QDND_1.0";
+    obj["lines"] = lines;
+    QJsonDocument document{obj};
+
+    QFile file{filename};
+    file.open(QIODevice::WriteOnly);
+    file.write(document.toJson(QJsonDocument::Compact));
+    file.close();
+}
+
+
+void ApplicationControl::save_all_lines()
+{
+    QString filename = QFileDialog::getSaveFileName(&d_main_window, "Select a Save Location");
+    if (filename.isEmpty())
+    {
+        debug_message("Nothing Saved.");
+        return;
+    }
+
+    QJsonArray lines;
+    for (auto &player : d_player_control.players())
+    {
+        for (auto it = player.lines().begin(); it != player.lines().end(); ++it)
+            lines.append(drawline_to_json(it.key(), it.value()));
+    }
+    
+    QJsonObject obj;
+    obj["type"] = "LineStorage_QDND_1.0";
+    obj["lines"] = lines;
+    QJsonDocument document{obj};
+
+    QFile file{filename};
+    file.open(QIODevice::WriteOnly);
+    file.write(document.toJson(QJsonDocument::Compact));
+    file.close();
+}
+
+
+void ApplicationControl::load_lines()
+{
+    if (!d_connection)
+        return;
+        
+    QString filename = QFileDialog::getOpenFileName(&d_main_window, "Select Line File");
+    if (filename.isEmpty())
+        return;
+
+    QFile file{filename};
+    file.open(QIODevice::ReadOnly);
+    QJsonDocument document = QJsonDocument::fromJson(file.readAll());
+
+    if (document["type"].toString() != "LineStorage_QDND_1.0")
+    {
+        debug_message("Invalid file!");
+        return;
+    }
+
+    QMap<QString, DrawLine> line_cache;
+    QJsonArray lines = document["lines"].toArray();
+    for (auto line : lines)
+    {
+        auto parsed = json_to_drawline(line.toObject());
+        line_cache["loaded." + parsed.first] = parsed.second;
+        d_main_window.grid_control_widget()->register_line("loaded." + parsed.first);
+    }
+
+    d_connection->send(synchronize_lines_message(d_player_control.own_identifier(), line_cache));
+}
 
 ////////////////////
 //    Painting    //

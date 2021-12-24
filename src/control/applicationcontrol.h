@@ -14,6 +14,7 @@
 #include "../network/clientconnection.h"
 #include "../network/connectionbase.h"
 #include "../network/serverconnection.h"
+#include "../utility/jsonconversion.h"
 #include "../utility/painting.h"
 #include "../view/connectdialog.h"
 #include "../view/mainwindow.h"
@@ -88,6 +89,11 @@ class ApplicationControl : public QObject
         // server only slots
         void pixmap_requested(QString const &id, QString const &key);
         void on_trigger_synchronization(QString const &identifier);
+
+        // saving & loading
+        void save_own_lines();
+        void save_all_lines();
+        void load_lines();
 
         // painting stuff
         void on_paint_ground_layer(QPainter &painter, QSize size, QPoint offset, QPoint mousepos);
