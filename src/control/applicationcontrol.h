@@ -29,15 +29,15 @@ class ApplicationControl : public QObject
     Q_OBJECT
 
     PixmapCache d_pixmap_cache;
+    QMap<QString, Spell> d_spells;
     EntityManager d_entity_manager;
     PlayerControl d_player_control;
     MainWindow d_main_window;
 
+    int d_local_angle; // for local entity rotation
+    QSet<QString> d_pixmap_requests;
     QSet<QString> d_line_selection;
     QSet<QString> d_entity_selection;
-
-    QMap<QString, Spell> d_spells;
-    QMap<QString, Entity> d_entities;
 
     ConnectionBase *d_connection;
 
@@ -78,6 +78,8 @@ class ApplicationControl : public QObject
         void on_entity_added(QString const &name, QString const &filename, GridScale scale);
         void on_entities_removed(QVector<QString> const &entities);
         void on_entities_selection(QSet<QString> const &names);
+        void on_entity_local_rotation(int angle);
+        void on_entity_rotation(int angle);
 
         // misc
         void chat_entered(QString const &chat);

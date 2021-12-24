@@ -35,6 +35,12 @@ bool PixmapCache::has_pixmap(QString const &name) const noexcept
 }
 
 
+void PixmapCache::placehold_pixmap(QString const &name)
+{
+    d_pixmaps[name] = d_missing_texture;
+}
+
+
 void PixmapCache::put_pixmap(QString const &name, QPixmap const &pixmap)
 {
     d_pixmaps[name] = pixmap;

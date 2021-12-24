@@ -15,7 +15,7 @@ class Entity
 
     public:
         Entity();
-        Entity(QString const &avatar, QPoint const &position);
+        Entity(QString const &avatar, QPoint const &position, GridScale scale = GridScale::MEDIUM, int rotation = 0);
 
         // Set/Get
         QString const &avatar() const;

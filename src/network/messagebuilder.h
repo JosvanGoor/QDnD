@@ -40,6 +40,7 @@ QJsonDocument entity_added_message(QString const &id, QString const &avatar_key,
 QJsonDocument entities_moved_message(QSet<QString> const &names, QPoint const &newpos);
 QJsonDocument entities_removed_message(QVector<QString> const &names);
 QJsonDocument entities_cleared_message();
+QJsonDocument entities_rotated_message(QSet<QString> const &names, int angle);
 
 // lines
 QJsonDocument line_drawn_message(QString const &id, QString const &name, QVector<QLine> const &lines, QColor const &color);

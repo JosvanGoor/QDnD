@@ -7,6 +7,7 @@
 #include <QLineEdit>
 #include <QListWidget>
 #include <QPushButton>
+#include <QSlider>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QFileDialog>
@@ -21,6 +22,7 @@ class EntityWidget : public QWidget
     QGroupBox *d_entity_widget;
         QListWidget *d_entity_list;
         QPushButton *d_delete_entities;
+        QSlider *d_entity_rotation;
 
     QGroupBox *d_adder_widget;
         DropWidget *d_pixmap_drop;
@@ -47,10 +49,16 @@ class EntityWidget : public QWidget
         void on_file_dropped(QString const &filename);
         void on_selection_change();
 
+        void on_slider_moved(int value);
+        void on_slider_released();
+
     signals:
         void delete_entities(QVector<QString> const &entities);
         void add_entity(QString const &name, QString const &filename, GridScale scale);
         void entity_selection(QSet<QString> const &names);
+
+        void entity_rotation(int angle);
+        void local_entity_rotation(int angle);
 };
 
 #endif

@@ -15,7 +15,7 @@ void paint_grid(QPainter &painter, QSize size, QPoint offset)
 }
 
 
-void paint_player(QPainter &painter, QPixmap const &pixmap, GridScale size, QPoint pos, QPoint offset)
+void paint_player(QPainter &painter, QPixmap const &pixmap, GridScale size, QPoint pos, QPoint offset, int rotation)
 {
     int dims = 64 * scale(size);
     int local_offset = 4;
@@ -24,9 +24,18 @@ void paint_player(QPainter &painter, QPixmap const &pixmap, GridScale size, QPoi
     else
         dims -= 8;
 
-    painter.translate(offset);
-    painter.drawPixmap({pos.x() + local_offset, pos.y() + local_offset, dims, dims}, pixmap);
-    painter.translate(-offset);
+    
+    QPoint center{dims / 2, dims / 2};
+    QPoint combined_offset = offset + pos + QPoint{local_offset, local_offset};
+    painter.translate(combined_offset + center);
+    painter.rotate(rotation);
+    painter.translate(-center);
+
+    painter.drawPixmap({0, 0, dims, dims}, pixmap);
+    
+    painter.translate(center);
+    painter.rotate(-rotation);
+    painter.translate(-center + -combined_offset);
 }
 
 

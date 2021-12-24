@@ -81,6 +81,7 @@ QString as_string(MessageType type)
         case MessageType::ENTITIES_MOVED:       return "ENTITIES_MOVED";
         case MessageType::ENTITIES_REMOVED:     return "ENTITIES_REMOVED";
         case MessageType::ENTITIES_CLEARED:     return "ENTITIES_CLEARED";
+        case MessageType::ENTITIES_ROTATED:     return "ENTITIES_ROTATED";
 
         case MessageType::LINE_DRAWN:           return "LINE_DRAWN";
         case MessageType::LINES_DELETED:        return "LINES_DELETED";

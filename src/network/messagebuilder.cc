@@ -67,6 +67,7 @@ QJsonDocument synchronize_entities_message(QMap<QString, Entity> const &entities
         obj["x"] = it.value().position().x();
         obj["y"] = it.value().position().y();
         obj["scale"] = as_int(it.value().scale());
+        obj["rotation"] = it.value().rotation();
         arr.push_back(obj);
     }
 
@@ -258,6 +259,20 @@ QJsonDocument entities_cleared_message()
 {
     QJsonObject obj;
     obj["type"] = as_int(MessageType::ENTITIES_CLEARED);
+    return QJsonDocument{obj};
+}
+
+
+QJsonDocument entities_rotated_message(QSet<QString> const &entities, int angle)
+{
+    QJsonArray arr;
+    for (auto &name : entities)
+        arr.push_back(name);
+
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::ENTITIES_ROTATED);
+    obj["entities"] = arr;
+    obj["angle"] = angle;
     return QJsonDocument{obj};
 }
 

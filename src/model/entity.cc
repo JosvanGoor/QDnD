@@ -12,11 +12,11 @@ Entity::Entity()
 { }
 
 
-Entity::Entity(QString const &avatar, QPoint const &position)
+Entity::Entity(QString const &avatar, QPoint const &position, GridScale scale, int rotation)
 :   d_avatar(avatar),
     d_position(position),
-    d_rotation(0),
-    d_scale(GridScale::MEDIUM)
+    d_rotation(rotation),
+    d_scale(scale)
 { }
 
 

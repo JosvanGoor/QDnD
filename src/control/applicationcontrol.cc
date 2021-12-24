@@ -50,6 +50,8 @@ void ApplicationControl::create_default_connections()
     QObject::connect(d_main_window.entity_widget(), &EntityWidget::add_entity, this, &ApplicationControl::on_entity_added);
     QObject::connect(d_main_window.entity_widget(), &EntityWidget::delete_entities, this, &ApplicationControl::on_entities_removed);
     QObject::connect(d_main_window.entity_widget(), &EntityWidget::entity_selection, this, &ApplicationControl::on_entities_selection);
+    QObject::connect(d_main_window.entity_widget(), &EntityWidget::local_entity_rotation, this, &ApplicationControl::on_entity_local_rotation);
+    QObject::connect(d_main_window.entity_widget(), &EntityWidget::entity_rotation, this, &ApplicationControl::on_entity_rotation);
 
     QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::lines_cleared, this, &ApplicationControl::on_grid_delete_all_lines);
     QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::lines_removed, this, &ApplicationControl::on_grid_delete_lines);
@@ -193,6 +195,7 @@ void ApplicationControl::set_connectionbase_signals()
     QObject::connect(d_connection, &ConnectionBase::entities_removed, &d_entity_manager, &EntityManager::on_entities_removed);
     QObject::connect(d_connection, &ConnectionBase::entities_cleared, &d_entity_manager, &EntityManager::on_entities_cleared);
     QObject::connect(d_connection, &ConnectionBase::entities_moved, &d_entity_manager, &EntityManager::on_entities_moved);
+    QObject::connect(d_connection, &ConnectionBase::entities_rotated, &d_entity_manager, &EntityManager::on_entities_rotated);
     QObject::connect(d_connection, &ConnectionBase::synchronize_entities, &d_entity_manager, &EntityManager::on_entities_synchronized);
 }
 
@@ -204,7 +207,13 @@ void ApplicationControl::set_connectionbase_signals()
 void ApplicationControl::on_pixmap_required(QString const &key)
 {
     if (!d_pixmap_cache.has_pixmap(key))
+    {
+        if (auto it = d_pixmap_requests.find(key); it != d_pixmap_requests.end())
+            return;
+        
+        d_pixmap_requests.insert(key);
         d_connection->send(pixmap_request_message({key}));
+    }
 }
 
 
@@ -275,8 +284,9 @@ void ApplicationControl::on_line_sync(QJsonObject const &obj)
     update_grid();
 }
 
-void ApplicationControl::on_pixmap_received([[maybe_unused]] QString const &key, [[maybe_unused]] QPixmap const &pixmap)
+void ApplicationControl::on_pixmap_received(QString const &key, [[maybe_unused]] QPixmap const &pixmap)
 {
+    d_pixmap_requests.remove(key);
     update_grid();
 }
 
@@ -367,6 +377,23 @@ void ApplicationControl::on_entities_selection(QSet<QString> const &names)
 {
     d_entity_selection = names;
     update_grid();
+}
+
+
+void ApplicationControl::on_entity_local_rotation(int angle)
+{
+    debug_message("Local angle: " + QString::number(angle));
+    d_local_angle = angle;
+    update_grid();
+}
+
+
+void ApplicationControl::on_entity_rotation(int angle)
+{
+    if (!d_connection)
+        return;
+
+    d_connection->send(entities_rotated_message(d_entity_selection, angle));
 }
 
 
@@ -508,9 +535,13 @@ void ApplicationControl::on_paint_entity_layer(QPainter &painter, [[maybe_unused
     QMap<QString, Entity> entities = d_entity_manager.entities();
     for (auto it = entities.begin(); it != entities.end(); ++it)
     {
-        paint_player(painter, d_pixmap_cache.get_pixmap(it.value().avatar()), it.value().scale(), it.value().position(), offset);
         if (auto it2 = d_entity_selection.find(it.key()); it2 != d_entity_selection.end())
+        {
+            paint_player(painter, d_pixmap_cache.get_pixmap(it.value().avatar()), it.value().scale(), it.value().position(), offset, d_local_angle + it.value().rotation());
             paint_rect_around_pixmap(painter, it.value().position(), it.value().scale(), QColor{0, 255, 0}, offset);
+        }
+        else 
+            paint_player(painter, d_pixmap_cache.get_pixmap(it.value().avatar()), it.value().scale(), it.value().position(), offset, it.value().rotation());
     }
     
     // paint all players

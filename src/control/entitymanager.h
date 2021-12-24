@@ -29,6 +29,7 @@ class EntityManager : public QObject
         void on_entities_removed(QJsonObject const &obj);
         void on_entities_cleared();
         void on_entities_moved(QJsonObject const &obj);
+        void on_entities_rotated(QJsonObject const &obj);
         void on_entities_synchronized(QJsonObject const &obj);
 
     signals:

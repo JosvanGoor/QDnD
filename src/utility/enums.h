@@ -51,6 +51,7 @@ enum class MessageType
     ENTITIES_MOVED,
     ENTITIES_REMOVED,
     ENTITIES_CLEARED,
+    ENTITIES_ROTATED,
 
     // drawing
     LINE_DRAWN,

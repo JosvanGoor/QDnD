@@ -60,6 +60,7 @@ class ConnectionBase : public QObject
         void entities_removed(QJsonObject const &obj);
         void entities_cleared();
         void entities_moved(QJsonObject const &obj);
+        void entities_rotated(QJsonObject const &obj);
         void synchronize_entities(QJsonObject const &obj);
 
         // grid stuff

@@ -41,10 +41,9 @@ void EntityManager::on_entity_added(QJsonObject const &obj)
     QPoint pos{obj["x"].toInt(), obj["y"].toInt()};
     GridScale scale = static_cast<GridScale>(obj["scale"].toInt());
 
-    d_entities[name] = Entity{avatar, pos};
-    d_entities[name].set_scale(scale);
+    d_entities[name] = Entity{avatar, pos, scale};
     emit pixmap_required(avatar);
-    update_grid();
+    emit update_grid();
 }
 
 
@@ -80,7 +79,22 @@ void EntityManager::on_entities_moved(QJsonObject const &obj)
             it.value().set_postion(pos);
     }
 
-    update_grid();
+    emit update_grid();
+}
+
+
+void EntityManager::on_entities_rotated(QJsonObject const &obj)
+{
+    QJsonArray entities = obj["entities"].toArray();
+    int angle = obj["angle"].toInt();
+
+    for (auto entity : entities)
+    {
+        if (auto it = d_entities.find(entity.toString()); it != d_entities.end())
+            it.value().set_rotation(it.value().rotation() + angle);
+    }
+
+    emit update_grid();
 }
 
 
@@ -95,11 +109,12 @@ void EntityManager::on_entities_synchronized(QJsonObject const &obj)
         QString avatar = obj["avatar"].toString();
         GridScale scale = static_cast<GridScale>(obj["scale"].toInt());
         QPoint pos{obj["x"].toInt(), obj["y"].toInt()};
+        int rotation = obj["rotation"].toInt();
 
         // this is so ugly lol
-        (d_entities[name] = Entity{avatar, pos}).set_scale(scale);
+        d_entities[name] = Entity{avatar, pos, scale, rotation};
         emit pixmap_required(avatar);
     }
 
-    update_grid();
+    emit update_grid();
 }

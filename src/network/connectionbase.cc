@@ -169,6 +169,10 @@ void ConnectionBase::handle_message(QJsonDocument const &doc)
             emit entities_moved(obj);
         break;
 
+        case MessageType::ENTITIES_ROTATED:
+            emit entities_rotated(obj);
+        break;
+
         default: break;
     }
 }

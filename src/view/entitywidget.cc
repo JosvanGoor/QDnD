@@ -13,7 +13,11 @@ EntityWidget::EntityWidget(QWidget *parent)
     d_entity_widget->setLayout(new QVBoxLayout);
     d_entity_widget->layout()->addWidget(d_entity_list = new QListWidget);
     d_entity_widget->layout()->addWidget(d_delete_entities = new QPushButton{"Delete Selected"});
-    // d_entity_widget->layout()->addWidget(d_clear_entities = new QPushButton{"Clear Entities"});
+    d_entity_widget->layout()->addWidget(d_entity_rotation = new QSlider{Qt::Horizontal});
+    d_entity_rotation->setTickPosition(QSlider::TicksBelow);
+    d_entity_rotation->setTickInterval(1);
+    d_entity_rotation->setRange(-12, 12);
+    d_entity_rotation->setValue(0);
 
     d_adder_buttons = new QWidget;
     d_adder_buttons->setLayout(new QHBoxLayout);
@@ -48,11 +52,12 @@ EntityWidget::EntityWidget(QWidget *parent)
     layout()->addWidget(d_adder_widget);
 
     QObject::connect(d_delete_entities, &QPushButton::pressed, this, &EntityWidget::on_delete_entities);
-    // QObject::connect(d_clear_entities, &QPushButton::pressed, this, &EntityWidget::on_clear_entities);
     QObject::connect(d_add_entity, &QPushButton::pressed, this, &EntityWidget::on_add_entity);
     QObject::connect(d_select_file, &QPushButton::pressed, this, &EntityWidget::on_select_file);
     QObject::connect(d_pixmap_drop, &DropWidget::pixmap_dropped, this, &EntityWidget::on_file_dropped);
     QObject::connect(d_entity_list, &QListWidget::itemSelectionChanged, this, &EntityWidget::on_selection_change);
+    QObject::connect(d_entity_rotation, &QSlider::sliderMoved, this, &EntityWidget::on_slider_moved);
+    QObject::connect(d_entity_rotation, &QSlider::sliderReleased, this, &EntityWidget::on_slider_released);
 }
 
 
@@ -126,5 +131,25 @@ void EntityWidget::on_selection_change()
     for (auto item : selection)
         names.insert(item->text());
 
+    d_entity_rotation->setValue(0);
+    emit local_entity_rotation(0);
     emit entity_selection(names);
+}
+
+
+void EntityWidget::on_slider_moved(int value)
+{
+    emit local_entity_rotation(value * 15);
+}
+
+
+void EntityWidget::on_slider_released()
+{
+    int value = d_entity_rotation->value();
+    if (value == 0)
+        return;
+
+    emit entity_rotation(value * 15);
+    emit local_entity_rotation(0);
+    d_entity_rotation->setValue(0);
 }
