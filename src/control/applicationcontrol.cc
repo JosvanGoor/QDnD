@@ -578,8 +578,8 @@ void ApplicationControl::load_lines()
     for (auto line : lines)
     {
         auto parsed = json_to_drawline(line.toObject());
-        line_cache["loaded." + parsed.first] = parsed.second;
-        d_main_window.grid_control_widget()->register_line("loaded." + parsed.first);
+        line_cache[parsed.first + "!"] = parsed.second;
+        d_main_window.grid_control_widget()->register_line(parsed.first + "!");
     }
 
     d_connection->send(synchronize_lines_message(d_player_control.own_identifier(), line_cache));
