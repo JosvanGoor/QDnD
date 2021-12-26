@@ -49,8 +49,8 @@ ItemGroupControlWidget::ItemGroupControlWidget(GridWidget *grid, MapManager *man
     rota_widget->layout()->addWidget(d_rotation_slider = new QSlider{Qt::Horizontal});
     rota_widget->layout()->addWidget(d_rotation_label = new QLabel{"0"});
     form_widget->setLayout(form_layout);
-    form_layout->addRow("x Position", d_xpos_edit = new QLineEdit);
-    form_layout->addRow("y Position", d_ypos_edit = new QLineEdit);
+    // form_layout->addRow("x Position", d_xpos_edit = new QLineEdit);
+    // form_layout->addRow("y Position", d_ypos_edit = new QLineEdit);
     form_layout->addRow("Rotation", rota_widget);
     form_layout->addRow("Scale", d_scale_selection = new QComboBox);
     d_rotation_slider->setRange(0, 24);
@@ -64,6 +64,7 @@ ItemGroupControlWidget::ItemGroupControlWidget(GridWidget *grid, MapManager *man
     d_current_item->layout()->addWidget(form_widget);
     d_current_item->layout()->addWidget(d_remove_item = new QPushButton{"Remove"});
 
+    layout()->addWidget(d_group_name = new QLabel{"Current Group: " + d_manager->selected_group_name()});
     layout()->addWidget(d_mouse_mode);
     layout()->addWidget(d_current_item);
 
@@ -75,6 +76,8 @@ ItemGroupControlWidget::ItemGroupControlWidget(GridWidget *grid, MapManager *man
     QObject::connect(d_snap_yoffset_check, &QCheckBox::toggled, this, &ItemGroupControlWidget::on_snap_changed);
     QObject::connect(d_pixmap_selection, &DropWidget::pixmap_dropped, this, &ItemGroupControlWidget::on_pixmap_dropped);
     QObject::connect(d_rotation_slider, &QSlider::valueChanged, this, &ItemGroupControlWidget::on_rotation_changed);
+    QObject::connect(d_scale_selection, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ItemGroupControlWidget::on_scale_changed);
+    QObject::connect(d_manager, &MapManager::selection_changed, this, &ItemGroupControlWidget::on_group_selection_changed);
 }
 
 
@@ -138,4 +141,16 @@ void ItemGroupControlWidget::on_rotation_changed(int value)
 {
     d_rotation_label->setText(QString::number(value * 15));
     d_grid->update_gi_rotation(value * 15);
+}
+
+
+void ItemGroupControlWidget::on_scale_changed(int index)
+{
+    d_grid->update_gi_scale(static_cast<GridScale>(index));
+}
+
+
+void ItemGroupControlWidget::on_group_selection_changed()
+{
+    d_group_name->setText("Current Group: " + d_manager->selected_group_name());
 }

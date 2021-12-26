@@ -102,8 +102,8 @@ QJsonObject GridItemGroup::serialize_item(GridItem const &item) const noexcept
 {
     QJsonObject obj;
     obj["pixmap_code"] = item.pixmap_code;
-    obj["xpos"] = item.xpos;
-    obj["ypos"] = item.ypos;
+    obj["x"] = item.position.x();
+    obj["y"] = item.position.y();
     obj["rotation"] = item.rotation;
     obj["scale"] = as_int(item.scale);
     obj["visibility"] = as_int(item.visibility);
@@ -140,8 +140,7 @@ void GridItemGroup::deserialize_item(QJsonObject const &obj)
 {
     d_items.push_back(GridItem{});
     d_items.back().pixmap_code = obj["pixmap_code"].toString();
-    d_items.back().xpos = obj["xpos"].toInt();
-    d_items.back().ypos = obj["ypos"].toInt();
+    d_items.back().position = {obj["x"].toInt(), obj["y"].toInt()};
     d_items.back().rotation = obj["rotation"].toInt();
     d_items.back().scale = static_cast<GridScale>(obj["scale"].toInt());
     d_items.back().visibility = static_cast<VisibilityMode>(obj["visibility"].toInt());

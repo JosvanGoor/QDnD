@@ -15,6 +15,22 @@ void paint_grid(QPainter &painter, QSize size, QPoint offset)
 }
 
 
+void paint_grid_item(QPainter &painter, QPoint offset, QPixmap const &pixmap, GridScale size, QPoint position, int rotation)
+{
+    int dims = scale(size) * 64;
+    QPoint center{dims / 2, dims / 2};
+    QPoint combined_position = position + offset;
+
+    painter.translate(combined_position + center);
+    painter.rotate(rotation);
+    painter.translate(-center);
+    painter.drawPixmap({0, 0, dims, dims}, pixmap);
+    painter.translate(center);
+    painter.rotate(-rotation);
+    painter.translate(-center + -combined_position);
+}
+
+
 void paint_player(QPainter &painter, QPixmap const &pixmap, GridScale size, QPoint pos, QPoint offset, int rotation)
 {
     int dims = 64 * scale(size);

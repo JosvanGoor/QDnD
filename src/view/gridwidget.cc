@@ -66,7 +66,7 @@ void GridWidget::paintEvent([[maybe_unused]] QPaintEvent *event)
     }
     else if (d_mouse_mode == MouseMode::GRID_ITEM_PLACEMENT)
     {
-        paint_player(painter, d_gi_pixmap, d_gi_scale, grid_item_snap(d_mouse_old), d_offset, d_gi_rotation);
+        paint_grid_item(painter, d_offset, d_gi_pixmap, d_gi_scale, grid_item_snap(d_mouse_old), d_gi_rotation);
     }
 }
 

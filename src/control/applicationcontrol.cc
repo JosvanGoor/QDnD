@@ -593,6 +593,26 @@ void ApplicationControl::load_lines()
 
 void ApplicationControl::on_paint_ground_layer(QPainter &painter, QSize size, QPoint offset, [[maybe_unused]] QPoint mouse)
 {
+    for (GridItemGroup const &group : d_map_manager.grid_groups())
+    {
+        if (group.visibility_mode() == VisibilityMode::VISIBLE)
+        {
+            for (auto const &item : group.items())
+                paint_grid_item(painter, offset, d_pixmap_cache.get_pixmap(item.pixmap_code), item.scale, item.position, item.rotation);
+        }
+        else
+        {
+            if (!d_connection || d_connection->is_server())
+                return;
+            
+            painter.setOpacity(0.5);
+            for (auto const &item : group.items())
+                paint_grid_item(painter, offset, d_pixmap_cache.get_pixmap(item.pixmap_code), item.scale, item.position, item.rotation);
+            painter.setOpacity(1.0);
+        }
+    }
+
+
     painter.setPen(QPen{Qt::black});
     paint_grid(painter, size, offset);
 }

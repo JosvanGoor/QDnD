@@ -1,6 +1,7 @@
 #ifndef MODEL_GRIDITEMGROUP_H
 #define MODEL_GRIDITEMGROUP_H
 
+#include <QPoint>
 #include <QString>
 #include <QVector>
 #include <QJsonArray>
@@ -12,8 +13,7 @@
 struct GridItem
 {
     QString pixmap_code;    // code for net use
-    int xpos                   = 0;
-    int ypos                   = 0;
+    QPoint position             = {};
     int rotation                = 0;
     GridScale scale             = GridScale::MEDIUM;
     VisibilityMode visibility   = VisibilityMode::PARENT;

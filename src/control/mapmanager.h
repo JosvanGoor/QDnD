@@ -25,6 +25,7 @@ class MapManager : public QObject
         void add_group(QString const &name);
         void set_selection(QString const &name);
 
+        QString const &selected_group_name() const;
         GridItemGroup &selected_group();
         GridItemGroup &find_group(QString const &name);
 

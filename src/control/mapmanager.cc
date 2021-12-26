@@ -7,7 +7,7 @@
 MapManager::MapManager(QObject *parent)
 :   QObject(parent)
 {
-    d_selection = "";
+    d_selection = "<default>";
     d_grid_groups["<default>"] = GridItemGroup{"<default>", VisibilityMode::VISIBLE};
 }
 
@@ -44,6 +44,12 @@ void MapManager::set_selection(QString const &name)
 {
     d_selection = name;
     emit selection_changed();
+}
+
+
+QString const &MapManager::selected_group_name() const
+{
+    return d_selection;
 }
 
 

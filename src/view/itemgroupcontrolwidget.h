@@ -25,7 +25,8 @@ class ItemGroupControlWidget : public QWidget
     GridWidget *d_grid;
     MapManager *d_manager;
     MouseMode d_current_mode;
-        
+    
+    QLabel *d_group_name;
     QGroupBox *d_mouse_mode;
         QPushButton *d_placement_mode;
         QPushButton *d_selection_mode;
@@ -54,6 +55,9 @@ class ItemGroupControlWidget : public QWidget
         void on_mouse_mode_changed();
         void on_pixmap_dropped(QString const &filename);
         void on_rotation_changed(int value);
+        void on_scale_changed(int index);
+
+        void on_group_selection_changed();
 };
 
 #endif
