@@ -19,6 +19,7 @@ class GridControlWidget : public QWidget
 {
     Q_OBJECT
 
+    MouseMode d_mouse_mode;
     GridWidget *d_grid_widget;
 
     QGroupBox *d_button_widget;
@@ -51,6 +52,8 @@ class GridControlWidget : public QWidget
         void on_clear_lines();
         void on_delete_lines();
         void on_selection_changed();
+        
+        void reset_mouse_mode();
 
         // slots
         void register_line(QString const &name);

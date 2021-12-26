@@ -71,6 +71,8 @@ enum class MouseMode
     MOVE_CHARACTER,
     MOVE_GRID,
     PING,
+    GRID_ITEM_PLACEMENT,
+    GRID_ITEM_SELECTION,
 };
 
 QString as_string(MouseMode mode);

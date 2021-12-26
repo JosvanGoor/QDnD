@@ -15,6 +15,7 @@ QMAKE_CXXFLAGS = -Wall -pedantic
 
 SOURCES +=  src/control/applicationcontrol.cc \
             src/control/entitymanager.cc \
+            src/control/mapmanager.cc \
             src/control/playercontrol.cc \
             \
             src/expressions/diceexpression.cc \
@@ -24,7 +25,6 @@ SOURCES +=  src/control/applicationcontrol.cc \
             \
             src/model/entity.cc \
             src/model/griditemgroup.cc \
-            src/model/gridmodel.cc \
             src/model/pixmapcache.cc \
             src/model/player.cc \
             src/model/spell.cc \
@@ -48,7 +48,9 @@ SOURCES +=  src/control/applicationcontrol.cc \
             src/view/entitywidget.cc \
             src/view/gridcontrolwidget.cc \
             src/view/gridwidget.cc \
+            src/view/itemgroupcontrolwidget.cc \
             src/view/mainwindow.cc \
+            src/view/mapmanagercontrolwidget.cc \
             src/view/menubar.cc \
             src/view/playerswidget.cc \
             src/view/spellswidget.cc \
@@ -59,6 +61,7 @@ SOURCES +=  src/control/applicationcontrol.cc \
 
 HEADERS +=  src/control/applicationcontrol.h \
             src/control/entitymanager.h \
+            src/control/mapmanager.h \
             src/control/playercontrol.h \
             \
             src/expressions/diceexpression.h \
@@ -68,7 +71,6 @@ HEADERS +=  src/control/applicationcontrol.h \
             \
             src/model/entity.h \
             src/model/griditemgroup.h \
-            src/model/gridmodel.h \
             src/model/pixmapcache.h \
             src/model/player.h \
             src/model/spell.h \
@@ -92,7 +94,9 @@ HEADERS +=  src/control/applicationcontrol.h \
             src/view/entitywidget.h \
             src/view/gridcontrolwidget.h \
             src/view/gridwidget.h \
+            src/view/itemgroupcontrolwidget.h \
             src/view/mainwindow.h \
+            src/view/mapmanagercontrolwidget.h \
             src/view/menubar.h \
             src/view/playerswidget.h \
             src/view/spellswidget.h \

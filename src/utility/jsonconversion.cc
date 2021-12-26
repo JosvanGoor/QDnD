@@ -35,7 +35,7 @@ QPair<QString, DrawLine> json_to_drawline(QJsonObject const &obj)
     line.color = obj["color"].toInt();
     QJsonArray segments = obj["points"].toArray();
 
-    for (size_t idx = 0; idx < segments.size() - 1; ++idx)
+    for (int idx = 0; idx < segments.size() - 1; ++idx)
     {
         QJsonArray p1 = segments[idx].toArray();
         QJsonArray p2 = segments[idx + 1].toArray();

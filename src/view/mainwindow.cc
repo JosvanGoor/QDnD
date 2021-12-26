@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
     d_right_tabs->addTab(d_chat_tab = new ChatWidget, "Chat");
     d_right_tabs->addTab(d_players_tab = new PlayersWidget, "Players");
     d_right_tabs->addTab(d_grid_control_tab = new GridControlWidget{d_grid_tab}, "Grid Control");
+    d_right_tabs->addTab(d_entity_tab = new EntityWidget, "Entity Control");
 
     d_middle_widget->setOrientation(Qt::Vertical);
     d_middle_widget->setSizes({600, 100});
@@ -33,8 +34,10 @@ MainWindow::MainWindow(QWidget *parent)
     setMenuBar(d_menu_bar = new MenuBar);
     setStatusBar(d_status_bar = new StatusBar);
 
-    load_entity_widget();
+    d_map_manager = nullptr;
+    d_item_group_manager = nullptr;
 
+    QObject::connect(d_right_tabs, &QTabWidget::currentChanged, this, &MainWindow::right_tab_changed);
     resize(1600, 900);
 }
 
@@ -46,7 +49,7 @@ MainWindow::~MainWindow()
 
 
 ////////////////////
-//     Slots      //
+//    Getters     //
 ////////////////////
 
 ChatWidget *MainWindow::chat_widget() noexcept
@@ -102,19 +105,20 @@ StatusBar *MainWindow::status_bar() noexcept
 
 
 ////////////////////
-//    Utility     //
+//     Editor     //
 ////////////////////
 
-void MainWindow::load_entity_widget()
+void MainWindow::load_editor(MapManager *manager)
 {
-    d_right_tabs->addTab(d_entity_tab = new EntityWidget, "Entity Control");
+    d_right_tabs->addTab(d_item_group_manager = new ItemGroupControlWidget{d_grid_tab, manager}, "Item Group Control");
+    d_right_tabs->addTab(d_map_manager = new MapManagerControlWidget{manager}, "Map Manager");
 }
 
 
-void MainWindow::unload_entity_widget()
+void MainWindow::unload_editor()
 {
-    delete d_entity_tab;
-    d_entity_tab = nullptr;
+    delete d_map_manager;
+    delete d_item_group_manager;
 }
 
 
@@ -140,4 +144,18 @@ void MainWindow::debug_message(QString const &message)
     }
 
     d_debug_output->verticalScrollBar()->setValue(d_debug_output->verticalScrollBar()->maximum());
+}
+
+
+void MainWindow::right_tab_changed(int index)
+{
+    if (index == -1)
+        return;
+
+    if (auto ptr = dynamic_cast<ItemGroupControlWidget*>(d_right_tabs->currentWidget()); ptr != nullptr)
+        ptr->reset_mouse_mode();
+    else if (auto ptr = dynamic_cast<EntityWidget*>(d_right_tabs->currentWidget()); ptr != nullptr)
+        d_grid_tab->set_mouse_mode(MouseMode::MOVE_CHARACTER);
+    else
+        d_grid_control_tab->reset_mouse_mode();
 }

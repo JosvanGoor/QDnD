@@ -14,8 +14,13 @@ GridWidget::GridWidget(QWidget *parent)
     d_worldmouse_old = {};
     d_mouse_old = {};
     d_mouse_mode = MouseMode::MOVE_CHARACTER;
+    d_snap_horizontal = false;
+    d_snap_vertical = false;
     d_left_button = false;
     d_right_button = false;
+
+    d_gi_rotation = 0;
+    d_gi_scale = GridScale::MEDIUM;
 
     setMouseTracking(true);
 }
@@ -59,6 +64,10 @@ void GridWidget::paintEvent([[maybe_unused]] QPaintEvent *event)
             default: break;
         }
     }
+    else if (d_mouse_mode == MouseMode::GRID_ITEM_PLACEMENT)
+    {
+        paint_player(painter, d_gi_pixmap, d_gi_scale, grid_item_snap(d_mouse_old), d_offset, d_gi_rotation);
+    }
 }
 
 
@@ -75,6 +84,15 @@ void GridWidget::set_draw_color(QColor color)
 void GridWidget::set_mouse_mode(MouseMode mode)
 {
     d_mouse_mode = mode;
+}
+
+
+void GridWidget::set_snap_modes(bool horizontal, bool vertical, bool xoff, bool yoff)
+{
+    d_snap_horizontal = horizontal;
+    d_snap_vertical = vertical;
+    d_snap_offset_x = xoff;
+    d_snap_offset_y = yoff;
 }
 
 
@@ -106,11 +124,61 @@ QPoint GridWidget::world_pos(QPoint const &point)
 }
 
 
+QPoint GridWidget::grid_item_snap(QPoint const &point)
+{
+    QPoint position = world_pos(point);
+    int x = position.x();
+    int y = position.y();
+
+    if (d_snap_horizontal)
+    {
+        x += 32 * d_snap_offset_x;
+        if (x < 0) x -= 64;
+        x = (x / 64) * 64;
+    }
+
+    if (d_snap_vertical)
+    {
+        y += 32 * d_snap_offset_y;
+        if (y < 0) y -= 64;
+        y  = (y / 64) * 64;
+    }
+
+    if (d_snap_offset_x) x -= scale(d_gi_scale) * 64 / 2;
+    if (d_snap_offset_y) y -= scale(d_gi_scale) * 64 / 2;
+    
+    return QPoint{x, y};
+}
+
+
 void GridWidget::reset_offset()
 {
     d_offset = {};
     update();
 }
+
+
+////////////////////
+//  Mouse Events  //
+////////////////////
+
+void GridWidget::update_gi_pixmap(QPixmap const &pixmap)
+{
+    d_gi_pixmap = pixmap;
+}
+
+
+void GridWidget::update_gi_rotation(int rotation)
+{
+    d_gi_rotation = rotation;
+}
+
+
+void GridWidget::update_gi_scale(GridScale scale)
+{
+    d_gi_scale = scale;
+}
+
 
 ////////////////////
 //  Mouse Events  //

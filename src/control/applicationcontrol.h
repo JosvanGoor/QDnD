@@ -6,6 +6,7 @@
 #include <QObject>
 
 #include "entitymanager.h"
+#include "mapmanager.h"
 #include "playercontrol.h"
 #include "../expressions/diceparser.h"
 #include "../model/entity.h"
@@ -32,6 +33,7 @@ class ApplicationControl : public QObject
     PixmapCache d_pixmap_cache;
     QMap<QString, Spell> d_spells;
     EntityManager d_entity_manager;
+    MapManager d_map_manager;
     PlayerControl d_player_control;
     MainWindow d_main_window;
 

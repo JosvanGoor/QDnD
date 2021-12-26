@@ -7,8 +7,8 @@
 #include <QPoint>
 #include <QWidget>
 
+#include "../control/mapmanager.h"
 #include "../control/playercontrol.h"
-#include "../model/gridmodel.h"
 #include "../utility/enums.h"
 #include "../utility/painting.h"
 
@@ -31,8 +31,17 @@ class GridWidget : public QWidget
     QPoint d_mouse_old;
     QPoint d_worldmouse_old;
     MouseMode d_mouse_mode;
+    bool d_snap_horizontal; // for grid items
+    bool d_snap_vertical; // for grid items
+    bool d_snap_offset_x; // for grid items
+    bool d_snap_offset_y;
     bool d_left_button;
     bool d_right_button;
+
+    // grid editing
+    QPixmap d_gi_pixmap;
+    int d_gi_rotation;
+    GridScale d_gi_scale;
 
     public:
         explicit GridWidget(QWidget *parent = nullptr);
@@ -47,7 +56,14 @@ class GridWidget : public QWidget
         void request_render_update();
         QPoint snap_to_grid(QPoint const &point, bool round = true);
         QPoint world_pos(QPoint const &point);
+        QPoint grid_item_snap(QPoint const &point);
         void reset_offset();
+
+        // gi stuff
+        void set_snap_modes(bool horizontal, bool vertical, bool xoff, bool yoff);
+        void update_gi_pixmap(QPixmap const &pixmap);
+        void update_gi_rotation(int rotation);
+        void update_gi_scale(GridScale scale);
 
         // mouse events
         void mouseMoveEvent(QMouseEvent *event) override;

@@ -14,6 +14,8 @@
 #include "entitywidget.h"
 #include "gridcontrolwidget.h"
 #include "gridwidget.h"
+#include "itemgroupcontrolwidget.h"
+#include "mapmanagercontrolwidget.h"
 #include "menubar.h"
 #include "playerswidget.h"
 #include "spellswidget.h"
@@ -35,6 +37,10 @@ class MainWindow : public QMainWindow
             PlayersWidget *d_players_tab;
             GridControlWidget *d_grid_control_tab;
             EntityWidget *d_entity_tab;
+            
+        MapManagerControlWidget *d_map_manager;
+        ItemGroupControlWidget *d_item_group_manager;
+            
 
     MenuBar *d_menu_bar;
     StatusBar *d_status_bar;
@@ -53,13 +59,14 @@ class MainWindow : public QMainWindow
         PlayersWidget *players_widget() noexcept;
         SpellsWidget *spells_widget() noexcept;
         StatusBar *status_bar() noexcept;
-        
-        // utility
-        void load_entity_widget();
-        void unload_entity_widget();
+
+        // editor
+        void load_editor(MapManager *manager);
+        void unload_editor();
 
     public slots:
         void debug_message(QString const &message);
+        void right_tab_changed(int index);
 };
 
 #endif

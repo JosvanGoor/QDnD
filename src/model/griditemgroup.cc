@@ -4,11 +4,48 @@
 //  Constructor   //
 ////////////////////
 
-GridItemGroup::GridItemGroup(QString const &name)
-:   d_name(name),
+GridItemGroup::GridItemGroup()
+:   d_name("__ERROR__"),
     d_visibility(VisibilityMode::HIDDEN),
-    d_items()
+    d_items(),
+    d_filename_dict()
 { }
+
+
+GridItemGroup::GridItemGroup(QString const &name, VisibilityMode mode)
+:   d_name(name),
+    d_visibility(mode),
+    d_items(),
+    d_filename_dict()
+{ }
+
+
+////////////////////
+//    Getters     //
+////////////////////
+
+QString const &GridItemGroup::name() const
+{
+    return d_name;
+}
+
+
+VisibilityMode GridItemGroup::visibility_mode() const
+{
+    return d_visibility;
+}
+
+
+QVector<GridItem> &GridItemGroup::items()
+{
+    return d_items;
+}
+
+
+QVector<GridItem> const &GridItemGroup::items() const
+{
+    return d_items;
+}
 
 
 ////////////////////
@@ -22,11 +59,17 @@ void GridItemGroup::clear()
 }
 
 
+void GridItemGroup::set_visibility(VisibilityMode mode)
+{
+    d_visibility = mode;
+}
+
+
 ////////////////////
 //   Serialize    //
 ////////////////////
 
-QJsonObject GridItemGroup::serialize() const noexcept
+QJsonObject GridItemGroup::serialize(bool include_filenames) const noexcept
 {
     QJsonArray items;
     for (GridItem const &item : d_items)
@@ -36,6 +79,21 @@ QJsonObject GridItemGroup::serialize() const noexcept
     obj["name"] = d_name;
     obj["visibility"] = as_int(d_visibility);
     obj["items"] = items;
+
+    if (include_filenames)
+        obj["filenames"] = serialize_filenames();
+
+    return obj;
+}
+
+
+QJsonObject GridItemGroup::serialize_filenames() const
+{
+    QJsonObject obj;
+
+    for (auto it = d_filename_dict.begin(); it != d_filename_dict.end(); ++it)
+        obj[it.key()] = it.value();
+
     return obj;
 }
 
@@ -43,13 +101,13 @@ QJsonObject GridItemGroup::serialize() const noexcept
 QJsonObject GridItemGroup::serialize_item(GridItem const &item) const noexcept
 {
     QJsonObject obj;
-    obj["name"] = item.name;
-    obj["pixmap_file"] = item.pixmap_file;
     obj["pixmap_code"] = item.pixmap_code;
-    obj["x_pos"] = item.x_pos;
-    obj["y_pos"] = item.y_pos;
+    obj["xpos"] = item.xpos;
+    obj["ypos"] = item.ypos;
+    obj["rotation"] = item.rotation;
     obj["scale"] = as_int(item.scale);
     obj["visibility"] = as_int(item.visibility);
+    
     return obj;
 }
 
@@ -81,11 +139,9 @@ void GridItemGroup::deserialize(QJsonObject const &obj)
 void GridItemGroup::deserialize_item(QJsonObject const &obj)
 {
     d_items.push_back(GridItem{});
-    d_items.back().name = obj["name"].toString();
-    d_items.back().pixmap_file = obj["pixmap_file"].toString();
     d_items.back().pixmap_code = obj["pixmap_code"].toString();
-    d_items.back().x_pos = obj["x_pos"].toInt();
-    d_items.back().y_pos = obj["y_pos"].toInt();
+    d_items.back().xpos = obj["xpos"].toInt();
+    d_items.back().ypos = obj["ypos"].toInt();
     d_items.back().rotation = obj["rotation"].toInt();
     d_items.back().scale = static_cast<GridScale>(obj["scale"].toInt());
     d_items.back().visibility = static_cast<VisibilityMode>(obj["visibility"].toInt());

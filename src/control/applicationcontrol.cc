@@ -99,6 +99,7 @@ void ApplicationControl::reset()
     d_pixmap_cache.clear();
     d_entity_manager.clear();
     d_main_window.entity_widget()->set_name_prefix("");
+    d_main_window.unload_editor();
 }
 
 
@@ -142,6 +143,8 @@ void ApplicationControl::start_hosting()
 
     QObject::connect(&d_player_control, &PlayerControl::trigger_synchronization, this, &ApplicationControl::on_trigger_synchronization);
     QObject::connect(d_connection, &ConnectionBase::pixmap_requested, this, &ApplicationControl::pixmap_requested);
+
+    d_main_window.load_editor(&d_map_manager);
 
     set_connectionbase_signals();
     d_connection->connect("", 4144);
@@ -385,7 +388,6 @@ void ApplicationControl::on_entities_selection(QSet<QString> const &names)
 
 void ApplicationControl::on_entity_local_rotation(int angle)
 {
-    debug_message("Local angle: " + QString::number(angle));
     d_local_angle = angle;
     update_grid();
 }

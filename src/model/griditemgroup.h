@@ -11,11 +11,9 @@
 
 struct GridItem
 {
-    QString name;
-    QString pixmap_file;    // filename for host
     QString pixmap_code;    // code for net use
-    int x_pos                   = 0;
-    int y_pos                   = 0;
+    int xpos                   = 0;
+    int ypos                   = 0;
     int rotation                = 0;
     GridScale scale             = GridScale::MEDIUM;
     VisibilityMode visibility   = VisibilityMode::PARENT;
@@ -27,16 +25,25 @@ struct GridItemGroup
     QString d_name;
     VisibilityMode d_visibility;
     QVector<GridItem> d_items;
-    // QVector<GridItemGroup> d_subgroups; // lets keep it simple
+    QMap<QString, QString> d_filename_dict;
 
     public:
-        GridItemGroup(QString const &name = "group");
+        GridItemGroup();
+        GridItemGroup(QString const &name, VisibilityMode mode = VisibilityMode::HIDDEN);
+
+        // getters
+        QString const &name() const;
+        VisibilityMode visibility_mode() const;
+        QVector<GridItem> &items();
+        QVector<GridItem> const &items() const;
 
         // utility
         void clear();
+        void set_visibility(VisibilityMode mode);
 
         // serialization
-        QJsonObject serialize() const noexcept;
+        QJsonObject serialize(bool include_filenames = true) const noexcept;
+        QJsonObject serialize_filenames() const;
         QJsonObject serialize_item(GridItem const &item) const noexcept;
 
         // deserialization

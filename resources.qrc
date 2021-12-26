@@ -15,5 +15,7 @@
         <file>data/move_icon.png</file>
         <file>data/straight_icon.png</file>
         <file>data/walk_icon.png</file>
+        <file>data/placeitem.png</file>
+        <file>data/select.png</file>
     </qresource>
 </RCC>

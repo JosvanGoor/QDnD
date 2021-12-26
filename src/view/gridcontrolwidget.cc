@@ -7,7 +7,8 @@
 GridControlWidget::GridControlWidget(GridWidget *grid_widget, QWidget *parent)
 :   QWidget(parent)
 {
-    d_grid_widget = grid_widget;    
+    d_grid_widget = grid_widget;
+    d_mouse_mode = MouseMode::MOVE_CHARACTER;
     d_grid_widget->set_mouse_mode(MouseMode::MOVE_CHARACTER);
 
     setLayout(new QVBoxLayout);
@@ -97,29 +98,31 @@ void GridControlWidget::on_button_pressed()
 
     if (sender == d_walk_button)
     {
-        d_grid_widget->set_mouse_mode(MouseMode::MOVE_CHARACTER);
+        d_mouse_mode = MouseMode::MOVE_CHARACTER;
         d_button_widget->setTitle("Cursor: Walk");
     }
     else if (sender == d_move_button)
     {
-        d_grid_widget->set_mouse_mode(MouseMode::MOVE_GRID);
+        d_mouse_mode = MouseMode::MOVE_GRID;
         d_button_widget->setTitle("Cursor: Move Grid");
     }
     else if (sender == d_ping_button)
     {
-        d_grid_widget->set_mouse_mode(MouseMode::PING);
+        d_mouse_mode = MouseMode::PING;
         d_button_widget->setTitle("Cursor: Ping");
     }
     else if (sender == d_straight_button)
     {
-        d_grid_widget->set_mouse_mode(MouseMode::LINE_DRAW);
+        d_mouse_mode = MouseMode::LINE_DRAW;
         d_button_widget->setTitle("Cursor: Line Draw");
     }
     else if (sender == d_free_button)
     {
-        d_grid_widget->set_mouse_mode(MouseMode::FREE_DRAW);
+        d_mouse_mode = MouseMode::FREE_DRAW;
         d_button_widget->setTitle("Cursor: Free Draw");
     }
+
+    reset_mouse_mode();
 }
 
 
@@ -157,6 +160,12 @@ void GridControlWidget::on_selection_changed()
         names.insert(item->text());
     
     emit line_selection_changed(names);
+}
+
+
+void GridControlWidget::reset_mouse_mode()
+{
+    d_grid_widget->set_mouse_mode(d_mouse_mode);
 }
 
 

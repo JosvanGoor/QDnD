@@ -100,11 +100,13 @@ QString as_string(MouseMode mode)
 {
     switch (mode)
     {
-        case MouseMode::FREE_DRAW:      return "FREE_DRAW";
-        case MouseMode::LINE_DRAW:      return "LINE_DRAW";
-        case MouseMode::MOVE_CHARACTER: return "MOVE_CHARACTER";
-        case MouseMode::MOVE_GRID:      return "MOVE_GRID";
-        case MouseMode::PING:           return "PING";
+        case MouseMode::FREE_DRAW:              return "FREE_DRAW";
+        case MouseMode::LINE_DRAW:              return "LINE_DRAW";
+        case MouseMode::MOVE_CHARACTER:         return "MOVE_CHARACTER";
+        case MouseMode::MOVE_GRID:              return "MOVE_GRID";
+        case MouseMode::PING:                   return "PING";
+        case MouseMode::GRID_ITEM_PLACEMENT:    return "GRID_ITEM_PLACEMENT";
+        case MouseMode::GRID_ITEM_SELECTION:    return "GRID_ITEM_SELECTION";
     }
     
     return "MouseMode: If you read this Jos fucked up.";
@@ -125,9 +127,9 @@ QString as_string(VisibilityMode mode)
 {
     switch (mode)
     {
-        case VisibilityMode::VISIBLE: return "VISIBLE";
-        case VisibilityMode::HIDDEN: return "HIDDEN";
-        case VisibilityMode::PARENT: return "PARENT";
+        case VisibilityMode::VISIBLE:   return "VISIBLE";
+        case VisibilityMode::HIDDEN:    return "HIDDEN";
+        case VisibilityMode::PARENT:    return "PARENT";
     }
 
     return "VisibilityMode: If you read this Jos fucked up.";
