@@ -85,9 +85,10 @@ class ApplicationControl : public QObject
         void on_entity_rotation(int angle);
 
         // map builder stuff
+        void on_map_reloaded();
         void on_grid_item_placed(QString const &filename, QPoint position, int rotation, GridScale scale, VisibilityMode mode);
         void on_grid_group_visibility_set(QString const &group, VisibilityMode mode);
-        
+
         // misc
         void chat_entered(QString const &chat);
         void display_update_clicked();

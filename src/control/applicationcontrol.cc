@@ -59,6 +59,7 @@ void ApplicationControl::create_default_connections()
     QObject::connect(&d_map_manager, &MapManager::pixmap_required, this, &ApplicationControl::on_pixmap_required);
     QObject::connect(&d_map_manager, &MapManager::update_grid, this, &ApplicationControl::update_grid);
     QObject::connect(&d_map_manager, &MapManager::preload_pixmap, this, &ApplicationControl::load_pixmap_file);
+    QObject::connect(&d_map_manager, &MapManager::map_reloaded, this, &ApplicationControl::on_map_reloaded);
 
     QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::lines_cleared, this, &ApplicationControl::on_grid_delete_all_lines);
     QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::lines_removed, this, &ApplicationControl::on_grid_delete_lines);
@@ -443,6 +444,21 @@ void ApplicationControl::on_grid_group_visibility_set(QString const &group, Visi
     debug_message("on_grid_group_visibility_set");
     d_connection->send(grid_group_visibility_message(group, mode));
 }
+
+
+void ApplicationControl::on_map_reloaded()
+{
+    if (!d_connection)
+        return;
+    
+    for (auto &player : d_player_control.players())
+    {
+        if (player.identifier() == d_player_control.own_identifier())
+            continue;
+        on_map_synchronization(player.identifier());
+    }
+}
+
 
 ////////////////////
 //      Misc      //

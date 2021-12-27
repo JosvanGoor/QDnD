@@ -114,4 +114,8 @@ void MapManagerControlWidget::on_load_map()
         return; // illegal file, no error? not my problim
 
     d_manager->clean_from_json(document.object());
+
+    d_group_list->clear();
+    for (auto const &group : d_manager->grid_groups())
+        d_group_list->addItem(group.name());
 }

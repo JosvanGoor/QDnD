@@ -42,6 +42,7 @@ class MapManager : public QObject
     signals:
         void update_grid();
         void selection_changed();
+        void map_reloaded();
         void pixmap_required(QString const &key);
         void preload_pixmap(QString const &filename, QString const &key);
 

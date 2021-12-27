@@ -111,6 +111,8 @@ void MapManager::clean_from_json(QJsonObject const &obj)
         for (auto itemval : items)
             current.deserialize_item(itemval.toObject());
     }
+
+    emit map_reloaded();
 }
 
 
