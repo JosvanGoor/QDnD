@@ -8,6 +8,8 @@
 #include <QMimeData>
 #include <QLabel>
 
+#include "../utility/loading.h"
+
 class DropWidget : public QLabel
 {
     Q_OBJECT

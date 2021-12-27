@@ -139,6 +139,7 @@ void ItemGroupControlWidget::on_mouse_mode_changed()
 void ItemGroupControlWidget::on_pixmap_dropped(QString const &filename)
 {
     QPixmap pixmap{filename};
+    pixmap = squared(pixmap);
     d_grid->update_gi_pixmap(pixmap);
     d_pixmap_filename = filename;
 }

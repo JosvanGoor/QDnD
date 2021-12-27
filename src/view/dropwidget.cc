@@ -74,7 +74,7 @@ void DropWidget::dragLeaveEvent([[maybe_unused]] QDragLeaveEvent *event)
 void DropWidget::dropEvent([[maybe_unused]] QDropEvent *event)
 {
     QString filename = d_file_to_accept.toLocalFile();
-    QPixmap pixmap = QPixmap{filename}.scaled(d_size);
+    QPixmap pixmap = squared(QPixmap{filename}.scaled(d_size));
 
     if (pixmap.isNull())
     {

@@ -30,3 +30,26 @@ QJsonDocument load_json_file(QString const &filename)
     
     return QJsonDocument::fromJson(file.readAll());
 }
+
+
+////////////////////
+//     Pixmap     //
+////////////////////
+
+QPixmap squared(QPixmap const &pixmap)
+{
+    if (pixmap.width() == pixmap.height())
+        return pixmap;
+    
+    int maxdim = qMax(pixmap.width(), pixmap.height());
+    
+    QPixmap newmap{maxdim, maxdim};
+    newmap.fill(Qt::transparent);
+
+    int xoffset = (maxdim - pixmap.width()) / 2;
+    int yoffset = (maxdim - pixmap.height()) / 2;
+
+    QPainter painter{&newmap};
+    painter.drawPixmap(QPoint{xoffset, yoffset}, pixmap);
+    return newmap;
+}

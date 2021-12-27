@@ -76,6 +76,7 @@ QString PixmapCache::load_from_memory(QByteArray const &b64_avatar) noexcept
     if (pixmap.isNull())
         return "";
 
+    pixmap = squared(pixmap);
     QString name = QCryptographicHash::hash(b64_avatar, QCryptographicHash::Sha1).toHex();
     d_pixmaps[name] = pixmap;
     return name;
@@ -95,7 +96,8 @@ TransferableImage PixmapCache::load_from_file(QString const &filename) noexcept
     QPixmap pixmap;
     if (!pixmap.loadFromData(data))
         return {};
-
+    
+    pixmap = squared(pixmap);
     rval.b64_data = data.toBase64();
     rval.name = QCryptographicHash::hash(rval.b64_data, QCryptographicHash::Sha1).toHex();
     d_pixmaps[rval.name] = pixmap;
@@ -129,5 +131,5 @@ QPixmap PixmapCache::load_from_b64(QByteArray const &b64_data) const noexcept
     QByteArray raw_data = QByteArray::fromBase64(b64_data);
     rval.loadFromData(raw_data);
 
-    return rval;
+    return squared(rval);
 }

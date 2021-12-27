@@ -537,7 +537,7 @@ void ApplicationControl::display_update_clicked()
 void ApplicationControl::load_pixmap_file(QString const &filename, QString const &key)
 {
     QPixmap pixmap{filename};
-    d_pixmap_cache.put_pixmap(key, pixmap);
+    d_pixmap_cache.put_pixmap(key, squared(pixmap));
 }
 
 

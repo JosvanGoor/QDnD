@@ -8,6 +8,8 @@
 #include <QMap>
 #include <QPixmap>
 
+#include "../utility/loading.h"
+
 /*
     Pixmap files are recognised cross client by taking a Sha1 hash from their
     b64 encoded files in .jpg or .png encoding.
