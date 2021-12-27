@@ -58,6 +58,7 @@ void ApplicationControl::create_default_connections()
 
     QObject::connect(&d_map_manager, &MapManager::pixmap_required, this, &ApplicationControl::on_pixmap_required);
     QObject::connect(&d_map_manager, &MapManager::update_grid, this, &ApplicationControl::update_grid);
+    QObject::connect(&d_map_manager, &MapManager::preload_pixmap, this, &ApplicationControl::load_pixmap_file);
 
     QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::lines_cleared, this, &ApplicationControl::on_grid_delete_all_lines);
     QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::lines_removed, this, &ApplicationControl::on_grid_delete_lines);
@@ -142,13 +143,13 @@ void ApplicationControl::start_hosting()
 
     TransferableImage dm_ava = d_pixmap_cache.load_from_file(":/data/dmpic.png");
     d_player_control.create_dungeon_master(dm_ava.name);
-    // d_main_window.load_entity_widget();
-
+    d_main_window.load_editor(&d_map_manager);
+    
     QObject::connect(&d_player_control, &PlayerControl::trigger_synchronization, this, &ApplicationControl::on_trigger_synchronization);
     QObject::connect(d_connection, &ConnectionBase::pixmap_requested, this, &ApplicationControl::pixmap_requested);
 
-    d_main_window.load_editor(&d_map_manager);
     QObject::connect(d_main_window.item_group_control(), &ItemGroupControlWidget::place_grid_item, this, &ApplicationControl::on_grid_item_placed);
+    QObject::connect(d_main_window.map_manager(), &MapManagerControlWidget::group_visibility_changed, this, &ApplicationControl::on_grid_group_visibility_set);
 
     set_connectionbase_signals();
     d_connection->connect("", 4144);
@@ -208,8 +209,10 @@ void ApplicationControl::set_connectionbase_signals()
     QObject::connect(d_connection, &ConnectionBase::entities_rotated, &d_entity_manager, &EntityManager::on_entities_rotated);
     QObject::connect(d_connection, &ConnectionBase::synchronize_entities, &d_entity_manager, &EntityManager::on_entities_synchronized);
 
+    QObject::connect(d_connection, &ConnectionBase::clear_grid_groups, &d_map_manager, &MapManager::clear_map);
     QObject::connect(d_connection, &ConnectionBase::grid_item_added, &d_map_manager, &MapManager::on_grid_item_added);
     QObject::connect(d_connection, &ConnectionBase::grid_group_visibility, &d_map_manager, &MapManager::on_group_visibility);
+    QObject::connect(d_connection, &ConnectionBase::synchronize_grid_group, &d_map_manager, &MapManager::on_synchronize_grid_group);
 }
 
 
@@ -418,6 +421,7 @@ void ApplicationControl::on_grid_item_placed(QString const &filename, QPoint pos
     if (!d_connection)
         return;
 
+    // this is stupid
     // TODO: make this better.
     TransferableImage image = d_pixmap_cache.load_from_file(filename);
     GridItem item;
@@ -426,10 +430,19 @@ void ApplicationControl::on_grid_item_placed(QString const &filename, QPoint pos
     item.rotation = rotation;
     item.scale = scale;
     item.visibility = mode;
-    // this is stupid
+    
+    d_map_manager.selected_group().list_filename(image.name, filename);
     d_connection->send(grid_item_added_message(d_map_manager.selected_group_name(), item));
 }
 
+
+void ApplicationControl::on_grid_group_visibility_set(QString const &group, VisibilityMode mode)
+{
+    if (!d_connection)
+        return;
+    debug_message("on_grid_group_visibility_set");
+    d_connection->send(grid_group_visibility_message(group, mode));
+}
 
 ////////////////////
 //      Misc      //
@@ -487,6 +500,13 @@ void ApplicationControl::display_update_clicked()
 //  Server Slots  //
 ////////////////////
 
+void ApplicationControl::load_pixmap_file(QString const &filename, QString const &key)
+{
+    QPixmap pixmap{filename};
+    d_pixmap_cache.put_pixmap(key, pixmap);
+}
+
+
 void ApplicationControl::pixmap_requested(QString const &id, QString const &key)
 {
     ServerConnection *server = reinterpret_cast<ServerConnection*>(d_connection);
@@ -519,11 +539,21 @@ void ApplicationControl::on_trigger_synchronization(QString const &id)
     for (auto &player : d_player_control.players())
     {
         if (!player.lines().isEmpty())
-            reinterpret_cast<ServerConnection*>(d_connection)->queue_message(id, synchronize_lines_message(player.identifier(), player.lines()).toJson());
+            reinterpret_cast<ServerConnection*>(d_connection)->queue_message(id, synchronize_lines_message(player.identifier(), player.lines()).toJson(QJsonDocument::Compact));
     }
 
     if (!d_entity_manager.entities().isEmpty())
-        reinterpret_cast<ServerConnection*>(d_connection)->queue_message(id, synchronize_entities_message(d_entity_manager.entities()).toJson());
+        reinterpret_cast<ServerConnection*>(d_connection)->queue_message(id, synchronize_entities_message(d_entity_manager.entities()).toJson(QJsonDocument::Compact));
+
+    on_map_synchronization(id);
+}
+
+
+void ApplicationControl::on_map_synchronization(QString const &id)
+{
+    reinterpret_cast<ServerConnection*>(d_connection)->message_to(id, grid_groups_cleared_message().toJson(QJsonDocument::Compact));
+    for (auto const &group : d_map_manager.grid_groups())
+        reinterpret_cast<ServerConnection*>(d_connection)->queue_message(id, synchronize_grid_group_message(group).toJson(QJsonDocument::Compact));
 }
 
 

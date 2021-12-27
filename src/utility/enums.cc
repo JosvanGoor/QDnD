@@ -61,7 +61,8 @@ QString as_string(MessageType type)
         case MessageType::SYNCHRONIZE:              return "SYNCHRONIZE";
         case MessageType::SYNCHRONIZE_LINES:        return "SYNCHRONIZE_LINES";
         case MessageType::SYNCHRONIZE_ENTITIES:     return "SYNCHRONIZE_ENTITIES";
-        case MessageType::SYNCHRONIZE_GRID_ITEMS:   return "SYNCHRONIZE_GRID_ITEMS";
+        case MessageType::SYNCHRONIZE_GRID_GROUP:   return "SYNCHRONIZE_GRID_GROUP";
+        case MessageType::SYNCHRONIZE_MAP:          return "SYNCHRONIZE_MAP";
         case MessageType::HANDSHAKE:                return "HANDSHAKE";
         case MessageType::PLAYER_CONNECTED:         return "PLAYER_CONNECTED";
         case MessageType::PLAYER_DISCONNECTED:      return "PLAYER_DISCONNECTED";
@@ -86,6 +87,7 @@ QString as_string(MessageType type)
 
         case MessageType::GRID_ITEM_ADDED:          return "GRID_ITEM_ADDED";
         case MessageType::GRID_GROUP_VISIBILITY:    return "GRID_GROUP_VISIBILITY";
+        case MessageType::GRID_GROUPS_CLEARED:      return "GRID_GROUPS_CLEARED";
 
         case MessageType::LINE_DRAWN:               return "LINE_DRAWN";
         case MessageType::LINES_DELETED:            return "LINES_DELETED";

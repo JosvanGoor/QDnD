@@ -86,14 +86,17 @@ class ApplicationControl : public QObject
 
         // map builder stuff
         void on_grid_item_placed(QString const &filename, QPoint position, int rotation, GridScale scale, VisibilityMode mode);
-
+        void on_grid_group_visibility_set(QString const &group, VisibilityMode mode);
+        
         // misc
         void chat_entered(QString const &chat);
         void display_update_clicked();
         
         // server only slots
+        void load_pixmap_file(QString const &filename, QString const &key);
         void pixmap_requested(QString const &id, QString const &key);
         void on_trigger_synchronization(QString const &identifier);
+        void on_map_synchronization(QString const &identifier);
 
         // saving & loading
         void save_own_lines();

@@ -32,8 +32,10 @@ MapManagerControlWidget::MapManagerControlWidget(MapManager *manager, QWidget *p
     layout()->addWidget(d_insert_map = new QPushButton{"Insert Map"});
 
     QObject::connect(d_new_group_button, &QPushButton::pressed, this, &MapManagerControlWidget::on_group_added);
-    QObject::connect(d_visibility_check, &QCheckBox::toggled, this, &MapManagerControlWidget::on_visibility_changed);
+    QObject::connect(d_visibility_check, &QCheckBox::clicked, this, &MapManagerControlWidget::on_visibility_changed);
     QObject::connect(d_group_list, &QListWidget::itemSelectionChanged, this, &MapManagerControlWidget::on_selection_changed);
+    QObject::connect(d_save_map, &QPushButton::pressed, this, &MapManagerControlWidget::on_save_map);
+    QObject::connect(d_load_map, &QPushButton::pressed, this, &MapManagerControlWidget::on_load_map);
 
     d_manager = manager;
     for (auto &group : d_manager->grid_groups())
@@ -75,8 +77,41 @@ void MapManagerControlWidget::on_selection_changed()
 }
 
 
-void MapManagerControlWidget::on_visibility_changed(bool checked)
+void MapManagerControlWidget::on_visibility_changed([[maybe_unused]] bool checked)
 {
-    d_manager->selected_group().set_visibility(checked ? VisibilityMode::VISIBLE : VisibilityMode::HIDDEN);
-    emit update_grid();
+    emit group_visibility_changed(d_manager->selected_group_name(), d_visibility_check->isChecked() ? VisibilityMode::VISIBLE : VisibilityMode::HIDDEN);
+}
+
+
+void MapManagerControlWidget::on_save_map()
+{
+    QString filename = QFileDialog::getSaveFileName(this, "Choose Save Location...");
+    if (filename.isEmpty())
+        return;
+
+    QJsonObject obj;
+    obj["type"] = "QDND_MAP_1.0A";
+    obj["groups"] = d_manager->jsonify_map(true);
+    QJsonDocument document{obj};
+
+    QFile file{filename};
+    file.open(QIODevice::WriteOnly);
+    file.write(document.toJson());
+}
+
+
+void MapManagerControlWidget::on_load_map()
+{
+    QString filename = QFileDialog::getOpenFileName(this, "Choose file to load from.");
+    if (filename.isEmpty())
+        return;
+
+    QFile file{filename};
+    file.open(QIODevice::ReadOnly);
+    QJsonDocument document = QJsonDocument::fromJson(file.readAll());
+
+    if (document["type"].toString() != "QDND_MAP_1.0A")
+        return; // illegal file, no error? not my problim
+
+    d_manager->clean_from_json(document.object());
 }

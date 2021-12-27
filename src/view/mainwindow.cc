@@ -110,6 +110,11 @@ ItemGroupControlWidget *MainWindow::item_group_control() noexcept
     return d_item_group_manager;
 }
 
+MapManagerControlWidget *MainWindow::map_manager() noexcept
+{
+    return d_map_manager;
+}
+
 
 ////////////////////
 //     Editor     //
@@ -119,8 +124,6 @@ void MainWindow::load_editor(MapManager *manager)
 {
     d_right_tabs->addTab(d_item_group_manager = new ItemGroupControlWidget{d_grid_tab, manager}, "Item Group Control");
     d_right_tabs->addTab(d_map_manager = new MapManagerControlWidget{manager}, "Map Manager");
-    QObject::connect(d_item_group_manager, &ItemGroupControlWidget::debug_message, this, &MainWindow::debug_message);
-    QObject::connect(d_map_manager, &MapManagerControlWidget::update_grid, d_grid_tab, &GridWidget::request_render_update);
 }
 
 

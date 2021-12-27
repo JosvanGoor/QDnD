@@ -173,12 +173,20 @@ void ConnectionBase::handle_message(QJsonDocument const &doc)
             emit entities_rotated(obj);
         break;
 
+        case MessageType::GRID_GROUPS_CLEARED:
+            emit clear_grid_groups();
+        break;
+
         case MessageType::GRID_ITEM_ADDED:
             emit grid_item_added(obj);
         break;
 
         case MessageType::GRID_GROUP_VISIBILITY:
             emit grid_group_visibility(obj["group"].toString(), static_cast<VisibilityMode>(obj["visibility"].toInt()));
+        break;
+
+        case MessageType::SYNCHRONIZE_GRID_GROUP:
+            emit synchronize_grid_group(obj);
         break;
 
         default: break;

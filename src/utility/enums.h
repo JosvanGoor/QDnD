@@ -29,7 +29,8 @@ enum class MessageType
     SYNCHRONIZE,
     SYNCHRONIZE_LINES,
     SYNCHRONIZE_ENTITIES,
-    SYNCHRONIZE_GRID_ITEMS,
+    SYNCHRONIZE_GRID_GROUP,
+    SYNCHRONIZE_MAP,
     PLAYER_CONNECTED,
     PLAYER_DISCONNECTED,
     PING,
@@ -57,6 +58,7 @@ enum class MessageType
     // mapping stuff
     GRID_ITEM_ADDED,
     GRID_GROUP_VISIBILITY,
+    GRID_GROUPS_CLEARED,
 
     // drawing
     LINE_DRAWN,

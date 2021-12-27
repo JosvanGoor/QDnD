@@ -2,6 +2,7 @@
 #define VIEW_MAPMANAGERCONTROLWIDGET_H
 
 #include <QCheckBox>
+#include <QFileDialog>
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QLineEdit>
@@ -35,8 +36,11 @@ class MapManagerControlWidget : public QWidget
         void on_selection_changed();
         void on_visibility_changed(bool checked);
 
+        void on_save_map();
+        void on_load_map();
+
     signals:
-        void update_grid();
+        void group_visibility_changed(QString const &group, VisibilityMode mode);
 };
 
 #endif

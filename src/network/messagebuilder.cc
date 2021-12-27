@@ -78,6 +78,15 @@ QJsonDocument synchronize_entities_message(QMap<QString, Entity> const &entities
 }
 
 
+QJsonDocument synchronize_grid_group_message(GridItemGroup const &group)
+{
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::SYNCHRONIZE_GRID_GROUP);
+    obj["group"] = group.serialize(false);
+    return QJsonDocument{obj};
+}
+
+
 QJsonDocument player_connected_message(QString const &id, QString const &avatar_key, QColor const &color, GridScale scale)
 {
     QJsonObject obj;
@@ -281,12 +290,20 @@ QJsonDocument entities_rotated_message(QSet<QString> const &entities, int angle)
 //   Grid Items   //
 ////////////////////
 
+QJsonDocument grid_groups_cleared_message()
+{
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::GRID_GROUPS_CLEARED);
+    return QJsonDocument{obj};
+}
+
+
 QJsonDocument grid_item_added_message(QString const &group, GridItem const &item)
 {
     QJsonObject obj;
     obj["type"] = as_int(MessageType::GRID_ITEM_ADDED);
     obj["group"] = group;
-    obj["pixmap"] = item.pixmap_code;
+    obj["pixmap_code"] = item.pixmap_code;
     obj["x"] = item.position.x();
     obj["y"] = item.position.y();
     obj["rotation"] = item.rotation;

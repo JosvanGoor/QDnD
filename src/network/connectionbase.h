@@ -64,8 +64,10 @@ class ConnectionBase : public QObject
         void synchronize_entities(QJsonObject const &obj);
 
         // grid item stuff
+        void clear_grid_groups();
         void grid_item_added(QJsonObject const &obj);
         void grid_group_visibility(QString const &group, VisibilityMode mode);
+        void synchronize_grid_group(QJsonObject const &obj);
 
         // line stuff
         void line_sync(QJsonObject const &obj);

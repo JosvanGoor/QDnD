@@ -40,6 +40,7 @@ struct GridItemGroup
         // utility
         void clear();
         void set_visibility(VisibilityMode mode);
+        void list_filename(QString const &key, QString const &filename);
 
         // serialization
         QJsonObject serialize(bool include_filenames = true) const noexcept;

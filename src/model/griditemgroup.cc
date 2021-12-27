@@ -65,6 +65,12 @@ void GridItemGroup::set_visibility(VisibilityMode mode)
 }
 
 
+void GridItemGroup::list_filename(QString const &key, QString const &filename)
+{
+    d_filename_dict[key] = filename;
+}
+
+
 ////////////////////
 //   Serialize    //
 ////////////////////

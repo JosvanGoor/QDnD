@@ -19,7 +19,7 @@ struct Entity; // forward decl temporary
 QJsonDocument handshake_message(QString const &id, QByteArray const &b64_avatar, QColor const &color, GridScale scale);
 QJsonDocument synchronize_lines_message(QString const &id, QMap<QString, DrawLine> const &lines);
 QJsonDocument synchronize_entities_message(QMap<QString, Entity> const &entities);
-QJsonDocument synchronize_grid_items_message(GridItemGroup const &group);
+QJsonDocument synchronize_grid_group_message(GridItemGroup const &group);
 QJsonDocument player_connected_message(QString const &id, QString const &avatar_key, QColor const &color, GridScale scale);
 QJsonDocument player_disconnected_message(QString const &id);
 QJsonDocument ping_message() noexcept;
@@ -45,6 +45,7 @@ QJsonDocument entities_cleared_message();
 QJsonDocument entities_rotated_message(QSet<QString> const &names, int angle);
 
 // grid items
+QJsonDocument grid_groups_cleared_message();
 QJsonDocument grid_item_added_message(QString const &group, GridItem const &item);
 QJsonDocument grid_group_visibility_message(QString const &group, VisibilityMode mode);
 

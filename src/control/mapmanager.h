@@ -1,6 +1,7 @@
 #ifndef CONTROL_MAPMANAGER_H
 #define CONTROL_MAPMANAGER_H
 
+#include <QJsonArray>
 #include <QJsonObject>
 #include <QMap>
 #include <QString>
@@ -22,6 +23,7 @@ class MapManager : public QObject
         QMap<QString, GridItemGroup> const &grid_groups() const;
         
         // utility
+        void clear_map();
         void add_group(QString const &name);
         void set_selection(QString const &name);
         
@@ -29,7 +31,11 @@ class MapManager : public QObject
         GridItemGroup &selected_group();
         GridItemGroup &find_group(QString const &name);
 
+        QJsonArray jsonify_map(bool filenames);
+        void clean_from_json(QJsonObject const &doc);
+
         // slots
+        void on_synchronize_grid_group(QJsonObject const &obj);
         void on_grid_item_added(QJsonObject const &obj);
         void on_group_visibility(QString const &group, VisibilityMode mode);
 
@@ -37,6 +43,7 @@ class MapManager : public QObject
         void update_grid();
         void selection_changed();
         void pixmap_required(QString const &key);
+        void preload_pixmap(QString const &filename, QString const &key);
 
 
 };
