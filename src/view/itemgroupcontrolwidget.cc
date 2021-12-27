@@ -62,11 +62,11 @@ ItemGroupControlWidget::ItemGroupControlWidget(GridWidget *grid, MapManager *man
     d_current_item->setLayout(new QVBoxLayout);
     d_current_item->layout()->addWidget(centering_widget);
     d_current_item->layout()->addWidget(form_widget);
-    d_current_item->layout()->addWidget(d_remove_item = new QPushButton{"Remove"});
 
     layout()->addWidget(d_group_name = new QLabel{"Current Group: " + d_manager->selected_group_name()});
     layout()->addWidget(d_mouse_mode);
     layout()->addWidget(d_current_item);
+    layout()->addWidget(d_remove_item = new QPushButton{"Remove Selected"});
 
     QObject::connect(d_placement_mode, &QPushButton::pressed, this, &ItemGroupControlWidget::on_mouse_mode_changed);
     QObject::connect(d_selection_mode, &QPushButton::pressed, this, &ItemGroupControlWidget::on_mouse_mode_changed);
@@ -77,8 +77,11 @@ ItemGroupControlWidget::ItemGroupControlWidget(GridWidget *grid, MapManager *man
     QObject::connect(d_pixmap_selection, &DropWidget::pixmap_dropped, this, &ItemGroupControlWidget::on_pixmap_dropped);
     QObject::connect(d_rotation_slider, &QSlider::valueChanged, this, &ItemGroupControlWidget::on_rotation_changed);
     QObject::connect(d_scale_selection, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ItemGroupControlWidget::on_scale_changed);
+    QObject::connect(d_remove_item, &QPushButton::pressed, this, &ItemGroupControlWidget::on_remove);
     
     QObject::connect(d_grid, &GridWidget::grid_item_placed, this, &ItemGroupControlWidget::on_grid_item_click);
+    QObject::connect(d_grid, &GridWidget::selection_click, this, &ItemGroupControlWidget::on_grid_selection_click);
+    QObject::connect(d_grid, &GridWidget::selection_rclick, this, &ItemGroupControlWidget::on_grid_selection_rclick);
     QObject::connect(d_manager, &MapManager::selection_changed, this, &ItemGroupControlWidget::on_group_selection_changed);
 }
 
@@ -128,6 +131,7 @@ void ItemGroupControlWidget::on_mouse_mode_changed()
         d_mouse_mode->setTitle("Mouse Mode: Selection");
     }
 
+    clear_selection();
     reset_mouse_mode();
 }
 
@@ -153,18 +157,27 @@ void ItemGroupControlWidget::on_scale_changed(int index)
 }
 
 
+void ItemGroupControlWidget::on_remove()
+{
+    if (d_selection == -1)
+        return;
+
+    emit remove_grid_item(d_selection);
+    clear_selection();
+}
+
+
 void ItemGroupControlWidget::on_group_selection_changed()
 {
+    clear_selection();
     d_group_name->setText("Current Group: " + d_manager->selected_group_name());
 }
 
 
 void ItemGroupControlWidget::on_grid_item_click(QPoint const &position)
 {
-    debug_message("on_grid_item_click");
     if (d_pixmap_filename.isEmpty())
         return;
-    debug_message("we have a filename!");
 
     emit place_grid_item
     (
@@ -174,4 +187,40 @@ void ItemGroupControlWidget::on_grid_item_click(QPoint const &position)
         static_cast<GridScale>(d_scale_selection->currentIndex()),
         VisibilityMode::PARENT
     );
+}
+
+
+void ItemGroupControlWidget::clear_selection()
+{
+    d_selection = 0;
+    d_grid->update_gi_selected(false);
+    emit debug_message("selection cleared?");
+}
+
+
+void ItemGroupControlWidget::on_grid_selection_click(QPoint const &position)
+{
+    debug_message("on_grid_selection_click");
+    QVector<GridItem> &items = d_manager->selected_group().items();
+    for (int idx = 0; idx != items.size(); ++idx)
+    {
+        int dims = scale(items[idx].scale) * 64;
+        QRect rect{items[idx].position, QSize{dims, dims}};
+        if (rect.contains(position))
+        {
+            d_selection = idx;
+            d_grid->update_gi_selected(true, rect.topLeft());
+            d_grid->update_gi_scale(items[idx].scale);
+            d_grid->update_gi_rotation(items[idx].rotation);
+            return;
+        }
+    }
+
+    clear_selection();
+}
+
+
+void ItemGroupControlWidget::on_grid_selection_rclick()
+{
+    clear_selection();
 }

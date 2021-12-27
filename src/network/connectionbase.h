@@ -65,6 +65,7 @@ class ConnectionBase : public QObject
 
         // grid item stuff
         void clear_grid_groups();
+        void grid_item_removed(QString const &group, int index);
         void grid_item_added(QJsonObject const &obj);
         void grid_group_visibility(QString const &group, VisibilityMode mode);
         void synchronize_grid_group(QJsonObject const &obj);

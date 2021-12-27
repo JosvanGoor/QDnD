@@ -177,6 +177,10 @@ void ConnectionBase::handle_message(QJsonDocument const &doc)
             emit clear_grid_groups();
         break;
 
+        case MessageType::GRID_ITEM_REMOVED:
+            emit grid_item_removed(obj["group"].toString(), obj["index"].toInt());
+        break;
+
         case MessageType::GRID_ITEM_ADDED:
             emit grid_item_added(obj);
         break;

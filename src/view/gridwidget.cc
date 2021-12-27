@@ -19,6 +19,8 @@ GridWidget::GridWidget(QWidget *parent)
     d_left_button = false;
     d_right_button = false;
 
+    d_gi_selected = false;
+    d_selection_origin = {};
     d_gi_rotation = 0;
     d_gi_scale = GridScale::MEDIUM;
 
@@ -67,6 +69,10 @@ void GridWidget::paintEvent([[maybe_unused]] QPaintEvent *event)
     else if (d_mouse_mode == MouseMode::GRID_ITEM_PLACEMENT)
     {
         paint_grid_item(painter, d_offset, d_gi_pixmap, d_gi_scale, grid_item_snap(d_mouse_old), d_gi_rotation);
+    }
+    else if (d_mouse_mode == MouseMode::GRID_ITEM_SELECTION && d_gi_selected)
+    {
+        paint_rect_around_pixmap(painter, d_selection_origin, d_gi_scale, Qt::red, d_offset);
     }
 }
 
@@ -180,6 +186,14 @@ void GridWidget::update_gi_scale(GridScale scale)
 }
 
 
+void GridWidget::update_gi_selected(bool selection, QPoint const &origin)
+{
+    d_gi_selected = selection;
+    d_selection_origin = origin;
+    update();
+}
+
+
 ////////////////////
 //  Mouse Events  //
 ////////////////////
@@ -244,12 +258,19 @@ void GridWidget::mousePressEvent(QMouseEvent *event)
                     emit grid_item_placed(grid_item_snap(event->pos()));
                 break;
 
+                case MouseMode::GRID_ITEM_SELECTION:
+                    emit selection_click(world_pos(event->pos()));
+                break;
+
                 default: break;
             }
         break;
         
         case Qt::RightButton:
             d_right_button = true;
+            
+            if (d_mouse_mode == MouseMode::GRID_ITEM_SELECTION)
+                emit selection_rclick();
         break;
 
         default: break;

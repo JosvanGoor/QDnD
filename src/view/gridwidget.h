@@ -39,6 +39,8 @@ class GridWidget : public QWidget
     bool d_right_button;
 
     // grid editing
+    bool d_gi_selected;
+    QPoint d_selection_origin;
     QPixmap d_gi_pixmap;
     int d_gi_rotation;
     GridScale d_gi_scale;
@@ -64,6 +66,7 @@ class GridWidget : public QWidget
         void update_gi_pixmap(QPixmap const &pixmap);
         void update_gi_rotation(int rotation);
         void update_gi_scale(GridScale scale);
+        void update_gi_selected(bool selection, QPoint const &origin = {});
 
         // mouse events
         void mouseMoveEvent(QMouseEvent *event) override;
@@ -76,6 +79,8 @@ class GridWidget : public QWidget
         void debug_message(QString const &message);
         void grid_player_move(QPoint const &point);
         void grid_line_drawn(QVector<QLine> const &line, QColor const &color);
+        void selection_click(QPoint pos);
+        void selection_rclick();
 
         // paints grid, background color & brushes (TODO)
         // then  paints scenery

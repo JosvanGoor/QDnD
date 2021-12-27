@@ -86,6 +86,8 @@ QString as_string(MessageType type)
         case MessageType::ENTITIES_ROTATED:         return "ENTITIES_ROTATED";
 
         case MessageType::GRID_ITEM_ADDED:          return "GRID_ITEM_ADDED";
+        case MessageType::GRID_ITEM_REMOVED:        return "GRID_ITEM_REMOVED";
+        case MessageType::GRID_GROUP_REMOVED:       return "GRID_GROUP_REMOVED";
         case MessageType::GRID_GROUP_VISIBILITY:    return "GRID_GROUP_VISIBILITY";
         case MessageType::GRID_GROUPS_CLEARED:      return "GRID_GROUPS_CLEARED";
 

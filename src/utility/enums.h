@@ -57,6 +57,8 @@ enum class MessageType
 
     // mapping stuff
     GRID_ITEM_ADDED,
+    GRID_ITEM_REMOVED,
+    GRID_GROUP_REMOVED,
     GRID_GROUP_VISIBILITY,
     GRID_GROUPS_CLEARED,
 

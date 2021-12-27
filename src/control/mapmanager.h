@@ -37,6 +37,7 @@ class MapManager : public QObject
         // slots
         void on_synchronize_grid_group(QJsonObject const &obj);
         void on_grid_item_added(QJsonObject const &obj);
+        void on_grid_item_removed(QString const &group, int index);
         void on_group_visibility(QString const &group, VisibilityMode mode);
 
     signals:

@@ -313,6 +313,25 @@ QJsonDocument grid_item_added_message(QString const &group, GridItem const &item
 }
 
 
+QJsonDocument grid_item_removed_message(QString const &group, int index)
+{
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::GRID_ITEM_REMOVED);
+    obj["group"] = group;
+    obj["index"] = index;
+    return QJsonDocument{obj};
+}
+
+
+QJsonDocument grid_group_removed_message(QString const &group)
+{
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::GRID_GROUP_REMOVED);
+    obj["group"] = group;
+    return QJsonDocument{obj};
+}
+
+
 QJsonDocument grid_group_visibility_message(QString const &group, VisibilityMode mode)
 {
     QJsonObject obj;

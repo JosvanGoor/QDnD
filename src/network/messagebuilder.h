@@ -47,6 +47,8 @@ QJsonDocument entities_rotated_message(QSet<QString> const &names, int angle);
 // grid items
 QJsonDocument grid_groups_cleared_message();
 QJsonDocument grid_item_added_message(QString const &group, GridItem const &item);
+QJsonDocument grid_item_removed_message(QString const &group, int index);
+QJsonDocument grid_group_removed_message(QString const &group);
 QJsonDocument grid_group_visibility_message(QString const &group, VisibilityMode mode);
 
 // lines

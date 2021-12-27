@@ -147,6 +147,23 @@ void MapManager::on_grid_item_added(QJsonObject const &obj)
 }
 
 
+void MapManager::on_grid_item_removed(QString const &group, int index)
+{
+    if (index == -1)
+        return;
+
+    if (auto it = d_grid_groups.find(group); it != d_grid_groups.end())
+    {
+        if (it.value().items().size() <= index)
+            return;
+
+        it.value().items().erase(it.value().items().begin() + index);
+    }
+    
+    emit update_grid();
+}
+
+
 void MapManager::on_group_visibility(QString const &group, VisibilityMode mode)
 {
     if (auto it = d_grid_groups.find(group); it != d_grid_groups.end())

@@ -150,6 +150,7 @@ void ApplicationControl::start_hosting()
     QObject::connect(d_connection, &ConnectionBase::pixmap_requested, this, &ApplicationControl::pixmap_requested);
 
     QObject::connect(d_main_window.item_group_control(), &ItemGroupControlWidget::place_grid_item, this, &ApplicationControl::on_grid_item_placed);
+    QObject::connect(d_main_window.item_group_control(), &ItemGroupControlWidget::remove_grid_item, this, &ApplicationControl::on_grid_item_removed);
     QObject::connect(d_main_window.map_manager(), &MapManagerControlWidget::group_visibility_changed, this, &ApplicationControl::on_grid_group_visibility_set);
 
     set_connectionbase_signals();
@@ -212,6 +213,7 @@ void ApplicationControl::set_connectionbase_signals()
 
     QObject::connect(d_connection, &ConnectionBase::clear_grid_groups, &d_map_manager, &MapManager::clear_map);
     QObject::connect(d_connection, &ConnectionBase::grid_item_added, &d_map_manager, &MapManager::on_grid_item_added);
+    QObject::connect(d_connection, &ConnectionBase::grid_item_removed, &d_map_manager, &MapManager::on_grid_item_removed);
     QObject::connect(d_connection, &ConnectionBase::grid_group_visibility, &d_map_manager, &MapManager::on_group_visibility);
     QObject::connect(d_connection, &ConnectionBase::synchronize_grid_group, &d_map_manager, &MapManager::on_synchronize_grid_group);
 }
@@ -416,6 +418,22 @@ void ApplicationControl::on_entity_rotation(int angle)
 ////////////////////
 //  Map Editing   //
 ////////////////////
+
+void ApplicationControl::on_grid_group_removed()
+{
+    if (!d_connection)
+        return;
+    d_connection->send(grid_group_removed_message(d_map_manager.selected_group_name()));
+}
+
+
+void ApplicationControl::on_grid_item_removed(int index)
+{
+    if (!d_connection)
+        return;
+    d_connection->send(grid_item_removed_message(d_map_manager.selected_group_name(), index));
+}
+
 
 void ApplicationControl::on_grid_item_placed(QString const &filename, QPoint position, int rotation, GridScale scale, VisibilityMode mode)
 {

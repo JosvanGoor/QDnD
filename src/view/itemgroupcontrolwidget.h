@@ -22,6 +22,7 @@ class ItemGroupControlWidget : public QWidget
 {
     Q_OBJECT
 
+    int d_selection;
     GridWidget *d_grid;
     MapManager *d_manager;
     QString d_pixmap_filename;
@@ -58,12 +59,18 @@ class ItemGroupControlWidget : public QWidget
         void on_rotation_changed(int value);
         void on_scale_changed(int index);
 
+        void on_remove();
         void on_group_selection_changed();
         void on_grid_item_click(QPoint const &position);
+
+        void clear_selection();
+        void on_grid_selection_click(QPoint const &position);
+        void on_grid_selection_rclick();
 
     signals:
         void debug_message(QString const &message);
         void place_grid_item(QString const &filename, QPoint position, int rotation, GridScale scale, VisibilityMode mode);
+        void remove_grid_item(int index);
 };
 
 #endif
