@@ -63,7 +63,11 @@ class ConnectionBase : public QObject
         void entities_rotated(QJsonObject const &obj);
         void synchronize_entities(QJsonObject const &obj);
 
-        // grid stuff
+        // grid item stuff
+        void grid_item_added(QJsonObject const &obj);
+        void grid_group_visibility(QString const &group, VisibilityMode mode);
+
+        // line stuff
         void line_sync(QJsonObject const &obj);
         void line_received(QJsonObject const &obj);
         void lines_removed(QJsonObject const &obj);

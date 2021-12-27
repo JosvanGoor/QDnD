@@ -98,9 +98,16 @@ SpellsWidget *MainWindow::spells_widget() noexcept
     return d_spells_tab;
 }
 
+
 StatusBar *MainWindow::status_bar() noexcept
 {
     return d_status_bar;
+}
+
+
+ItemGroupControlWidget *MainWindow::item_group_control() noexcept
+{
+    return d_item_group_manager;
 }
 
 
@@ -112,6 +119,8 @@ void MainWindow::load_editor(MapManager *manager)
 {
     d_right_tabs->addTab(d_item_group_manager = new ItemGroupControlWidget{d_grid_tab, manager}, "Item Group Control");
     d_right_tabs->addTab(d_map_manager = new MapManagerControlWidget{manager}, "Map Manager");
+    QObject::connect(d_item_group_manager, &ItemGroupControlWidget::debug_message, this, &MainWindow::debug_message);
+    QObject::connect(d_map_manager, &MapManagerControlWidget::update_grid, d_grid_tab, &GridWidget::request_render_update);
 }
 
 

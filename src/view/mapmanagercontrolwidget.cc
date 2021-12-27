@@ -78,4 +78,5 @@ void MapManagerControlWidget::on_selection_changed()
 void MapManagerControlWidget::on_visibility_changed(bool checked)
 {
     d_manager->selected_group().set_visibility(checked ? VisibilityMode::VISIBLE : VisibilityMode::HIDDEN);
+    emit update_grid();
 }

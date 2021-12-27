@@ -34,6 +34,9 @@ class MapManagerControlWidget : public QWidget
         void on_group_added();
         void on_selection_changed();
         void on_visibility_changed(bool checked);
+
+    signals:
+        void update_grid();
 };
 
 #endif

@@ -278,6 +278,35 @@ QJsonDocument entities_rotated_message(QSet<QString> const &entities, int angle)
 
 
 ////////////////////
+//   Grid Items   //
+////////////////////
+
+QJsonDocument grid_item_added_message(QString const &group, GridItem const &item)
+{
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::GRID_ITEM_ADDED);
+    obj["group"] = group;
+    obj["pixmap"] = item.pixmap_code;
+    obj["x"] = item.position.x();
+    obj["y"] = item.position.y();
+    obj["rotation"] = item.rotation;
+    obj["scale"] = as_int(item.scale);
+    obj["visibility"] = as_int(item.visibility);
+    return QJsonDocument{obj};
+}
+
+
+QJsonDocument grid_group_visibility_message(QString const &group, VisibilityMode mode)
+{
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::GRID_GROUP_VISIBILITY);
+    obj["group"] = group;
+    obj["visibility"] = as_int(mode);
+    return QJsonDocument{obj};
+}
+
+
+////////////////////
 //  Line Control  //
 ////////////////////
 

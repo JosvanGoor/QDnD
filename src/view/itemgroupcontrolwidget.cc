@@ -77,6 +77,8 @@ ItemGroupControlWidget::ItemGroupControlWidget(GridWidget *grid, MapManager *man
     QObject::connect(d_pixmap_selection, &DropWidget::pixmap_dropped, this, &ItemGroupControlWidget::on_pixmap_dropped);
     QObject::connect(d_rotation_slider, &QSlider::valueChanged, this, &ItemGroupControlWidget::on_rotation_changed);
     QObject::connect(d_scale_selection, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ItemGroupControlWidget::on_scale_changed);
+    
+    QObject::connect(d_grid, &GridWidget::grid_item_placed, this, &ItemGroupControlWidget::on_grid_item_click);
     QObject::connect(d_manager, &MapManager::selection_changed, this, &ItemGroupControlWidget::on_group_selection_changed);
 }
 
@@ -134,6 +136,7 @@ void ItemGroupControlWidget::on_pixmap_dropped(QString const &filename)
 {
     QPixmap pixmap{filename};
     d_grid->update_gi_pixmap(pixmap);
+    d_pixmap_filename = filename;
 }
 
 
@@ -153,4 +156,22 @@ void ItemGroupControlWidget::on_scale_changed(int index)
 void ItemGroupControlWidget::on_group_selection_changed()
 {
     d_group_name->setText("Current Group: " + d_manager->selected_group_name());
+}
+
+
+void ItemGroupControlWidget::on_grid_item_click(QPoint const &position)
+{
+    debug_message("on_grid_item_click");
+    if (d_pixmap_filename.isEmpty())
+        return;
+    debug_message("we have a filename!");
+
+    emit place_grid_item
+    (
+        d_pixmap_filename,
+        position,
+        d_rotation_slider->value() * 15,
+        static_cast<GridScale>(d_scale_selection->currentIndex()),
+        VisibilityMode::PARENT
+    );
 }

@@ -72,6 +72,7 @@ class GridWidget : public QWidget
         void wheelEvent(QWheelEvent *event) override;
 
     signals:
+        void grid_item_placed(QPoint const &position);
         void debug_message(QString const &message);
         void grid_player_move(QPoint const &point);
         void grid_line_drawn(QVector<QLine> const &line, QColor const &color);

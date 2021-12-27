@@ -59,6 +59,7 @@ class MainWindow : public QMainWindow
         PlayersWidget *players_widget() noexcept;
         SpellsWidget *spells_widget() noexcept;
         StatusBar *status_bar() noexcept;
+        ItemGroupControlWidget *item_group_control() noexcept;
 
         // editor
         void load_editor(MapManager *manager);

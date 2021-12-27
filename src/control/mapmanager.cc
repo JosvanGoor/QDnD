@@ -63,5 +63,43 @@ GridItemGroup &MapManager::selected_group()
 
 GridItemGroup &MapManager::find_group(QString const &name)
 {
-    return d_grid_groups[name];
+    if (auto it = d_grid_groups.find(name); it != d_grid_groups.end())
+        return it.value();
+    return d_grid_groups["<default>"];
+}
+
+
+////////////////////
+//     Slots      //
+////////////////////
+
+void MapManager::on_grid_item_added(QJsonObject const &obj)
+{
+    GridItem item;
+    item.pixmap_code = obj["pixmap"].toString();
+    item.position = QPoint{obj["x"].toInt(), obj["y"].toInt()};
+    item.rotation = obj["rotation"].toInt();
+    item.scale = static_cast<GridScale>(obj["scale"].toInt());
+    item.visibility = static_cast<VisibilityMode>(obj["visibility"].toInt());
+
+    QString group = obj["group"].toString();
+    if (auto it = d_grid_groups.find(group); it != d_grid_groups.end())
+        it.value().items().push_back(item);
+    else
+    {
+        d_grid_groups[group] = GridItemGroup{group};
+        d_grid_groups[group].items().push_back(item);
+    }
+
+    emit pixmap_required(item.pixmap_code);
+    emit update_grid();
+}
+
+
+void MapManager::on_group_visibility(QString const &group, VisibilityMode mode)
+{
+    if (auto it = d_grid_groups.find(group); it != d_grid_groups.end())
+        it.value().set_visibility(mode);
+    else
+        d_grid_groups[group] = GridItemGroup{group, mode};
 }

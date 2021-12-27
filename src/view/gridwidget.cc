@@ -239,6 +239,11 @@ void GridWidget::mousePressEvent(QMouseEvent *event)
                     d_line_start = shift ? snap_to_grid(world_pos(event->pos())) : world_pos(event->pos());
                 break;
 
+                case MouseMode::GRID_ITEM_PLACEMENT:
+                    emit debug_message("GRID_ITEM_PLACEMENT *click*");
+                    emit grid_item_placed(grid_item_snap(event->pos()));
+                break;
+
                 default: break;
             }
         break;

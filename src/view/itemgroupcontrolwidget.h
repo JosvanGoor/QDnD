@@ -24,6 +24,7 @@ class ItemGroupControlWidget : public QWidget
 
     GridWidget *d_grid;
     MapManager *d_manager;
+    QString d_pixmap_filename;
     MouseMode d_current_mode;
     
     QLabel *d_group_name;
@@ -58,6 +59,11 @@ class ItemGroupControlWidget : public QWidget
         void on_scale_changed(int index);
 
         void on_group_selection_changed();
+        void on_grid_item_click(QPoint const &position);
+
+    signals:
+        void debug_message(QString const &message);
+        void place_grid_item(QString const &filename, QPoint position, int rotation, GridScale scale, VisibilityMode mode);
 };
 
 #endif

@@ -57,35 +57,39 @@ QString as_string(MessageType type)
 {
     switch (type)
     {
-        case MessageType::ERROR:                return "ERROR";
-        case MessageType::SYNCHRONIZE:          return "SYNCHRONIZE";
-        case MessageType::SYNCHRONIZE_LINES:    return "SYNCHRONIZE_LINES";
-        case MessageType::SYNCHRONIZE_ENTITIES: return "SYNCHRONIZE_ENTITIES";
-        case MessageType::HANDSHAKE:            return "HANDSHAKE";
-        case MessageType::PLAYER_CONNECTED:     return "PLAYER_CONNECTED";
-        case MessageType::PLAYER_DISCONNECTED:  return "PLAYER_DISCONNECTED";
-        case MessageType::PING:                 return "PING";
-        case MessageType::PONG:                 return "PONG";
+        case MessageType::ERROR:                    return "ERROR";
+        case MessageType::SYNCHRONIZE:              return "SYNCHRONIZE";
+        case MessageType::SYNCHRONIZE_LINES:        return "SYNCHRONIZE_LINES";
+        case MessageType::SYNCHRONIZE_ENTITIES:     return "SYNCHRONIZE_ENTITIES";
+        case MessageType::SYNCHRONIZE_GRID_ITEMS:   return "SYNCHRONIZE_GRID_ITEMS";
+        case MessageType::HANDSHAKE:                return "HANDSHAKE";
+        case MessageType::PLAYER_CONNECTED:         return "PLAYER_CONNECTED";
+        case MessageType::PLAYER_DISCONNECTED:      return "PLAYER_DISCONNECTED";
+        case MessageType::PING:                     return "PING";
+        case MessageType::PONG:                     return "PONG";
 
-        case MessageType::PIXMAP_REQUEST:       return "PIXMAP_REQUEST";
-        case MessageType::PIXMAP_TRANSFER:      return "PIXMAP_TRANSFER";
-        case MessageType::PIXMAP_NOT_FOUND:     return "PIXMAP_NOT_FOUND";
+        case MessageType::PIXMAP_REQUEST:           return "PIXMAP_REQUEST";
+        case MessageType::PIXMAP_TRANSFER:          return "PIXMAP_TRANSFER";
+        case MessageType::PIXMAP_NOT_FOUND:         return "PIXMAP_NOT_FOUND";
 
-        case MessageType::CHAT:                 return "CHAT";
-        case MessageType::RICH_TEXT:            return "RICH_TEXT";
-        case MessageType::DISPLAY_UPDATE:       return "DISPLAY_UPDATE";
+        case MessageType::CHAT:                     return "CHAT";
+        case MessageType::RICH_TEXT:                return "RICH_TEXT";
+        case MessageType::DISPLAY_UPDATE:           return "DISPLAY_UPDATE";
 
-        case MessageType::PLAYER_MOVED:         return "PLAYER_MOVED";
-        case MessageType::PLAYER_ENTITY_ADDED:  return "PLAYER_ENTITY_ADDED";
-        case MessageType::ENTITY_ADDED:         return "ENTITY_ADDED";
-        case MessageType::ENTITIES_MOVED:       return "ENTITIES_MOVED";
-        case MessageType::ENTITIES_REMOVED:     return "ENTITIES_REMOVED";
-        case MessageType::ENTITIES_CLEARED:     return "ENTITIES_CLEARED";
-        case MessageType::ENTITIES_ROTATED:     return "ENTITIES_ROTATED";
+        case MessageType::PLAYER_MOVED:             return "PLAYER_MOVED";
+        case MessageType::PLAYER_ENTITY_ADDED:      return "PLAYER_ENTITY_ADDED";
+        case MessageType::ENTITY_ADDED:             return "ENTITY_ADDED";
+        case MessageType::ENTITIES_MOVED:           return "ENTITIES_MOVED";
+        case MessageType::ENTITIES_REMOVED:         return "ENTITIES_REMOVED";
+        case MessageType::ENTITIES_CLEARED:         return "ENTITIES_CLEARED";
+        case MessageType::ENTITIES_ROTATED:         return "ENTITIES_ROTATED";
 
-        case MessageType::LINE_DRAWN:           return "LINE_DRAWN";
-        case MessageType::LINES_DELETED:        return "LINES_DELETED";
-        case MessageType::LINES_CLEARED:        return "LINES_CLEARED";
+        case MessageType::GRID_ITEM_ADDED:          return "GRID_ITEM_ADDED";
+        case MessageType::GRID_GROUP_VISIBILITY:    return "GRID_GROUP_VISIBILITY";
+
+        case MessageType::LINE_DRAWN:               return "LINE_DRAWN";
+        case MessageType::LINES_DELETED:            return "LINES_DELETED";
+        case MessageType::LINES_CLEARED:            return "LINES_CLEARED";
     }
 
     return "MessageType: If you read this Jos fucked up.";

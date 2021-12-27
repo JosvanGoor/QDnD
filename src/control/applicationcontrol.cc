@@ -56,6 +56,9 @@ void ApplicationControl::create_default_connections()
     QObject::connect(d_main_window.entity_widget(), &EntityWidget::local_entity_rotation, this, &ApplicationControl::on_entity_local_rotation);
     QObject::connect(d_main_window.entity_widget(), &EntityWidget::entity_rotation, this, &ApplicationControl::on_entity_rotation);
 
+    QObject::connect(&d_map_manager, &MapManager::pixmap_required, this, &ApplicationControl::on_pixmap_required);
+    QObject::connect(&d_map_manager, &MapManager::update_grid, this, &ApplicationControl::update_grid);
+
     QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::lines_cleared, this, &ApplicationControl::on_grid_delete_all_lines);
     QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::lines_removed, this, &ApplicationControl::on_grid_delete_lines);
     QObject::connect(d_main_window.grid_control_widget(), &GridControlWidget::line_selection_changed, this, &ApplicationControl::on_grid_line_selection);
@@ -145,6 +148,7 @@ void ApplicationControl::start_hosting()
     QObject::connect(d_connection, &ConnectionBase::pixmap_requested, this, &ApplicationControl::pixmap_requested);
 
     d_main_window.load_editor(&d_map_manager);
+    QObject::connect(d_main_window.item_group_control(), &ItemGroupControlWidget::place_grid_item, this, &ApplicationControl::on_grid_item_placed);
 
     set_connectionbase_signals();
     d_connection->connect("", 4144);
@@ -203,6 +207,9 @@ void ApplicationControl::set_connectionbase_signals()
     QObject::connect(d_connection, &ConnectionBase::entities_moved, &d_entity_manager, &EntityManager::on_entities_moved);
     QObject::connect(d_connection, &ConnectionBase::entities_rotated, &d_entity_manager, &EntityManager::on_entities_rotated);
     QObject::connect(d_connection, &ConnectionBase::synchronize_entities, &d_entity_manager, &EntityManager::on_entities_synchronized);
+
+    QObject::connect(d_connection, &ConnectionBase::grid_item_added, &d_map_manager, &MapManager::on_grid_item_added);
+    QObject::connect(d_connection, &ConnectionBase::grid_group_visibility, &d_map_manager, &MapManager::on_group_visibility);
 }
 
 
@@ -399,6 +406,28 @@ void ApplicationControl::on_entity_rotation(int angle)
         return;
 
     d_connection->send(entities_rotated_message(d_entity_selection, angle));
+}
+
+
+////////////////////
+//  Map Editing   //
+////////////////////
+
+void ApplicationControl::on_grid_item_placed(QString const &filename, QPoint position, int rotation, GridScale scale, VisibilityMode mode)
+{
+    if (!d_connection)
+        return;
+
+    // TODO: make this better.
+    TransferableImage image = d_pixmap_cache.load_from_file(filename);
+    GridItem item;
+    item.pixmap_code = image.name;
+    item.position = position;
+    item.rotation = rotation;
+    item.scale = scale;
+    item.visibility = mode;
+    // this is stupid
+    d_connection->send(grid_item_added_message(d_map_manager.selected_group_name(), item));
 }
 
 
@@ -602,8 +631,8 @@ void ApplicationControl::on_paint_ground_layer(QPainter &painter, QSize size, QP
         }
         else
         {
-            if (!d_connection || d_connection->is_server())
-                return;
+            if (!d_connection || !d_connection->is_server())
+                continue;
             
             painter.setOpacity(0.5);
             for (auto const &item : group.items())
@@ -611,7 +640,6 @@ void ApplicationControl::on_paint_ground_layer(QPainter &painter, QSize size, QP
             painter.setOpacity(1.0);
         }
     }
-
 
     painter.setPen(QPen{Qt::black});
     paint_grid(painter, size, offset);
