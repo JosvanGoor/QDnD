@@ -11,7 +11,18 @@ enum class GridScale
     MEDIUM,
     LARGE,
     HUGE,
-    GARGANTUAN
+    GARGANTUAN,
+
+    SIZE_0_625,
+    SIZE_0_750,
+    SIZE_0_875,
+    SIZE_1_250,
+    SIZE_1_500,
+    SIZE_1_750,
+    SIZE_2_500,
+    SIZE_3_500,
+
+    SCALE_MAX
 };
 
 float scale(GridScale scale);

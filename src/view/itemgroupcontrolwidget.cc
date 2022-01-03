@@ -55,7 +55,11 @@ ItemGroupControlWidget::ItemGroupControlWidget(GridWidget *grid, MapManager *man
     form_layout->addRow("Scale", d_scale_selection = new QComboBox);
     d_rotation_slider->setRange(0, 24);
     d_rotation_slider->setTickInterval(1);
-    d_scale_selection->addItems({"Tiny", "Small", "Medium", "Large", "Huge", "Gargantuan"});
+    // d_scale_selection->addItems({"Tiny", "Small", "Medium", "Large", "Huge", "Gargantuan"});
+    QStringList strlist;
+    for (size_t idx = 0; static_cast<GridScale>(idx) != GridScale::SCALE_MAX; ++idx)
+        strlist.push_back(as_string(static_cast<GridScale>(idx)));
+    d_scale_selection->addItems(strlist);
     d_scale_selection->setCurrentIndex(2);
 
     d_current_item = new QGroupBox{"Current Item"};
@@ -203,7 +207,7 @@ void ItemGroupControlWidget::on_grid_selection_click(QPoint const &position)
 {
     debug_message("on_grid_selection_click");
     QVector<GridItem> &items = d_manager->selected_group().items();
-    for (int idx = 0; idx != items.size(); ++idx)
+    for (int idx = items.size(); --idx; )
     {
         int dims = scale(items[idx].scale) * 64;
         QRect rect{items[idx].position, QSize{dims, dims}};

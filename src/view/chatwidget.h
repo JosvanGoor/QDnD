@@ -1,6 +1,7 @@
 #ifndef VIEW_CHATWIDGET_H
 #define VIEW_CHATWIDGET_H
 
+#include <QDateTime>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QScrollBar>
@@ -13,6 +14,7 @@ class ChatWidget : public QWidget
 {
     Q_OBJECT
 
+    size_t d_latest_message;
     QTextEdit *d_output;
     QLineEdit *d_input;
     QPushButton *d_send;
@@ -20,6 +22,9 @@ class ChatWidget : public QWidget
     public:
         explicit ChatWidget(QWidget *parent = nullptr);
         ~ChatWidget();
+
+        // utility
+        QString timestamp();
 
     public slots:
         void on_send_pressed();

@@ -10,6 +10,7 @@
 ChatWidget::ChatWidget(QWidget *parent)
 :   QWidget(parent)
 {
+    d_latest_message = 0;
     setLayout(new QVBoxLayout);
 
     layout()->addWidget(d_output = new QTextEdit);
@@ -31,6 +32,21 @@ ChatWidget::ChatWidget(QWidget *parent)
 ChatWidget::~ChatWidget()
 {
 
+}
+
+
+////////////////////
+//     Slots      //
+////////////////////
+
+QString ChatWidget::timestamp()
+{
+    QString stamp = "";
+    size_t now = QDateTime::currentMSecsSinceEpoch() / 1000;
+    if (d_latest_message != 0 && (now - d_latest_message) > 600) // 10 min
+        stamp = "-----\n";
+    d_latest_message = now;
+    return (stamp + QDateTime::currentDateTime().toString("[hh:mm] "));
 }
 
 
@@ -68,6 +84,7 @@ void ChatWidget::on_info_message(QString const &message)
     cursor.movePosition(QTextCursor::End);
 
     cursor.beginEditBlock();
+    cursor.insertText(timestamp());
     cursor.insertText(message + "\n");
     cursor.endEditBlock();
 
@@ -81,6 +98,7 @@ void ChatWidget::on_user_message(QString const &name, QString const &message)
     cursor.movePosition(QTextCursor::End);
 
     cursor.beginEditBlock();
+    cursor.insertText(timestamp());
     cursor.insertText(name + ": ");
     cursor.insertText(message + "\n");
     cursor.endEditBlock();
@@ -95,6 +113,7 @@ void ChatWidget::on_rich_message(QString const &user, QString const &message)
     cursor.movePosition(QTextCursor::End);
 
     cursor.beginEditBlock();
+    cursor.insertText(timestamp());
     cursor.insertText(user + ": ");
     cursor.insertHtml(message);
     cursor.insertText("\n");

@@ -14,6 +14,17 @@ float scale(GridScale scale)
         case GridScale::LARGE: return 2.0f;
         case GridScale::HUGE: return 3.0f;
         case GridScale::GARGANTUAN: return 4.0f;
+
+        case GridScale::SIZE_0_625: return 0.625f;
+        case GridScale::SIZE_0_750: return 0.750f;
+        case GridScale::SIZE_0_875: return 0.875f;
+        case GridScale::SIZE_1_250: return 1.250f;
+        case GridScale::SIZE_1_500: return 1.500f;
+        case GridScale::SIZE_1_750: return 1.750f;
+        case GridScale::SIZE_2_500: return 2.500f;
+        case GridScale::SIZE_3_500: return 3.500f;
+
+        case GridScale::SCALE_MAX: return 30.0f; // ROC size yeah
     }
 
     // TODO: add warning
@@ -31,12 +42,21 @@ QString as_string(GridScale scale)
 {
     switch (scale)
     {
-        case GridScale::TINY: return "TINY";
-        case GridScale::SMALL: return "SMALL";
-        case GridScale::MEDIUM: return "MEDIUM";
-        case GridScale::LARGE: return "LARGE";
-        case GridScale::HUGE: return "HUGE";
-        case GridScale::GARGANTUAN: return "GARGANTUAN";
+        case GridScale::TINY: return "Tiny (0.250)";
+        case GridScale::SMALL: return "Small (0.500)";
+        case GridScale::MEDIUM: return "Medium (1.000)";
+        case GridScale::LARGE: return "Large (2.000)";
+        case GridScale::HUGE: return "Huge (3.000)";
+        case GridScale::GARGANTUAN: return "Gargantuan (4.000)";
+        case GridScale::SIZE_0_625: return "0.625";
+        case GridScale::SIZE_0_750: return "0.750";
+        case GridScale::SIZE_0_875: return "0.875";
+        case GridScale::SIZE_1_250: return "1.250";
+        case GridScale::SIZE_1_500: return "1.500";
+        case GridScale::SIZE_1_750: return "1.750";
+        case GridScale::SIZE_2_500: return "2.500";
+        case GridScale::SIZE_3_500: return "3.500";
+        case GridScale::SCALE_MAX: return "30.00";
     }
     
     return "GridScale: If you read this Jos fucked up.";

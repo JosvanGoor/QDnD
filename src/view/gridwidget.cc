@@ -206,8 +206,8 @@ void GridWidget::mouseMoveEvent(QMouseEvent *event)
     
     if (d_right_button)
     {
-        d_offset.setX(d_offset.x() + (dx * d_zoom));
-        d_offset.setY(d_offset.y() + (dy * d_zoom));
+        d_offset.setX(d_offset.x() + qRound(dx * d_zoom));
+        d_offset.setY(d_offset.y() + qRound(dy * d_zoom));
     }
 
     if (d_left_button)
@@ -322,6 +322,6 @@ void GridWidget::wheelEvent(QWheelEvent *event)
     int steps = event->angleDelta().y() / (8 * 15);
 
     d_zoom -= steps * 0.1;
-    d_zoom = qMax(0.5f, qMin(2.0f, d_zoom));
+    d_zoom = qMax(0.125f, qMin(8.0f, d_zoom));
     update();
 }

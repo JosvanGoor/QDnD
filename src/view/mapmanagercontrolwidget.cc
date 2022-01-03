@@ -96,7 +96,7 @@ void MapManagerControlWidget::on_save_map()
 
     QFile file{filename};
     file.open(QIODevice::WriteOnly);
-    file.write(document.toJson());
+    file.write(document.toJson(QJsonDocument::Compact));
 }
 
 
