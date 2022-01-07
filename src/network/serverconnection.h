@@ -8,18 +8,10 @@
 #include <QPixmap>
 
 #include "connectionbase.h"
+#include "dataconnectionserver.h"
 #include "messagebuilder.h"
+#include "socketstate.h"
 #include "../utility/loading.h"
-
-struct SocketState
-{
-    int incoming = 0;
-    uint64_t ping_time = -1;
-    QTcpSocket *socket = nullptr;
-    QByteArray buffer;
-    QString identifier;
-    QVector<QByteArray> lowprio_queue;
-};
 
 class ServerConnection : public ConnectionBase
 {
@@ -28,6 +20,7 @@ class ServerConnection : public ConnectionBase
     QTimer d_ping_timer;
     QTcpServer *d_server;
     QMap<QObject*, SocketState> d_connections;
+    DataConnectionServer *d_data_server;
 
     public:
         explicit ServerConnection(QObject *parent = nullptr);
@@ -44,11 +37,12 @@ class ServerConnection : public ConnectionBase
         void pre_handle_message(QJsonDocument const &doc, SocketState &state);
         void message_to(QString const &identifier, QByteArray const &data);
         void message_to(QString const &identifier, QJsonDocument const &doc);
-        void queue_message(QString const &identifier, QByteArray const &data);
+        void send_data_message(QString const &identifier, QJsonDocument const &doc);
 
         // utility
         bool is_server() override;
         void update_status();
+        DataConnectionServer *data_server();
 
     private slots:
         // internal slots
@@ -56,8 +50,11 @@ class ServerConnection : public ConnectionBase
         void on_new_connection();
         void on_socket_error(QAbstractSocket::SocketError error);
         void on_socket_readyread();
-        void on_socket_readywrite(uint64_t written);
         void on_socket_disconnect();
+
+    signals:
+        void dispatch_data(QJsonDocument const &doc);
+        void dispatch_data_to(QString const &id, QJsonDocument const &doc);
 };
 
 #endif

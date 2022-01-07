@@ -11,6 +11,7 @@ ConnectDialog::ConnectDialog(QWidget *parent)
     QFormLayout *form_layout = new QFormLayout;
     form_layout->addRow("Hostname", d_hostname = new QLineEdit);
     form_layout->addRow("Port", d_port = new QLineEdit);
+    form_layout->addRow("Data Port", d_data_port = new QLineEdit);
     form_layout->addRow("Character Name", d_character_name = new QLineEdit);
     form->setLayout(form_layout);
 
@@ -29,6 +30,8 @@ ConnectDialog::ConnectDialog(QWidget *parent)
 
     d_hostname->setText("jbvg.nl");
     d_port->setText("4144");
+    d_data_port->setText("41201");
+    d_data_port->setEnabled(false);
 
     setLayout(new QVBoxLayout);
     layout()->addWidget(form);

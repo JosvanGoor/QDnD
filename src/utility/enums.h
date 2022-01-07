@@ -37,6 +37,7 @@ enum class MessageType
 
     // system messages
     HANDSHAKE,
+    DATA_CONNECTED,
     SYNCHRONIZE,
     SYNCHRONIZE_LINES,
     SYNCHRONIZE_ENTITIES,

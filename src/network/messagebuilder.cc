@@ -18,6 +18,23 @@ QJsonDocument handshake_message(QString const &id, QByteArray const &b64_avatar,
 }
 
 
+QJsonDocument data_handshake_message(QString const &id)
+{
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::HANDSHAKE);
+    obj["id"] = id;
+    return QJsonDocument{obj};
+}
+
+
+QJsonDocument data_connected_message()
+{
+    QJsonObject obj;
+    obj["type"] = as_int(MessageType::DATA_CONNECTED);
+    return QJsonDocument{obj};
+}
+
+
 QJsonDocument synchronize_lines_message(QString const &id, QMap<QString, DrawLine> const &lines)
 {
     QJsonArray line_objects;

@@ -141,10 +141,14 @@ void ApplicationControl::start_hosting()
         return;
     
     d_connection = new ServerConnection;
+    DataConnectionServer *data_server = reinterpret_cast<ServerConnection*>(d_connection)->data_server();
 
     TransferableImage dm_ava = d_pixmap_cache.load_from_file(":/data/dmpic.png");
     d_player_control.create_dungeon_master(dm_ava.name);
     d_main_window.load_editor(&d_map_manager);
+
+    QObject::connect(data_server, &DataConnectionServer::debug_message, &d_main_window, &MainWindow::debug_message);
+    QObject::connect(data_server, &DataConnectionServer::connection_status, d_main_window.status_bar(), &StatusBar::update_data_connection_status);
     
     QObject::connect(&d_player_control, &PlayerControl::trigger_synchronization, this, &ApplicationControl::on_trigger_synchronization);
     QObject::connect(d_connection, &ConnectionBase::pixmap_requested, this, &ApplicationControl::pixmap_requested);
@@ -171,8 +175,12 @@ void ApplicationControl::connect_to_host()
     }
 
     d_connection = new ClientConnection;
+    DataConnectionClient *data_client = reinterpret_cast<ClientConnection*>(d_connection)->data_client();
+    QObject::connect(data_client, &DataConnectionClient::debug_message, &d_main_window, &MainWindow::debug_message);
+    QObject::connect(data_client, &DataConnectionClient::connection_status, d_main_window.status_bar(), &StatusBar::update_data_connection_status);
     set_connectionbase_signals();
 
+    data_client->connect(dialog.character_name(), dialog.hostname(), dialog.port());
     d_connection->connect(dialog.hostname(), dialog.port());
     d_player_control.set_own_identifier(dialog.character_name());
     d_main_window.entity_widget()->set_name_prefix(d_player_control.own_identifier());
@@ -553,7 +561,7 @@ void ApplicationControl::pixmap_requested(QString const &id, QString const &key)
     }
 
     TransferableImage transfer = d_pixmap_cache.prepare_for_transfer(key);
-    server->queue_message(id, pixmap_transfer_message(transfer.name, transfer.b64_data).toJson());
+    server->send_data_message(id, pixmap_transfer_message(transfer.name, transfer.b64_data));
 }
 
 
@@ -573,11 +581,11 @@ void ApplicationControl::on_trigger_synchronization(QString const &id)
     for (auto &player : d_player_control.players())
     {
         if (!player.lines().isEmpty())
-            reinterpret_cast<ServerConnection*>(d_connection)->queue_message(id, synchronize_lines_message(player.identifier(), player.lines()).toJson(QJsonDocument::Compact));
+            reinterpret_cast<ServerConnection*>(d_connection)->send_data_message(id, synchronize_lines_message(player.identifier(), player.lines()));
     }
 
     if (!d_entity_manager.entities().isEmpty())
-        reinterpret_cast<ServerConnection*>(d_connection)->queue_message(id, synchronize_entities_message(d_entity_manager.entities()).toJson(QJsonDocument::Compact));
+        reinterpret_cast<ServerConnection*>(d_connection)->send_data_message(id, synchronize_entities_message(d_entity_manager.entities()));
 
     on_map_synchronization(id);
 }
@@ -587,7 +595,7 @@ void ApplicationControl::on_map_synchronization(QString const &id)
 {
     reinterpret_cast<ServerConnection*>(d_connection)->message_to(id, grid_groups_cleared_message().toJson(QJsonDocument::Compact));
     for (auto const &group : d_map_manager.grid_groups())
-        reinterpret_cast<ServerConnection*>(d_connection)->queue_message(id, synchronize_grid_group_message(group).toJson(QJsonDocument::Compact));
+        reinterpret_cast<ServerConnection*>(d_connection)->send_data_message(id, synchronize_grid_group_message(group));
 }
 
 

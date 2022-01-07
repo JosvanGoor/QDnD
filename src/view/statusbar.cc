@@ -8,6 +8,7 @@ StatusBar::StatusBar(QWidget *parent)
 :   QStatusBar(parent)
 {
     addPermanentWidget(d_connection_status = new QLabel{"No Connection."});
+    addPermanentWidget(d_data_connection_status = new QLabel{"No Data Connection."});
 }
 
 
@@ -24,6 +25,12 @@ StatusBar::~StatusBar()
 void StatusBar::update_connection_status(QString const &message)
 {
     d_connection_status->setText(message);
+}
+
+
+void StatusBar::update_data_connection_status(QString const &message)
+{
+    d_data_connection_status->setText(message);
 }
 
 

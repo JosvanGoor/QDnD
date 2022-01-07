@@ -20,6 +20,7 @@ class ConnectDialog : public QDialog
 
     QLineEdit *d_hostname;
     QLineEdit *d_port;
+    QLineEdit *d_data_port;
     QLineEdit *d_character_name;
     QPushButton *d_connect;
     QPushButton *d_cancel;
@@ -35,6 +36,7 @@ class ConnectDialog : public QDialog
         // getters
         QString hostname();
         uint16_t port();
+        uint16_t data_port();
         QString character_name();
         QString avatar_file();
         

@@ -5,6 +5,7 @@
 #include <QMetaEnum>
 
 #include "connectionbase.h"
+#include "dataconnectionclient.h"
 
 class ClientConnection : public ConnectionBase
 {
@@ -13,12 +14,14 @@ class ClientConnection : public ConnectionBase
     int d_incoming;
     QTcpSocket *d_socket;
     QByteArray d_buffer;
+    DataConnectionClient *d_data_client;
 
     public:
         explicit ClientConnection(QObject *parent = nullptr);
         ~ClientConnection();
 
         bool is_server() override;
+        DataConnectionClient *data_client();
 
         // io
         void send(QByteArray const &data) override;

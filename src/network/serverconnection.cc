@@ -8,15 +8,24 @@ ServerConnection::ServerConnection(QObject *parent)
 :   ConnectionBase(parent)
 {
     d_server = new QTcpServer;
+    d_data_server = new DataConnectionServer{41201};
 
     QObject::connect(d_server, &QTcpServer::newConnection, this, &ServerConnection::on_new_connection);
     QObject::connect(&d_ping_timer, &QTimer::timeout, this, &ServerConnection::on_ping_timer);
+    QObject::connect(d_data_server, &DataConnectionServer::message_received, this, &ServerConnection::handle_message);
+
+    QObject::connect(this, &ServerConnection::dispatch_data, d_data_server, &DataConnectionServer::queue);
+    QObject::connect(this, &ServerConnection::dispatch_data_to, d_data_server, &DataConnectionServer::send_data_message);
 }
 
 
 ServerConnection::~ServerConnection()
 {
     d_server->deleteLater();
+    
+    d_data_server->disconnect();
+    d_data_server->wait();
+    delete d_data_server;
 }
 
 
@@ -53,6 +62,7 @@ void ServerConnection::connect(QString const &host, uint16_t port)
     if (!host.isEmpty())
         emit debug_message("ServerConnection: received hostname for connect, this will be ignored.");
 
+    d_data_server->start();
     bool success = d_server->listen(QHostAddress::Any, port);
     update_status();
 
@@ -70,6 +80,9 @@ void ServerConnection::connect(QString const &host, uint16_t port)
 
 void ServerConnection::disconnect()
 {
+    d_data_server->disconnect();
+    d_data_server->wait();
+
     for (auto &val : d_connections)
     {
         val.socket->disconnect(this);
@@ -166,23 +179,9 @@ void ServerConnection::message_to(QString const &identifier, QJsonDocument const
 }
 
 
-void ServerConnection::queue_message(QString const &identifier, QByteArray const &data)
+void ServerConnection::send_data_message(QString const &identifier, QJsonDocument const &doc)
 {
-    for (auto &state : d_connections)
-    {
-        if (state.identifier == identifier)
-        {
-            state.lowprio_queue.push_back(data);
-            if (state.lowprio_queue.size() == 1 && state.socket->bytesToWrite() == 0)
-            {
-                write_blob(state.socket, state.lowprio_queue.back(), false);
-                state.lowprio_queue.pop_back();
-            }
-            return;
-        }
-    }
-
-    debug_message("Failed to queue message for " + identifier + ", connection not found.");
+    emit dispatch_data_to(identifier, doc);
 }
 
 
@@ -202,6 +201,12 @@ void ServerConnection::update_status()
         emit connection_status("Hosting @ " + QString::number(d_server->serverPort()) + " (" + QString::number(d_connections.size()) + " connected).");
     else
         emit connection_status("No connection");
+}
+
+
+DataConnectionServer *ServerConnection::data_server()
+{
+    return d_data_server;
 }
 
 
@@ -225,11 +230,10 @@ void ServerConnection::on_new_connection()
 
         // server->client state update will emitted from user manager after
         // the new client has sent handshake
-        d_connections.insert(socket, {0, 0, socket, {}, "", {}});
+        d_connections.insert(socket, {0, 0, socket, {}, ""});
         QObject::connect(socket, &QTcpSocket::errorOccurred, this, &ServerConnection::on_socket_error);
         QObject::connect(socket, &QTcpSocket::readyRead, this, &ServerConnection::on_socket_readyread);
         QObject::connect(socket, &QTcpSocket::disconnected, this, &ServerConnection::on_socket_disconnect);
-        QObject::connect(socket, &QTcpSocket::bytesWritten, this, &ServerConnection::on_socket_readywrite);
         update_status();
     }
 }
@@ -258,21 +262,6 @@ void ServerConnection::on_socket_readyread()
     }
 }
 
-
-void ServerConnection::on_socket_readywrite([[maybe_unused]] uint64_t written)
-{
-    QObject *sender = QObject::sender();
-    SocketState &state = d_connections.find(sender).value();
-
-    if (state.lowprio_queue.isEmpty())
-        return;
-
-    if (state.socket->bytesToWrite() != 0)
-        return;
-
-    write_blob(state.socket, state.lowprio_queue.back(), false);
-    state.lowprio_queue.pop_back();
-}
 
 
 void ServerConnection::on_socket_disconnect()

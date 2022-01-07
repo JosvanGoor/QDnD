@@ -17,6 +17,8 @@ struct Entity; // forward decl temporary
 
 // system
 QJsonDocument handshake_message(QString const &id, QByteArray const &b64_avatar, QColor const &color, GridScale scale);
+QJsonDocument data_handshake_message(QString const &id);
+QJsonDocument data_connected_message();
 QJsonDocument synchronize_lines_message(QString const &id, QMap<QString, DrawLine> const &lines);
 QJsonDocument synchronize_entities_message(QMap<QString, Entity> const &entities);
 QJsonDocument synchronize_grid_group_message(GridItemGroup const &group);

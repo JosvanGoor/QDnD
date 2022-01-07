@@ -9,23 +9,32 @@ ClientConnection::ClientConnection(QObject *parent)
 {
     d_incoming = 0;
     d_socket = new QTcpSocket;
+    d_data_client = new DataConnectionClient;
 
     QObject::connect(d_socket, &QTcpSocket::connected, this, &ClientConnection::on_connected);
     QObject::connect(d_socket, &QTcpSocket::disconnected, this, &ClientConnection::on_disconnected);
     QObject::connect(d_socket, &QTcpSocket::errorOccurred, this, &ClientConnection::on_socket_error);
     QObject::connect(d_socket, &QTcpSocket::readyRead, this, &ClientConnection::on_socket_readyread);
+    QObject::connect(d_data_client, &DataConnectionClient::message_received, this, &ClientConnection::handle_message);
 }
 
 
 ClientConnection::~ClientConnection()
 {
     d_socket->deleteLater();
+    delete d_data_client;
 }
 
 
 bool ClientConnection::is_server()
 {
     return false;
+}
+
+
+DataConnectionClient *ClientConnection::data_client()
+{
+    return d_data_client;
 }
 
 
@@ -47,12 +56,18 @@ void ClientConnection::send(QJsonDocument const &doc)
 
 void ClientConnection::connect(QString const &host, uint16_t port)
 {
+    d_data_client->start();
+    QThread::msleep(150); // give thread a headstart.
+
     d_socket->connectToHost(host, port);
 }
 
 
 void ClientConnection::disconnect()
 {
+    d_data_client->disconnect();
+    d_data_client->wait();
+
     d_socket->close();
     emit connection_status("No connection");
 }
@@ -64,13 +79,13 @@ void ClientConnection::disconnect()
 
 void ClientConnection::on_connected()
 {
-    connection_status("Connected to " + d_socket->peerAddress().toString());
+    emit connection_status("Connected to " + d_socket->peerAddress().toString());
 }
 
 
 void ClientConnection::on_disconnected()
 {
-    connection_status("No connection");
+    emit connection_status("No connection");
 }
 
 

@@ -31,6 +31,9 @@ SOURCES +=  src/control/applicationcontrol.cc \
             \
             src/network/clientconnection.cc \
             src/network/connectionbase.cc \
+            src/network/dataconnectionbase.cc \
+            src/network/dataconnectionclient.cc \
+            src/network/dataconnectionserver.cc \
             src/network/messagebuilder.cc \
             src/network/serverconnection.cc \
             \
@@ -77,6 +80,9 @@ HEADERS +=  src/control/applicationcontrol.h \
             \
             src/network/clientconnection.h \
             src/network/connectionbase.h \
+            src/network/dataconnectionbase.h \
+            src/network/dataconnectionclient.h \
+            src/network/dataconnectionserver.h \
             src/network/messagebuilder.h \
             src/network/serverconnection.h \
             \
