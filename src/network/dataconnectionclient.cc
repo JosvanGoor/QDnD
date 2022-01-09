@@ -123,7 +123,6 @@ void DataConnectionClient::on_socket_error(QAbstractSocket::SocketError error)
 
 void DataConnectionClient::on_socket_readyread()
 {
-    debug_message("Receiving data");
     QJsonDocument doc = read(d_socket, d_incoming, d_buffer);
 
     while (!doc.isEmpty())
