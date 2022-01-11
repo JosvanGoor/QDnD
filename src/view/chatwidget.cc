@@ -43,7 +43,7 @@ QString ChatWidget::timestamp()
 {
     QString stamp = "";
     size_t now = QDateTime::currentMSecsSinceEpoch() / 1000;
-    if (d_latest_message != 0 && (now - d_latest_message) > 600) // 10 min
+    if (d_latest_message != 0 && (now - d_latest_message) > 180) // 3 min
         stamp = "-----\n";
     d_latest_message = now;
     return (stamp + QDateTime::currentDateTime().toString("[hh:mm] "));

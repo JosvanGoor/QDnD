@@ -9,27 +9,29 @@ MainWindow::MainWindow(QWidget *parent)
 {
     d_entity_tab = nullptr;
     setCentralWidget(d_central_widget = new QSplitter);
+    d_grid_tab = new GridWidget;
+
+    d_central_widget->addWidget(d_right_tabs = new QTabWidget);
+    d_right_tabs->addTab(d_players_tab = new PlayersWidget, "Players");
+    d_right_tabs->addTab(d_grid_control_tab = new GridControlWidget{d_grid_tab}, "Grid Control");
+    d_right_tabs->addTab(d_entity_tab = new EntityWidget, "Entity Control");
 
     d_central_widget->addWidget(d_middle_widget = new QSplitter);
-    
     d_middle_widget->addWidget(d_middle_tabs = new QTabWidget);
     d_middle_widget->addWidget(d_debug_output = new QTextEdit);
 
     d_middle_tabs->addTab(d_display_tab = new DisplayWidget, "Display");
     d_middle_tabs->addTab(d_spells_tab = new SpellsWidget, "Spells");
-    d_middle_tabs->addTab(d_grid_tab = new GridWidget, "Grid");
+    d_middle_tabs->addTab(d_grid_tab, "Grid");
     d_middle_tabs->setCurrentIndex(2); // TODO: remove
     
-    d_central_widget->addWidget(d_right_tabs = new QTabWidget);
-    d_right_tabs->addTab(d_chat_tab = new ChatWidget, "Chat");
-    d_right_tabs->addTab(d_players_tab = new PlayersWidget, "Players");
-    d_right_tabs->addTab(d_grid_control_tab = new GridControlWidget{d_grid_tab}, "Grid Control");
-    d_right_tabs->addTab(d_entity_tab = new EntityWidget, "Entity Control");
+    d_central_widget->addWidget(d_left_tabs = new QTabWidget);
+    d_left_tabs->addTab(d_chat_tab = new ChatWidget, "Chat");
 
     d_middle_widget->setOrientation(Qt::Vertical);
     d_middle_widget->setSizes({600, 100});
     d_debug_output->setReadOnly(true);
-    d_central_widget->setSizes({1200, 400});
+    d_central_widget->setSizes({200, 1100, 300});
 
     setMenuBar(d_menu_bar = new MenuBar);
     setStatusBar(d_status_bar = new StatusBar);
@@ -122,7 +124,7 @@ MapManagerControlWidget *MainWindow::map_manager() noexcept
 
 void MainWindow::load_editor(MapManager *manager)
 {
-    d_right_tabs->addTab(d_item_group_manager = new ItemGroupControlWidget{d_grid_tab, manager}, "Item Group Control");
+    d_left_tabs->addTab(d_item_group_manager = new ItemGroupControlWidget{d_grid_tab, manager}, "Item Group Control");
     d_right_tabs->addTab(d_map_manager = new MapManagerControlWidget{manager}, "Map Manager");
 }
 

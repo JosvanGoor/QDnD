@@ -32,8 +32,9 @@ class MainWindow : public QMainWindow
                 SpellsWidget *d_spells_tab;
                 GridWidget *d_grid_tab;
             QTextEdit *d_debug_output;
-        QTabWidget *d_right_tabs;
+        QTabWidget *d_left_tabs;
             ChatWidget *d_chat_tab;
+        QTabWidget *d_right_tabs;
             PlayersWidget *d_players_tab;
             GridControlWidget *d_grid_control_tab;
             EntityWidget *d_entity_tab;
