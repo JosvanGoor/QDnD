@@ -128,6 +128,10 @@ void ItemGroupControlWidget::on_mouse_mode_changed()
     {
         d_current_mode = MouseMode::GRID_ITEM_PLACEMENT;
         d_mouse_mode->setTitle("Mouse Mode: Placement");
+
+        //
+        on_rotation_changed(d_rotation_slider->value());
+        on_scale_changed(d_scale_selection->currentIndex());
     }
     else if (sender == d_selection_mode)
     {
@@ -197,9 +201,8 @@ void ItemGroupControlWidget::on_grid_item_click(QPoint const &position)
 
 void ItemGroupControlWidget::clear_selection()
 {
-    d_selection = 0;
+    d_selection = -1;
     d_grid->update_gi_selected(false);
-    emit debug_message("selection cleared?");
 }
 
 
