@@ -102,7 +102,10 @@ QString Spell::parse_description(QJsonObject const &object) noexcept
     for (auto const &extra : additional)
     {
         QJsonObject info = extra.toObject();
-        rval.append(html_par(html_bold(info["header"].toString() + ".") + info["text"].toString(), "color: black;"));
+        QString head = info["header"].toString() + ". ";
+        head = head == ". " ? "" : html_bold(head);
+        
+        rval.append(html_par(head + info["text"].toString(), "color: black;"));
     }
 
     rval.replace(QRegularExpression{"\\n"}, "<br>");
