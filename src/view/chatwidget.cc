@@ -113,9 +113,15 @@ void ChatWidget::on_rich_message(QString const &user, QString const &message)
     cursor.movePosition(QTextCursor::End);
 
     cursor.beginEditBlock();
+    QTextCharFormat original = cursor.charFormat();
+    QTextCharFormat format = cursor.charFormat();
+    format.setFontWeight(QFont::Bold);
+    format.setFontItalic(true);
+    cursor.setCharFormat(format);
     cursor.insertText(timestamp());
     cursor.insertText(user + ": ");
-    cursor.insertHtml(message);
+    cursor.insertHtml("<b><i>" + message);
+    cursor.setCharFormat(original);
     cursor.insertText("\n");
     cursor.endEditBlock();
 

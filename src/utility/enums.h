@@ -21,6 +21,8 @@ enum class GridScale
     SIZE_1_750,
     SIZE_2_500,
     SIZE_3_500,
+    SIZE_5,
+    SIZE_10,
 
     SCALE_MAX
 };

@@ -23,6 +23,8 @@ float scale(GridScale scale)
         case GridScale::SIZE_1_750: return 1.750f;
         case GridScale::SIZE_2_500: return 2.500f;
         case GridScale::SIZE_3_500: return 3.500f;
+        case GridScale::SIZE_5:     return 5.0f;
+        case GridScale::SIZE_10:    return 10.0f;
 
         case GridScale::SCALE_MAX: return 30.0f; // ROC size yeah
     }
@@ -56,6 +58,8 @@ QString as_string(GridScale scale)
         case GridScale::SIZE_1_750: return "1.750";
         case GridScale::SIZE_2_500: return "2.500";
         case GridScale::SIZE_3_500: return "3.500";
+        case GridScale::SIZE_5:     return "5.000";
+        case GridScale::SIZE_10:    return "10.000";
         case GridScale::SCALE_MAX: return "30.00";
     }
     
