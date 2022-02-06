@@ -110,7 +110,7 @@ namespace jb::dice
             break;
 
             case TokenType::KEEP_LOWEST:
-                operand.drop_highest(_amount - operand.number());
+                operand.drop_highest(operand.number() - _amount);
             break;
 
             case TokenType::DROP_HIGHEST:
@@ -118,7 +118,7 @@ namespace jb::dice
             break;
 
             case TokenType::DROP_LOWEST:
-                operand.keep_higest(_amount - operand.number());
+                operand.keep_higest(operand.number() - _amount);
             break;
 
             default:

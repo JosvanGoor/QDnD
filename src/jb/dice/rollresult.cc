@@ -123,7 +123,7 @@ namespace jb::dice
     {
         auto sorted_indices = sort_indices();
 
-        for (auto it = sorted_indices.begin(); it != sorted_indices.end(); ++it)
+        for (auto it = sorted_indices.rbegin(); it != sorted_indices.rend(); ++it)
         {
             if (amount == 0)
                 break;
