@@ -482,6 +482,83 @@ void ApplicationControl::on_map_reloaded()
 //      Misc      //
 ////////////////////
 
+static QString format_value(jb::dice::RollValue const &value)
+{
+    QString color;
+    QString open;
+    QString close;
+
+    if (value.flags & jb::dice::RollValue::EXPLODED_DIE)
+        color = "color:orange";
+    else if (value.flags & jb::dice::RollValue::MAXIMUM_VALUE)
+        color = "color:green";
+    else if (value.flags & jb::dice::RollValue::MINIMUM_VALUE)
+        color = "color:red";
+
+    if (value.flags & jb::dice::RollValue::REJECTED)
+    {
+        open = "<s>";
+        close = "</s>";
+    }
+
+    if (!color.isEmpty())
+    {
+        open = "<font style=" + color + ">" + open;
+        close += "</font>";
+    }
+
+    return open + QString::number(value.value) + close;
+}
+
+static QString format_result(jb::dice::RollResult const& result)
+{
+    QString rich = QString(result.display().c_str());
+        
+    if (!(result.result().front().flags & jb::dice::RollValue::PLAIN_VALUE))
+        rich += "(";
+    
+    rich += format_value(result.result().front());
+    for (size_t idx = 1; idx < result.result().size(); ++idx)
+        rich += ", " + format_value(result.result()[idx]);
+
+    if (!(result.result().front().flags & jb::dice::RollValue::PLAIN_VALUE))
+        rich += ")"; 
+    
+    return rich;
+}
+
+static QString format_roll(jb::dice::Roll const &roll)
+{
+    QString rich = roll.results().front().display().c_str();
+    if (roll.results().front().is_negative())
+        rich += "-";
+
+    if (!(roll.results().front().result().front().flags & jb::dice::RollValue::PLAIN_VALUE))
+        rich += "(";
+    
+    rich += format_value(roll.results().front().result().front());
+    for (size_t idx = 1; idx < roll.results().front().result().size(); ++idx)
+        rich += ", " + format_value(roll.results().front().result()[idx]);
+
+    if (!(roll.results().front().result().front().flags & jb::dice::RollValue::PLAIN_VALUE))
+        rich += ")"; 
+
+    for (size_t idx = 1; idx < roll.results().size(); ++idx)
+    {
+        if (roll.results()[idx].is_negative())
+            rich += " - ";
+        else 
+            rich += " + ";
+
+        rich += format_result(roll.results()[idx]);
+    }
+
+    rich += " -> " + QString::number(roll.score());
+    rich += QString(" ") + roll.message().c_str();
+    return rich;
+}
+
+
 void ApplicationControl::chat_entered(QString const &chat)
 {
     if (!d_connection)
@@ -491,13 +568,27 @@ void ApplicationControl::chat_entered(QString const &chat)
 
     if (chat.startsWith("/roll ") && chat.size() != 6)
     {
-        DiceExpressionPtr ptr = DiceParser::parse(chat.mid(6));
-        if (ptr == nullptr)
-            doc = chat_message(d_player_control.own_identifier(), chat);
+        // DiceExpressionPtr ptr = DiceParser::parse(chat.mid(6));
+        QString error_message;
+        
+        jb::dice::ExpressionPtr expr;
+        try 
+        {
+            d_connection->send(chat_message(d_player_control.own_identifier(), QString{"Rolling: "} + chat.mid(6)));
+            auto parser = jb::dice::Parser(chat.mid(6).toStdString());
+            expr = parser.parse();
+        }
+        catch(jb::Exception& ex)
+        {
+            error_message = ex.what();
+        }
+
+        if (expr.get() == nullptr)
+            doc = chat_message(d_player_control.own_identifier(), error_message);
         else
         {
-            DiceResult result = ptr->evaluate();
-            QString rich = result.text + " -> " + QString::number(result.result);
+            jb::dice::Roll result = expr->evaluate();
+            QString rich = format_roll(result);
             doc = richtext_message(d_player_control.own_identifier(), rich);    
         }
     }

@@ -4,8 +4,9 @@ QT       += core gui network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 
-CONFIG += c++17
-QMAKE_CXXFLAGS = -Wall -pedantic
+CONFIG += c++20
+QMAKE_CXXFLAGS = -Wall -pedantic -DFMT_HEADER_ONLY
+QMAKE_LFLAGS_WINDOWS = -lfmt
 
 
 # You can make your code fail to compile if it uses deprecated APIs.
@@ -18,10 +19,12 @@ SOURCES +=  src/control/applicationcontrol.cc \
             src/control/mapmanager.cc \
             src/control/playercontrol.cc \
             \
-            src/expressions/diceexpression.cc \
-            src/expressions/diceparser.cc \
-            src/expressions/dicetokenizer.cc \
-            src/expressions/parserstate.cc \
+            src/jb/common/exceptions.cc \
+            src/jb/dice/expression.cc \
+            src/jb/dice/parser.cc \
+            src/jb/dice/roll.cc \
+            src/jb/dice/rollresult.cc \
+            src/jb/dice/tokenizer.cc \
             \
             src/model/entity.cc \
             src/model/griditemgroup.cc \
@@ -64,10 +67,12 @@ HEADERS +=  src/control/applicationcontrol.h \
             src/control/mapmanager.h \
             src/control/playercontrol.h \
             \
-            src/expressions/diceexpression.h \
-            src/expressions/diceparser.h \
-            src/expressions/dicetokenizer.h \
-            src/expressions/parserstate.h \
+            src/jb/common/exceptions.h \
+            src/jb/dice/expression.h \
+            src/jb/dice/parser.h \
+            src/jb/dice/roll.h \
+            src/jb/dice/rollresult.h \
+            src/jb/dice/tokenizer.h \
             \
             src/model/entity.h \
             src/model/griditemgroup.h \
