@@ -570,6 +570,7 @@ void ApplicationControl::chat_entered(QString const &chat)
     {
         // DiceExpressionPtr ptr = DiceParser::parse(chat.mid(6));
         QString error_message;
+        jb::dice::Roll result;
         
         jb::dice::ExpressionPtr expr;
         try 
@@ -577,17 +578,18 @@ void ApplicationControl::chat_entered(QString const &chat)
             d_connection->send(chat_message(d_player_control.own_identifier(), QString{"Rolling: "} + chat.mid(6)));
             auto parser = jb::dice::Parser(chat.mid(6).toStdString());
             expr = parser.parse();
+            result = expr->evaluate();
         }
         catch(jb::Exception& ex)
         {
             error_message = ex.what();
+            expr = nullptr;
         }
 
         if (expr.get() == nullptr)
             doc = chat_message(d_player_control.own_identifier(), error_message);
         else
         {
-            jb::dice::Roll result = expr->evaluate();
             QString rich = format_roll(result);
             doc = richtext_message(d_player_control.own_identifier(), rich);    
         }
