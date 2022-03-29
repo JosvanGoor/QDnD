@@ -25,6 +25,8 @@ namespace jb::dice
 
     class RollResult
     {
+        static std::default_random_engine random_generator;
+
         bool _negative;
         std::uint16_t _number;
         std::uint16_t _sides;

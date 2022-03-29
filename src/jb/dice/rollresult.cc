@@ -1,9 +1,9 @@
 #include "rollresult.h"
 
 #include <algorithm>
-#include <random>
 #include <fmt/core.h>
 #include <time.h>
+#include <random>
 
 #include "../common/exceptions.h"
 
@@ -11,8 +11,7 @@ namespace jb::dice
 {
 
     // RNG for all rollers
-    static std::default_random_engine random_generator{static_cast<std::uint32_t>(time(nullptr))};
-
+    std::default_random_engine RollResult::random_generator{static_cast<std::uint32_t>(time(nullptr))};
 
     RollResult::RollResult()
     :   _negative(false),
@@ -243,7 +242,7 @@ namespace jb::dice
 
     RollValue RollResult::generate()
     {
-        RollValue value{_distribution(random_generator), RollValue::ROLL_VALUE};
+        RollValue value{static_cast<uint16_t>((rand() % _sides) + 1), RollValue::ROLL_VALUE};
         if (value.value == 1)
             value.flags |= RollValue::MINIMUM_VALUE;
         if (value.value == _sides)
