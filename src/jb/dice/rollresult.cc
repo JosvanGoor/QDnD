@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <random>
 #include <fmt/core.h>
+#include <time.h>
 
 #include "../common/exceptions.h"
 
@@ -10,7 +11,7 @@ namespace jb::dice
 {
 
     // RNG for all rollers
-    static std::default_random_engine random_generator{std::random_device{}()};
+    static std::default_random_engine random_generator{static_cast<std::uint32_t>(time(nullptr))};
 
 
     RollResult::RollResult()
